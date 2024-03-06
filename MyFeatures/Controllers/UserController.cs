@@ -1,9 +1,9 @@
-using AzureCICD.DTO;
+using MyFeatures.DTO;
 using Core.DomainModels;
 using Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AzureCICD.Controllers
+namespace MyFeatures.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

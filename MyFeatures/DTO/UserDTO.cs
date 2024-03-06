@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AzureCICD.DTO
+namespace MyFeatures.DTO
 {
     public class UserDTO
     {

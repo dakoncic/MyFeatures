@@ -8,9 +8,9 @@ namespace Core.Services
 {
     public class UserService : IUserService
     {
-        private readonly AzureCICDDbContext _context;
+        private readonly MyFeaturesDbContext _context;
 
-        public UserService(AzureCICDDbContext context)
+        public UserService(MyFeaturesDbContext context)
         {
             _context = context;
         }

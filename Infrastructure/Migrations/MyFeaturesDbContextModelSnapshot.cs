@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Infrastructure.Migrations
 {
-    [DbContext(typeof(AzureCICDDbContext))]
-    partial class AzureCICDDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(MyFeaturesDbContext))]
+    partial class MyFeaturesDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {

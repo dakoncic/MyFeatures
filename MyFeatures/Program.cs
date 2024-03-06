@@ -10,13 +10,13 @@ var _configuration = builder.Configuration;
 // Add services to the container.
 
 //zapisat da moram eksplicitno dodat referencu sa webapi na core, sa core na infrastructure kroz csproj
-//inače nije mogao iz web apia prepoznat AzureCICDDbContext
+//inače nije mogao iz web apia prepoznat MyFeaturesDbContext
 
 //zapisat da moram entity framework design instalirat u web api inače migracije ne rade
 
 builder.Services.AddScoped<IUserService, UserService>();
 
-builder.Services.AddDbContext<AzureCICDDbContext>(options =>
+builder.Services.AddDbContext<MyFeaturesDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     options.UseSqlServer(connectionString, sqlServerOptions =>

@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "AzureCICDUI": {
+    "MyFeaturesUI": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -92,13 +92,13 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "AzureCICDUI:build:production"
+              "buildTarget": "MyFeaturesUI:build:production"
             },
             "staging": {
-              "buildTarget": "AzureCICDUI:build:staging"
+              "buildTarget": "MyFeaturesUI:build:staging"
             },
             "development": {
-              "buildTarget": "AzureCICDUI:build:development"
+              "buildTarget": "MyFeaturesUI:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -106,7 +106,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "AzureCICDUI:build"
+            "buildTarget": "MyFeaturesUI:build"
           }
         },
         "test": {

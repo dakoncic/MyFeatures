@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Infrastructure.Migrations
 {
-    [DbContext(typeof(AzureCICDDbContext))]
+    [DbContext(typeof(MyFeaturesDbContext))]
     [Migration("20240115161359_InitialCreate")]
     partial class InitialCreate
     {

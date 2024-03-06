@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureCICD", "AzureCICD\AzureCICD.csproj", "{95AFA23A-8D0B-44BB-B10A-9998BD234C89}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyFeatures", "AzureCICD\MyFeatures.csproj", "{95AFA23A-8D0B-44BB-B10A-9998BD234C89}"
 	ProjectSection(ProjectDependencies) = postProject
 		{2C8245D1-279F-4A57-AC40-208F3C9172D2} = {2C8245D1-279F-4A57-AC40-208F3C9172D2}
 	EndProjectSection

@@ -20,7 +20,7 @@ export class AppComponent implements OnInit {
   private formBuilder = inject(FormBuilder);
   private userService = inject(UserService);
 
-  title = 'AzureCICDUI';
+  title = 'MyFeaturesUI';
   form!: FormGroup;
 
   contentList$ = this.userService.getAll();
