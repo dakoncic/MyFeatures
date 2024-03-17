@@ -2,6 +2,8 @@
 using Core.Services;
 using Infrastructure.DAL;
 using Infrastructure.Helpers;
+using Infrastructure.Interfaces.IRepository;
+using Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +26,8 @@ builder.Services.AddDbContext<MyFeaturesDbContext>(options =>
         sqlServerOptions.EnableRetryOnFailure();
     });
 });
+
+builder.Services.AddScoped(typeof(IGenericCrudService<>), typeof(GenericCrudService<>));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -53,7 +57,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-//dodano zbog UI
+//dodano zbog UI 
 app.UseStaticFiles();
 
 app.UseRouting();

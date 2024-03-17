@@ -1,10 +1,19 @@
-@import "primeng/resources/themes/lara-light-blue/theme.css";
-@import "primeng/resources/primeng.css";
+// ova tema je free downloadana sa primeng lokalno i onda sam kopirao layout i temu u svoj projekt
+// u free temi ima besplatnih primjera feature-a
+
+//ovo je samo kopirano iz free teme
+$gutter: 1rem; //for primeflex grid system
+
+//tema ide direktno u index.html zbog bržeg loada, a ostali ovdje
+//tema je kopirana i ne koristi se iz node modules-a, iz node modules-a
+//bi se trebala koristit ako se apsolutno ništa neće modificirat u dizajnu
+//jer će svaki novi npm install pregazit promjene
+
+//ostale teme se mogu naći i lokalno u node_modules npr. "primeng/resources/themes/lara-light-blue/theme.css";
+
+@import "./assets/styles/layout/layout.scss";
+
+//primeng.min.css je dodatak za styling, ali ne može bez teme
+@import "primeng/resources/primeng.min.css";
 @import "primeflex/primeflex.css";
 @import "primeicons/primeicons.css";
-
-body {
-  font-family: var(--font-family);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}

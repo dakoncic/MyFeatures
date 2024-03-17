@@ -1,7 +1,7 @@
-using MyFeatures.DTO;
 using Core.DomainModels;
 using Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using MyFeatures.DTO;
 
 namespace MyFeatures.Controllers
 {

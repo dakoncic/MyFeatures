@@ -1,0 +1,65 @@
+<div class="flex flex-column" style="height: 100%">
+  <!-- default je display block, kod PRIME-a je drugačije, dodaju se klase
+style je inače -->
+  <button
+    pButton
+    pRipple
+    label="Sign in with Microsoft"
+    icon="pi pi-microsoft"
+    class="auth-button"
+  ></button>
+
+  <!-- justify content i ml-auto pokaži -->
+  <div class="flex flex-row">
+    <button
+      pButton
+      pRipple
+      label="Sign in with Microsoft"
+      icon="pi pi-microsoft"
+      class="auth-button"
+    ></button>
+    <button
+      pButton
+      pRipple
+      label="Sign in with Something else"
+      icon="pi pi-microsoft"
+      class="auth-button"
+    ></button>
+    <button
+      pButton
+      pRipple
+      label="Sign in with Something else"
+      icon="pi pi-microsoft"
+      class="auth-button"
+    ></button>
+  </div>
+
+  <!-- zašto je ovdje flex-column a ne row
+zašto align-items center je obrnuto za flex-colum nego flex-row
+zašto justify-content je obrnuto za flex-colum nego flex-row i primjer -->
+  <div class="flex flex-column align-items-center" style="height: 150px">
+    <button
+      pButton
+      pRipple
+      label="Sign in with Google"
+      icon="pi pi-google"
+      class="auth-button"
+    ></button>
+    <button
+      pButton
+      pRipple
+      label="Sign in with email"
+      icon="pi pi-envelope"
+      class="auth-button"
+    ></button>
+  </div>
+
+  <!-- mt-auto ml-auto ovdi -->
+  <button
+    pButton
+    pRipple
+    label="bottom"
+    icon="pi pi-envelope"
+    class="auth-button mt-auto ml-auto"
+  ></button>
+</div>

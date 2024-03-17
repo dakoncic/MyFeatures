@@ -1,0 +1,31 @@
+<div
+  style="
+    position: fixed;
+    height: 100px;
+    width: 100%;
+    z-index: 999;
+    background-color: blueviolet;
+  "
+></div>
+
+<div
+  style="
+    position: fixed;
+    height: 100%;
+    width: 100px;
+    z-index: 999;
+    background-color: chocolate;
+    margin-top: 100px;
+  "
+></div>
+
+<!-- parent body mu daje 100%, što ja proslijeđujem dalje
+     moram dati i flex, i to sve kao wrapper tako da main content mogu pomaknut
+     marginama od topbara i sidebar-a da izbjegnem "margin collapsing" zbog position fixed -->
+<div class="flex" style="height: 100%">
+  <!-- margine moraju bit udaljene za visinu i širinu topbar i sidebar, pusha se od flexa
+       a ne od topbara, pa se ne collapsa margin -->
+  <main style="margin-top: 7rem; margin-left: 7rem; width: 100%">
+    <router-outlet></router-outlet>
+  </main>
+</div>

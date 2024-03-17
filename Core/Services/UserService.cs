@@ -1,46 +1,33 @@
 ﻿using Core.DomainModels;
 using Core.Interfaces;
-using Infrastructure.DAL;
-using Microsoft.EntityFrameworkCore;
+using Infrastructure.Interfaces.IRepository;
 using Entity = Infrastructure.Entities;
 
 namespace Core.Services
 {
     public class UserService : IUserService
     {
-        private readonly MyFeaturesDbContext _context;
+        private readonly IGenericCrudService<Entity.User, int> _crudService;
 
-        public UserService(MyFeaturesDbContext context)
+        public UserService(IGenericCrudService<Entity.User, int> crudService)
         {
-            _context = context;
+            _crudService = crudService;
         }
 
         public async Task<List<User>> GetAllPostsAsync()
         {
-            var entities = await _context.Users.ToListAsync();
-
-            return MapEntitiesToDomainModels(entities);
+            var entities = await _crudService.GetAllAsync();
+            return entities.Select(ToDomainModel).ToList();
         }
 
         public async Task CreatePostAsync(User post)
         {
             var entity = ToEntity(post);
-
-            _context.Users.Add(entity);
-
-            await _context.SaveChangesAsync();
+            _crudService.Add(entity);
+            await _crudService.SaveAsync();
         }
 
-        public List<User> MapEntitiesToDomainModels(List<Entity.User> entities)
-        {
-            return entities.Select(entity => new User
-            {
-                Id = entity.Id,
-                Content = entity.Content
-            }).ToList();
-        }
-
-        public User ToDomainModel(Entity.User entity)
+        private User ToDomainModel(Entity.User entity)
         {
             return new User
             {
@@ -49,15 +36,13 @@ namespace Core.Services
             };
         }
 
-        public Entity.User ToEntity(User entity)
+        private Entity.User ToEntity(User model)
         {
             return new Entity.User
             {
-                Id = entity.Id,
-                Content = entity.Content
+                Id = model.Id,
+                Content = model.Content
             };
         }
-
     }
-
 }
