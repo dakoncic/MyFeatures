@@ -4,6 +4,8 @@ import { Observable } from 'rxjs';
 import { environment } from '../environments/environment';
 import { User } from '../models/user';
 
+//ovaj servis je samo primjer kako se koristi ako ne koristim codegen za open api
+//model folder isto samo primjer
 @Injectable({ providedIn: 'root' })
 export class UserService {
   constructor(private http: HttpClient) { }

@@ -5,6 +5,7 @@ using Infrastructure.Helpers;
 using Infrastructure.Interfaces.IRepository;
 using Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
+using MyFeatures.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 var _configuration = builder.Configuration;
@@ -16,8 +17,6 @@ var _configuration = builder.Configuration;
 
 //zapisat da moram entity framework design instalirat u web api inače migracije ne rade
 
-builder.Services.AddScoped<IUserService, UserService>();
-
 builder.Services.AddDbContext<MyFeaturesDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -27,12 +26,21 @@ builder.Services.AddDbContext<MyFeaturesDbContext>(options =>
     });
 });
 
-builder.Services.AddScoped(typeof(IGenericCrudService<>), typeof(GenericCrudService<>));
+builder.Services.AddScoped(typeof(IGenericCrudService<,>), typeof(GenericCrudService<,>));
+
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+//ovo će generirat ime akcije controllera za frontend isto kao što je i za backend
+//npr. this.userService.GetAll()
+builder.Services.AddSwaggerGen(c =>
+{
+    c.OperationFilter<CustomOperationIdFilter>();
+});
+
 
 var allowedOrigins = builder.Configuration.GetSection("CorsOrigins:AllowedOrigins").Get<string[]>();
 

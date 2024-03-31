@@ -16,8 +16,7 @@ namespace MyFeatures.Controllers
             _userService = userService;
         }
 
-        [HttpGet]
-        [Route("[action]")]
+        [HttpGet("GetAll")]
         public async Task<ActionResult<IEnumerable<UserDTO>>> GetAll()
         {
             try
@@ -38,8 +37,10 @@ namespace MyFeatures.Controllers
             }
         }
 
-        [HttpPost]
-        [Route("[action]")]
+        //ovo je isto
+        //[HttpPost]
+        //[Route("[action]")]
+        [HttpPost("CreatePost")]
         public async Task<ActionResult<UserDTO>> CreatePost(UserDTO userDTO)
         {
 

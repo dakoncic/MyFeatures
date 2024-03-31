@@ -1,4 +1,5 @@
-﻿using Infrastructure.Interfaces.IRepository;
+﻿using Infrastructure.DAL;
+using Infrastructure.Interfaces.IRepository;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -6,10 +7,10 @@ namespace Infrastructure.Repository
 {
     public class GenericCrudService<TEntity, TKeyType> : IGenericCrudService<TEntity, TKeyType> where TEntity : class
     {
-        protected readonly DbContext _context;
+        protected readonly MyFeaturesDbContext _context;
         protected readonly DbSet<TEntity> _dbSet;
 
-        public GenericCrudService(DbContext context)
+        public GenericCrudService(MyFeaturesDbContext context)
         {
             _context = context;
             _dbSet = context.Set<TEntity>();

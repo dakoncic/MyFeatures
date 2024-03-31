@@ -25,7 +25,8 @@
 <div class="flex" style="height: 100%">
   <!-- margine moraju bit udaljene za visinu i širinu topbar i sidebar, pusha se od flexa
        a ne od topbara, pa se ne collapsa margin -->
-  <main style="margin-top: 7rem; margin-left: 7rem; width: 100%">
+  <!-- padding sa svih strana malo odmakne main prema unutra -->
+  <main style="margin-top: 7rem; margin-left: 7rem; width: 100%; padding: 1rem">
     <router-outlet></router-outlet>
   </main>
 </div>
