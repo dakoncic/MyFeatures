@@ -3,6 +3,7 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
 
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { ConfirmationService } from 'primeng/api';
 import { apiConfigFactory } from '../config/api-configuration.factory';
 import { Configuration } from '../infrastructure';
 import { routes } from './app.routes';
@@ -17,6 +18,8 @@ export const appConfig: ApplicationConfig = {
     {
       provide: Configuration,
       useFactory: apiConfigFactory
-    }
+    },
+    //moram provide-at zato što ga koristim u app.component.html (null injector error)
+    ConfirmationService
   ]
 };

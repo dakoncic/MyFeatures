@@ -227,6 +227,45 @@
         }
       }
     },
+    "/api/Item/GetItemsForWeek": {
+      "get": {
+        "tags": [
+          "Item"
+        ],
+        "operationId": "GetItemsForWeekItem",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WeekDayDTO"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WeekDayDTO"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WeekDayDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/User/GetAll": {
       "get": {
         "tags": [
@@ -328,6 +367,16 @@
           "description": {
             "type": "string",
             "nullable": true
+          },
+          "recurring": {
+            "type": "boolean"
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completed": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -345,6 +394,23 @@
           "content": {
             "minLength": 1,
             "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "WeekDayDTO": {
+        "type": "object",
+        "properties": {
+          "weekDayDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemDTO"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false

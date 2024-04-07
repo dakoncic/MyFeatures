@@ -48,5 +48,29 @@ namespace MyFeatures.Controllers
         public void Complete(int id, ItemDTO item)
         {
         }
+
+        [HttpGet("GetItemsForWeek")]
+        public IEnumerable<WeekDayDTO> GetItemsForWeek()
+        {
+            var weekDays = new List<WeekDayDTO>();
+
+            //znači sljedećih 7 dana uključujući danas
+            for (int i = 0; i < 7; i++)
+            {
+                WeekDayDTO day = new WeekDayDTO
+                {
+                    WeekDayDate = DateTime.UtcNow.AddDays(i),
+                    Items = new List<ItemDTO>
+                    {
+                        new ItemDTO { Id = i * 10 + 1, Description = $"Task {i * 10 + 1}", Recurring = false, DueDate = DateTime.UtcNow.AddDays(i), Completed = false },
+                        new ItemDTO { Id = i * 10 + 2, Description = $"Task {i * 10 + 2}", Recurring = true, DueDate = DateTime.UtcNow.AddDays(i), Completed = true }
+                    }
+                };
+                weekDays.Add(day);
+            }
+
+
+            return weekDays;
+        }
     }
 }

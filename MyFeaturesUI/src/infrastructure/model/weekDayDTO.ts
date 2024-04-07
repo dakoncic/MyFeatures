@@ -9,13 +9,11 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { ItemDTO } from './itemDTO';
 
 
-export interface ItemDTO { 
-    id?: number;
-    description?: string | null;
-    recurring?: boolean;
-    dueDate?: string;
-    completed?: boolean;
+export interface WeekDayDTO { 
+    weekDayDate?: string;
+    items?: Array<ItemDTO> | null;
 }
 

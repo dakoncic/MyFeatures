@@ -12,5 +12,6 @@ index.ts
 model/itemDTO.ts
 model/models.ts
 model/userDTO.ts
+model/weekDayDTO.ts
 param.ts
 variables.ts

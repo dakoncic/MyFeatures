@@ -17,3 +17,14 @@ $gutter: 1rem; //for primeflex grid system
 @import "primeng/resources/primeng.min.css";
 @import "primeflex/primeflex.css";
 @import "primeicons/primeicons.css";
+
+
+.drop-column {
+  border: 1px solid transparent;
+  transition: border-color .2s;
+}
+
+.p-draggable-enter {
+  border-color: var(--primary-color); /* Ensure this variable is defined or use a specific color */
+}
+

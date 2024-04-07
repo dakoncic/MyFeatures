@@ -1,0 +1,89 @@
+<!--
+<p-dialog
+  [style]="{ width: '450px', height: '1000px' }"
+  header="Item Details"
+  [modal]="true"
+  class="p-fluid"
+>
+  <ng-template pTemplate="content"> -->
+
+<form [formGroup]="form" style="height: 650px">
+  <div class="field flex flex-column">
+    <label for="description">Description</label>
+    <input
+      type="text"
+      pInputText
+      id="name"
+      formControlName="description"
+      autofocus
+      [ngClass]="{
+        'ng-invalid ng-dirty': description?.invalid && description?.dirty
+      }"
+    />
+    <small
+      *ngIf="description?.invalid && description?.dirty"
+      class="ng-dirty ng-invalid"
+    >
+      Description is required.
+    </small>
+  </div>
+
+  <div class="field">
+    <label for="oneTimeTask">To do only once?</label>
+    <p-selectButton
+      [options]="stateOptions"
+      formControlName="oneTimeTask"
+      optionLabel="label"
+      optionValue="value"
+    >
+    </p-selectButton>
+  </div>
+
+  <div class="field">
+    <label class="w-full" for="dueDate"
+      >Must be completed by certain date?
+    </label>
+    <p-calendar formControlName="dueDate" [showButtonBar]="true"></p-calendar>
+  </div>
+
+  <div class="field">
+    <label class="w-full" for="daysBetweenRepeat"
+      >How many days between task repeats?
+    </label>
+    <p-inputNumber
+      formControlName="daysBetweenRepeat"
+      [ngClass]="{
+        'ng-invalid ng-dirty': description?.invalid && description?.dirty
+      }"
+    >
+    </p-inputNumber>
+    <small
+      *ngIf="daysBetweenRepeat?.invalid && daysBetweenRepeat?.dirty"
+      class="ng-dirty ng-invalid"
+    >
+      Days between repeat is required.
+    </small>
+  </div>
+</form>
+
+<!-- </ng-template> -->
+
+<!-- <ng-template pTemplate="footer">
+    <button
+      pButton
+      pRipple
+      label="Cancel"
+      icon="pi pi-times"
+      class="p-button-text"
+      (click)="hideDialog()"
+    ></button>
+    <button
+      pButton
+      pRipple
+      label="Save"
+      icon="pi pi-check"
+      class="p-button-text"
+      (click)="saveItem()"
+    ></button>
+  </ng-template>
+</p-dialog> -->
