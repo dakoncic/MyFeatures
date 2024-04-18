@@ -16,8 +16,8 @@ namespace Infrastructure.Repository
             _dbSet = context.Set<TEntity>();
         }
 
-        //proć ovo sve detaljno vidit što šta znači
-
+        //ako želim naglasit da će se potencijalno ova lista dalje query-at tamo gdje se zove
+        //onda ostavit IEnumerable i ne vratit ToListAsync() nego IQueryable npr.
         public async Task<IEnumerable<TEntity>> GetAllAsync(
             Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
@@ -60,6 +60,10 @@ namespace Infrastructure.Repository
 
         public async Task<TEntity> GetByIdAsync(TKeyType id)
         {
+            //ne želimo ovdje bacit exception zato što ponekad možda i nije exception
+            //zato hendlaemo u Core (business logika/odluka dali je exception)
+            //a ne u data retrieval layeru
+
             //first or default ovdje ili ovako?
             return await _dbSet.FindAsync(id);
         }

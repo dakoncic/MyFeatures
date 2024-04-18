@@ -10,13 +10,40 @@ namespace Infrastructure.DAL
         {
         }
 
-        public DbSet<User> Users { get; set; }
+        public DbSet<Item> Items { get; set; }
+        public DbSet<CommittedItem> CommittedItems { get; set; }
+
+        //znači data annotations radimo za jednostavnije stvari direktno u entity klasi
+        //a ovdje kompliciranije (fluent API) koje se tamo ne mogu, npr. veze, cascade delete itd.
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
+            // veza između Itema i CommitedItema
+            // trebao biti eksplicitno postavljeno, iako već imamo data annotations u entity klasama
+            modelBuilder.Entity<Item>()
+                .HasMany<CommittedItem>()
+                .WithOne(ci => ci.Item)
+                .HasForeignKey(ci => ci.ItemID)
+                .OnDelete(DeleteBehavior.Cascade); // kaskadno deletamo
 
-            // Model configuration goes here
+            // indexi
+            modelBuilder.Entity<Item>()
+                .HasIndex(i => i.DueDate)
+                .HasDatabaseName("IDX_DueDate"); //opcionalno al daje ime indexu
+
+            modelBuilder.Entity<CommittedItem>()
+                .HasIndex(ci => ci.ItemID)
+                .HasDatabaseName("IDX_ItemID");
+
+            modelBuilder.Entity<CommittedItem>()
+                .HasIndex(ci => ci.CommittedDate)
+                .HasDatabaseName("IDX_CommittedDate");
+
+            modelBuilder.Entity<CommittedItem>()
+                .HasIndex(ci => ci.CompletionDate)
+                .HasDatabaseName("IDX_CompletionDate")
+                .HasFilter("CompletionDate IS NOT NULL");  // uvjetni index, ako puno redaka ima NULL, da njih ne gleda
+
         }
     }
 }

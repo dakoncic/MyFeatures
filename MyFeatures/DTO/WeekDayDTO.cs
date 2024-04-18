@@ -1,8 +1,8 @@
 ﻿namespace MyFeatures.DTO
 {
-    public class WeekDayDTO
+    public class WeekDayDto
     {
         public DateTime WeekDayDate { get; set; }
-        public List<ItemDTO> Items { get; set; }
+        public List<ItemDto> Items { get; set; }
     }
 }

@@ -27,10 +27,15 @@ builder.Services.AddDbContext<MyFeaturesDbContext>(options =>
 });
 
 builder.Services.AddScoped(typeof(IGenericCrudService<,>), typeof(GenericCrudService<,>));
+builder.Services.AddScoped<IItemRepository, ItemRepository>();
 
-builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IItemService, ItemService>();
 
 builder.Services.AddControllers();
+
+//mapster registracija nakon servisa
+StartupHelper.ConfigureMapster();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 

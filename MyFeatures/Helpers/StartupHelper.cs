@@ -1,5 +1,9 @@
-﻿using Infrastructure.DAL;
+﻿using Core.DomainModels;
+using Infrastructure.DAL;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
+using MyFeatures.DTO;
+using Entity = Infrastructure.Entities;
 
 namespace Infrastructure.Helpers
 {
@@ -22,6 +26,18 @@ namespace Infrastructure.Helpers
                     logger.LogError(ex, "An error occurred while applying the database migrations.");
                 }
             }
+        }
+
+        public static void ConfigureMapster()
+        {
+            // Configure mapping from DTOs to domain models and back
+            TypeAdapterConfig<ItemDto, Item>.NewConfig()
+                .TwoWays();
+
+            // Configure mapping from domain models to entity models (if needed)
+            TypeAdapterConfig<Item, Entity.Item>.NewConfig()
+                .TwoWays();
+
         }
     }
 }
