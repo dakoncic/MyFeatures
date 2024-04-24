@@ -11,17 +11,18 @@ namespace Core.Services
     public class ItemService : IItemService
     {
         private readonly IGenericCrudService<Entity.Item, int> _crudService;
-        private readonly ICommitedItemRepository _commitedItemRepository;
+        private readonly IItemTaskRepository _itemTaskRepository;
 
         public ItemService(
             IGenericCrudService<Entity.Item, int> crudService,
-            ICommitedItemRepository commitedItemRepository
+            IItemTaskRepository itemTaskRepository
             )
         {
             _crudService = crudService;
-            _commitedItemRepository = commitedItemRepository;
+            _itemTaskRepository = itemTaskRepository;
         }
 
+        //vjerojatno se neće koristiti nigdje
         public async Task<List<Item>> GetAllItemsAsync()
         {
             var items = await _crudService.GetAllAsync();
@@ -32,7 +33,7 @@ namespace Core.Services
         public async Task<List<Item>> GetOneTimeItemsAsync()
         {
             //one time itemi, nisu izbrisani (znači nisu completed) i isto nisu već commitani za specifičan dan
-            Expression<Func<Entity.Item, bool>> filter = i => !i.Recurring && !i.Deleted && !i.CommittedItems.Any(ci => ci.CommittedDate != null);
+            Expression<Func<Entity.Item, bool>> filter = i => !i.Recurring && !i.Deleted && !i.ItemTasks.Any(ci => ci.CommittedDate != null);
 
             var items = await _crudService.GetAllAsync(filter);
 
@@ -49,20 +50,13 @@ namespace Core.Services
             return items.Adapt<List<Item>>();
         }
 
-        //refaktorat ovo, napravit CommitedItem service
+        //refaktorat ovo, napravit ItemTask service
         //i mapirat ovo u kontroleru, odma entitet jer nije bitno stvarno
-        //jel dobra ideja Mapster ovdje iskoristit za mapiranje ili bolje manualno?
-        public async Task<List<WeekDayDto>> GetItemsForNextWeekAsync()
+        public async Task<IEnumerable<IGrouping<DateTime, Entity.ItemTask>>> GetItemsForNextWeekAsync()
         {
-            var groupedItems = await _commitedItemRepository.GetCommitedItemsGroupedByDueDateForNextWeek();
-            var weekDayDtos = groupedItems
-                .Select(group => new WeekDayDto
-                {
-                    WeekDayDate = group.Key,
-                    Items = group.Select(item => item.Adapt<ItemDto>()).ToList()
-                })
-                .ToList();
-            return weekDayDtos;
+            var groupedItems = await _itemTaskRepository.GetItemTasksGroupedByDueDateForNextWeek();
+
+            return groupedItems;
         }
 
         public async Task<Item> GetItemByIdAsync(int itemId)
@@ -77,11 +71,26 @@ namespace Core.Services
         }
 
 
-        public async Task<Item> CreateItemAsync(Item itemDomain)
+        //GPT review ovu metodu, jesam li trebao za itemTaskEntity bolje s Mapsterom
+        //mapirat taj 1 property?
+        //jel return value Item ili NewItem bolje kod create item metode
+        public async Task<Item> CreateItemAsync(NewItem newItemDomain)
         {
-            var itemEntity = itemDomain.Adapt<Entity.Item>();
+            var itemEntity = newItemDomain.Adapt<Entity.Item>();
+
+            //ako nije null DueDate, odma kreiraj njegovo dijete
+            if (newItemDomain.DueDate is not null)
+            {
+                var itemTaskEntity = new Entity.ItemTask
+                {
+                    DueDate = newItemDomain.DueDate
+                };
+
+                itemEntity.ItemTasks.Add(itemTaskEntity);
+            }
 
             _crudService.Add(itemEntity);
+
             await _crudService.SaveAsync();
 
             //itemEntity sadrži nove potencijalne promjene koje su se dogodile usred .SaveAsync()
@@ -125,6 +134,34 @@ namespace Core.Services
             _crudService.Delete(itemId);
             await _crudService.SaveAsync();
         }
+
+        public async Task CommitItemAsync(int itemId, DateTime committedDay)
+        {
+            //item u one time ili repeating listi se može assignat na određen dan u tjednu
+            //odabere se dan na UI i na click item u listi se pošalje ID taska
+            //i napravi se create u tablici commited item-a
+            //item može odma imati due date ili ne mora
+
+            //var itemEntity = itemDomain.Adapt<Entity.Item>();
+
+            //_crudService.Add(itemEntity);
+            //await _crudService.SaveAsync();
+
+            ////itemEntity sadrži nove potencijalne promjene koje su se dogodile usred .SaveAsync()
+            ////znači ne mora novi poseban get request nakon Save.
+            //return itemEntity.Adapt<Item>();
+
+            var itemEntity = await _crudService.GetByIdAsync(itemId);
+
+            if (itemEntity == null)
+            {
+                throw new NotFoundException($"Item with ID {itemId} not found.");
+            }
+
+            _crudService.Delete(itemId);
+            await _crudService.SaveAsync();
+        }
+
 
     }
 }

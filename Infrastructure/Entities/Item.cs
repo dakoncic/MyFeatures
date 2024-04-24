@@ -22,6 +22,6 @@ namespace Infrastructure.Entities
         public int DaysBetween { get; set; }
 
         // navigacijski property na djecu, nova lista se inicijalizira tako da nikad ne bude null
-        public virtual ICollection<CommittedItem> CommittedItems { get; set; } = new List<CommittedItem>();
+        public virtual ICollection<ItemTask> ItemTasks { get; set; } = new List<ItemTask>();
     }
 }

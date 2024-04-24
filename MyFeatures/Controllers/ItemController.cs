@@ -52,19 +52,16 @@ namespace MyFeatures.Controllers
             return Ok(createdItemDto);
         }
 
-
         [HttpPut("Update/{id}")]
         public async Task<IActionResult> Update(int id, ItemDto ItemDto)
         {
             var itemDomain = ItemDto.Adapt<Item>();
             var updatedItem = await _itemService.UpdateItemAsync(id, itemDomain);
 
-            var updatedItemDto = updatedItem.Adapt<ItemDto>(); // update neće vraćati null, bacit će exception
+            var updatedItemDto = updatedItem.Adapt<ItemDto>();
 
             return Ok(updatedItemDto);
         }
-
-
 
         [HttpDelete("Delete/{id}")]
         public async Task<IActionResult> Delete(int id)
@@ -73,34 +70,27 @@ namespace MyFeatures.Controllers
             return NoContent();  // Indicate successful deletion with HTTP 204 No Content
         }
 
-
         [HttpPost("Complete/{id}")]
         public void Complete(int id, ItemDto item)
         {
         }
 
         [HttpGet("GetItemsForWeek")]
-        public IEnumerable<WeekDayDto> GetItemsForWeek()
+        public async Task<IEnumerable<WeekDayDto>> GetItemsForWeekAsync()
         {
             var weekDays = new List<WeekDayDto>();
 
-            //znači sljedećih 7 dana uključujući danas
-            //for (int i = 0; i < 7; i++)
-            //{
-            //    WeekDayDto day = new WeekDayDto
-            //    {
-            //        WeekDayDate = DateTime.UtcNow.AddDays(i),
-            //        Items = new List<ItemDto>
-            //        {
-            //            new ItemDto { Id = i * 10 + 1, Description = $"Task {i * 10 + 1}", Recurring = false, DueDate = DateTime.UtcNow.AddDays(i), Completed = false },
-            //            new ItemDto { Id = i * 10 + 2, Description = $"Task {i * 10 + 2}", Recurring = true, DueDate = DateTime.UtcNow.AddDays(i), Completed = true }
-            //        }
-            //    };
-            //    weekDays.Add(day);
-            //}
+            var groupedItems = await _itemService.GetItemsForNextWeekAsync();
+            var weekDayDtos = groupedItems
+                .Select(group => new WeekDayDto
+                {
+                    WeekDayDate = group.Key,
+                    //!fali mapster mapiranje za committed item
+                    ItemTasks = group.Select(itemTask => itemTask.Adapt<ItemTaskDto>()).ToList()
+                })
+                .ToList();
 
-
-            return weekDays;
+            return weekDayDtos;
         }
     }
 }

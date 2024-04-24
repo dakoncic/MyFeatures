@@ -1,18 +1,12 @@
-﻿namespace Core.DomainModels
+﻿namespace MyFeatures.DTO
 {
-    public class Item
+    public class NewItemDto
     {
         public int Id { get; set; }
         public string Description { get; set; }
         public bool Recurring { get; set; }
         public bool RenewOnDueDate { get; set; }
         public int DaysBetween { get; set; }
-        public ICollection<ItemTask> ItemTasks { get; set; }
-
-        public Item()
-        {
-            ItemTasks = new List<ItemTask>();
-        }
+        public DateTime DueDate { get; set; }
     }
-
 }

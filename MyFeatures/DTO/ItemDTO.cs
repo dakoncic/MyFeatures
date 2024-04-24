@@ -7,11 +7,11 @@
         public bool Recurring { get; set; }
         public bool RenewOnDueDate { get; set; }
         public int DaysBetween { get; set; }
-        public List<CommittedItemDto> CommittedItems { get; set; }
+        public List<ItemTaskDto> ItemTasks { get; set; }
 
         public ItemDto()
         {
-            CommittedItems = new List<CommittedItemDto>();
+            ItemTasks = new List<ItemTaskDto>();
         }
     }
 

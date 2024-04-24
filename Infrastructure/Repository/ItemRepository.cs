@@ -16,10 +16,10 @@ namespace Infrastructure.Repository
 
         //ako želim naglasit da je ovo potpuna materijalizirana lista koje se neće query-at još
         //ond ostavit List
-        public async Task<List<Item>> GetNonRecurringUncommittedItemsAsync()
+        public async Task<List<Item>> GetNonRecurringUnitemTasksAsync()
         {
             return await _context.Items
-                .Where(i => !i.Recurring && !i.Deleted && !i.CommittedItems.Any(ci => ci.CommittedDate != null))
+                .Where(i => !i.Recurring && !i.Deleted && !i.ItemTasks.Any(ci => ci.CommittedDate != null))
                 .ToListAsync();
         }
     }

@@ -4,6 +4,6 @@ namespace Infrastructure.Interfaces.IRepository
 {
     public interface IItemRepository
     {
-        Task<List<Item>> GetNonRecurringUncommittedItemsAsync();
+        Task<List<Item>> GetNonRecurringUnitemTasksAsync();
     }
 }

@@ -5,23 +5,23 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repository
 {
-    public class CommitedItemRepository : ICommitedItemRepository
+    public class ItemTaskRepository : IItemTaskRepository
     {
         private readonly MyFeaturesDbContext _context;
 
-        public CommitedItemRepository(MyFeaturesDbContext context)
+        public ItemTaskRepository(MyFeaturesDbContext context)
         {
             _context = context;
         }
 
-        public async Task<IEnumerable<IGrouping<DateTime, CommittedItem>>> GetCommitedItemsGroupedByDueDateForNextWeek()
+        public async Task<IEnumerable<IGrouping<DateTime?, ItemTask>>> GetItemTasksGroupedByDueDateForNextWeek()
         {
             var today = DateTime.Today;
             var endOfWeek = today.AddDays(7);
 
-            return await _context.CommittedItems
-                .Where(item => item.DueDate >= today && item.DueDate < endOfWeek)
-                .GroupBy(item => item.DueDate)
+            return await _context.ItemTasks
+                .Where(itemTask => itemTask.DueDate >= today && itemTask.DueDate < endOfWeek)
+                .GroupBy(itemTask => itemTask.DueDate)
                 .ToListAsync();
 
         }
