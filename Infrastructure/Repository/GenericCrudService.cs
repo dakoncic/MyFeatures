@@ -76,6 +76,11 @@ namespace Infrastructure.Repository
         public void Update(TEntity entity)
         {
             _dbSet.Attach(entity);
+
+            //eksplicitno attachamo/markamo entity u context, tako ako koristimo AsNoTracking()
+            //da se entity prepozna kao modified za slučaj kad ga AsNoTracking() više
+            //neće automatski pazit pa da se moće spremit normalno u bazu
+            //*AsNoTracking() se ne smije na tablici gdje pazimo na optimistic concurrency control
             _context.Entry(entity).State = EntityState.Modified;
         }
 

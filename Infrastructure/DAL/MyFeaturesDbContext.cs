@@ -23,16 +23,16 @@ namespace Infrastructure.DAL
             modelBuilder.Entity<Item>()
                 .HasMany<CommittedItem>()
                 .WithOne(ci => ci.Item)
-                .HasForeignKey(ci => ci.ItemID)
+                .HasForeignKey(ci => ci.ItemId)
                 .OnDelete(DeleteBehavior.Cascade); // kaskadno deletamo
 
             // indexi
-            modelBuilder.Entity<Item>()
+            modelBuilder.Entity<CommittedItem>()
                 .HasIndex(i => i.DueDate)
                 .HasDatabaseName("IDX_DueDate"); //opcionalno al daje ime indexu
 
             modelBuilder.Entity<CommittedItem>()
-                .HasIndex(ci => ci.ItemID)
+                .HasIndex(ci => ci.ItemId)
                 .HasDatabaseName("IDX_ItemID");
 
             modelBuilder.Entity<CommittedItem>()
