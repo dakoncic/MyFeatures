@@ -22,7 +22,7 @@ namespace Infrastructure.Entities
         public DateTime? CommittedDate { get; set; }
 
         [StringLength(1000)]
-        public string Description { get; set; }
+        public string Description { get; set; } //modified description for recurring
 
         [DataType(DataType.Date)]
         public DateTime? CompletionDate { get; set; }

@@ -142,14 +142,13 @@ namespace Core.Services
             await _itemRepository.SaveAsync();
         }
 
+        //refaktorat ovo, nije dobro
         public async Task<ItemTask> CommitItemAsync(Item item)
         {
-            //u listi itema i recurring itema mogu postojat itemi koji već imaju due date, prebace se sami
-            //gore kada su unutar tjedan dana (razmislit što ako će se ručno prebacit prije)
-
             //prvo dohvaćamo ItemTask po: ItemID-u i gdje item još nije committan, to je source of truth
             //ako postoji DueDate, onda item već postoji
-            Expression<Func<Entity.ItemTask, bool>> filter = itemTask => itemTask.ItemId.Equals(item.Id) && itemTask.CommittedDate == null;
+            Expression<Func<Entity.ItemTask, bool>> filter = itemTask =>
+                itemTask.ItemId.Equals(item.Id) && itemTask.CommittedDate == null;
 
             var itemTaskEntity = await _itemTaskRepository.GetFirstOrDefaultAsync(filter);
 
@@ -176,6 +175,31 @@ namespace Core.Services
             return itemTaskEntity.Adapt<ItemTask>();
         }
 
+        public async Task<ItemTask> CompleteItemAsync(Item item)
+        {
+            //one time item se može complete-at koji ima commited date već i koji nema
+            //recurring se može complete-at koji ima datum
+            //recurring koji nema datum će se samo vratit u svoju listu (novi ItemTask sa committedDate = null)
 
+            //DEFINIRAT:
+            //što je Item a što ItemTask, gdje je koji prikazan, problem je sad što su ispremješani na UI
+            //u listi itema i recurring itema koji nisu prešli gore u Weekdays
+
+            //ako je na UI sve item task, onda bi kod kreiranja itema odma morao postojat, makar i prazan
+            //pozitivno je što child ima direktnu referencu na parenta
+
+
+            Expression<Func<Entity.ItemTask, bool>> filter = itemTask =>
+                itemTask.ItemId.Equals(item.Id) && itemTask.CommittedDate == null;
+
+            var itemTaskEntity = await _itemTaskRepository.GetFirstOrDefaultAsync(filter);
+
+
+
+
+
+
+            return itemTaskEntity.Adapt<ItemTask>();
+        }
     }
 }

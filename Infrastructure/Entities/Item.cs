@@ -9,7 +9,7 @@ namespace Infrastructure.Entities
 
         [Required]
         [StringLength(500)]
-        public string Description { get; set; }
+        public string Description { get; set; } //original description for recurring
 
         public bool Recurring { get; set; }
 
