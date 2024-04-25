@@ -2,7 +2,7 @@
 
 namespace Infrastructure.Interfaces.IRepository
 {
-    public interface IGenericCrudService<TEntity, TKeyType> where TEntity : class
+    public interface IGenericRepository<TEntity, TKeyType> where TEntity : class
     {
         // Asynchronous read operations
         Task<IEnumerable<TEntity>> GetAllAsync(
@@ -12,6 +12,7 @@ namespace Infrastructure.Interfaces.IRepository
             int? skip = null,
             int? take = null);
         Task<TEntity> GetByIdAsync(TKeyType id);
+        Task<TEntity> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> filter);
 
         // Synchronous write operations
         void Add(TEntity entity);

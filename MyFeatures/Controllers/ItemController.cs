@@ -42,11 +42,11 @@ namespace MyFeatures.Controllers
 
         [HttpPost("Create")]
         //mogao sam i [Route("[action]")] pa iznad [HttpPost], isto je, ali je čišće u jednoj liniji
-        public async Task<ActionResult<ItemDto>> Create(ItemDto ItemDto)
+        public async Task<ActionResult<ItemDto>> Create(NewItemDto newItemDto)
         {
-            var itemDomain = ItemDto.Adapt<Item>();  // Map DTO to Domain Model
+            var newItemDomain = newItemDto.Adapt<NewItem>();  // Map DTO to Domain Model
 
-            var createdItem = await _itemService.CreateItemAsync(itemDomain);
+            var createdItem = await _itemService.CreateItemAsync(newItemDomain);
             var createdItemDto = createdItem.Adapt<ItemDto>();  // Map Domain Model back to DTO
 
             return Ok(createdItemDto);

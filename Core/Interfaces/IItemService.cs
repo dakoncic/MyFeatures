@@ -13,5 +13,6 @@ namespace Core.Interfaces
         Task<Item> CreateItemAsync(NewItem item);
         Task<Item> UpdateItemAsync(int itemId, Item item);
         Task DeleteItemAsync(int itemId);
+        Task<ItemTask> CommitItemAsync(Item item);
     }
 }

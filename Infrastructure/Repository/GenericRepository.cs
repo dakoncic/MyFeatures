@@ -5,12 +5,12 @@ using System.Linq.Expressions;
 
 namespace Infrastructure.Repository
 {
-    public class GenericCrudService<TEntity, TKeyType> : IGenericCrudService<TEntity, TKeyType> where TEntity : class
+    public class GenericRepository<TEntity, TKeyType> : IGenericRepository<TEntity, TKeyType> where TEntity : class
     {
         protected readonly MyFeaturesDbContext _context;
         protected readonly DbSet<TEntity> _dbSet;
 
-        public GenericCrudService(MyFeaturesDbContext context)
+        public GenericRepository(MyFeaturesDbContext context)
         {
             _context = context;
             _dbSet = context.Set<TEntity>();
@@ -66,6 +66,11 @@ namespace Infrastructure.Repository
 
             //first or default ovdje ili ovako?
             return await _dbSet.FindAsync(id);
+        }
+
+        public async Task<TEntity> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> filter)
+        {
+            return await _dbSet.FirstOrDefaultAsync(filter);
         }
 
         public void Add(TEntity entity)
