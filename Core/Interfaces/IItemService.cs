@@ -8,7 +8,7 @@ namespace Core.Interfaces
         Task<List<Item>> GetAllItemsAsync();
         Task<List<Item>> GetOneTimeItemsAsync();
         Task<List<Item>> GetRecurringItemsAsync();
-        Task<IEnumerable<IGrouping<DateTime, Entity.ItemTask>>> GetItemsForNextWeekAsync();
+        Task<Dictionary<DateTime, List<Entity.ItemTask>>> GetItemsForNextWeekAsync();
         Task<Item> GetItemByIdAsync(int itemId);
         Task<Item> CreateItemAsync(NewItem item);
         Task<Item> UpdateItemAsync(int itemId, Item item);

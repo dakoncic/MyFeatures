@@ -52,12 +52,13 @@ namespace Core.Services
 
         //refaktorat ovo, napravit ItemTask service
         //i mapirat ovo u kontroleru, odma entitet jer nije bitno stvarno
-        public async Task<IEnumerable<IGrouping<DateTime, Entity.ItemTask>>> GetItemsForNextWeekAsync()
+        public async Task<Dictionary<DateTime, List<Entity.ItemTask>>> GetItemsForNextWeekAsync()
         {
             var groupedItems = await _itemTaskRepository.GetItemTasksGroupedByDueDateForNextWeek();
 
             return groupedItems;
         }
+
 
         public async Task<Item> GetItemByIdAsync(int itemId)
         {
@@ -71,14 +72,13 @@ namespace Core.Services
         }
 
 
-        //GPT review ovu metodu, jesam li trebao za itemTaskEntity bolje s Mapsterom
-        //mapirat taj 1 property?
-        //jel return value Item ili NewItem bolje kod create item metode
+
         public async Task<Item> CreateItemAsync(NewItem newItemDomain)
         {
+            //mapiram ono što mogu s NewItem u Item entity.
             var itemEntity = newItemDomain.Adapt<Entity.Item>();
 
-            //ako nije null DueDate, odma kreiraj njegovo dijete
+            //ako je odabran DueDate, odma kreiraj ItemTask za taj parent
             if (newItemDomain.DueDate is not null)
             {
                 var itemTaskEntity = new Entity.ItemTask
@@ -93,8 +93,10 @@ namespace Core.Services
 
             await _crudService.SaveAsync();
 
-            //itemEntity sadrži nove potencijalne promjene koje su se dogodile usred .SaveAsync()
+            //itemEntity sadrži samo nove promjene koje su se dogodile usred .SaveAsync()
             //znači ne mora novi poseban get request nakon Save.
+            //ovdje vraćam samo parenta bez osvježene djece
+            //ovo je ok ako mi ne treba za ništa specijalno, mogao sam skroz drugo vraćat
             return itemEntity.Adapt<Item>();
         }
 

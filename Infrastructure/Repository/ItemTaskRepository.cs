@@ -14,17 +14,32 @@ namespace Infrastructure.Repository
             _context = context;
         }
 
-        public async Task<IEnumerable<IGrouping<DateTime?, ItemTask>>> GetItemTasksGroupedByDueDateForNextWeek()
+        public async Task<Dictionary<DateTime, List<ItemTask>>> GetItemTasksGroupedByDueDateForNextWeek()
         {
             var today = DateTime.Today;
             var endOfWeek = today.AddDays(7);
 
-            return await _context.ItemTasks
+            // dohvati sve taskove za tjedan
+            var tasks = await _context.ItemTasks
                 .Where(itemTask => itemTask.DueDate >= today && itemTask.DueDate < endOfWeek)
-                .GroupBy(itemTask => itemTask.DueDate)
                 .ToListAsync();
 
+            //dictionary koji će držat grupu taskova za tjedan
+            var groupedTasks = new Dictionary<DateTime, List<ItemTask>>();
+
+            // za svaki dan postoji lista, neovisno koliko ih ima taj dan
+            for (DateTime day = today; day < endOfWeek; day = day.AddDays(1))
+            {
+                // filter taskova za specifičan dan
+                var tasksForDay = tasks.Where(t => t.DueDate.HasValue && t.DueDate.Value.Date == day).ToList();
+
+                // dodaj dan i taskove za taj dan u dictionary
+                groupedTasks.Add(day, tasksForDay);
+            }
+
+            return groupedTasks;
         }
+
 
     }
 }

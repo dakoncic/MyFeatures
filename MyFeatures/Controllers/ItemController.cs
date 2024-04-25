@@ -86,7 +86,7 @@ namespace MyFeatures.Controllers
                 {
                     WeekDayDate = group.Key,
                     //!fali mapster mapiranje za committed item
-                    ItemTasks = group.Select(itemTask => itemTask.Adapt<ItemTaskDto>()).ToList()
+                    ItemTasks = group.Value.Select(itemTask => itemTask.Adapt<ItemTaskDto>()).ToList()
                 })
                 .ToList();
 

@@ -4,6 +4,6 @@ namespace Infrastructure.Interfaces.IRepository
 {
     public interface IItemTaskRepository
     {
-        Task<IEnumerable<IGrouping<DateTime, ItemTask>>> GetItemTasksGroupedByDueDateForNextWeek();
+        Task<Dictionary<DateTime, List<ItemTask>>> GetItemTasksGroupedByDueDateForNextWeek();
     }
 }
