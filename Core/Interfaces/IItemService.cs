@@ -5,14 +5,16 @@ namespace Core.Interfaces
 {
     public interface IItemService
     {
-        Task<List<Item>> GetAllItemsAsync();
-        Task<List<Item>> GetOneTimeItemsAsync();
-        Task<List<Item>> GetRecurringItemsAsync();
-        Task<Dictionary<DateTime, List<Entity.ItemTask>>> GetItemsForNextWeekAsync();
-        Task<Item> GetItemByIdAsync(int itemId);
-        Task<Item> CreateItemAsync(NewItem item);
-        Task<Item> UpdateItemAsync(int itemId, Item item);
+        Task<ItemTask> CommitItemTaskAsync(int itemTaskId);
+        Task CompleteItemTaskAsync(int itemTaskId);
+        Task<Item> CreateItemAsync(NewItem newItemDomain);
         Task DeleteItemAsync(int itemId);
-        Task<ItemTask> CommitItemAsync(Item item);
+        Task<List<Item>> GetAllItemsAsync();
+        Task<ItemTask> GetItemTaskByIdAsync(int itemTaskId);
+        Task<Dictionary<DateTime, List<Entity.ItemTask>>> GetItemsForNextWeekAsync();
+        Task<List<ItemTask>> GetOneTimeItemTasksAsync();
+        Task<List<ItemTask>> GetRecurringItemTasksAsync();
+        Task ReturnItemTaskToGroupAsync(int itemTaskId);
+        Task<ItemTask> UpdateItemAsync(int itemTaskId, ItemTask updatedItemTask);
     }
 }

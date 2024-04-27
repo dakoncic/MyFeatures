@@ -30,12 +30,18 @@ namespace Infrastructure.Helpers
 
         public static void ConfigureMapster()
         {
+            //navodno registracija mapiranja za jednostavan property u property
+            //nije potrebno
+
             // Configure mapping from DTOs to domain models and back
             TypeAdapterConfig<ItemDto, Item>.NewConfig()
                 .TwoWays();
 
             // Configure mapping from domain models to entity models (if needed)
             TypeAdapterConfig<Item, Entity.Item>.NewConfig()
+                .TwoWays();
+
+            TypeAdapterConfig<ItemTask, Entity.ItemTask>.NewConfig()
                 .TwoWays();
 
         }

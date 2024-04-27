@@ -18,7 +18,15 @@ namespace MyFeatures.Controllers
             _itemService = itemService;
         }
 
+        [HttpPost("CommitItemTask/{itemTaskId}")]
+        public async Task<ActionResult<ItemTaskDto>> CommitItemTask(int itemTaskId)
+        {
+            await _itemService.CommitItemTaskAsync(itemTaskId);
 
+            return Ok();
+        }
+
+        //vjv ne treba, obrisat kasnije
         [HttpGet("GetAll")]
         public async Task<ActionResult<IEnumerable<ItemDto>>> GetAll()
         {
@@ -28,16 +36,41 @@ namespace MyFeatures.Controllers
             return Ok(ItemDtos);
         }
 
+        [HttpGet("GetOneTimeItemTasks")]
+        public async Task<ActionResult<IEnumerable<ItemDto>>> GetOneTimeItemTasks()
+        {
+            var itemTasks = await _itemService.GetOneTimeItemTasksAsync();
+            var itemTaskDto = itemTasks.Adapt<List<ItemTaskDto>>();
+
+            return Ok(itemTaskDto);
+        }
+
+        [HttpGet("GetRecurringItemTasks")]
+        public async Task<ActionResult<IEnumerable<ItemDto>>> GetRecurringItemTasks()
+        {
+            var itemTasks = await _itemService.GetRecurringItemTasksAsync();
+            var itemTaskDto = itemTasks.Adapt<List<ItemTaskDto>>();
+
+            return Ok(itemTaskDto);
+        }
+
+        [HttpPost("ReturnItemTaskToGroup")]
+        public async Task<ActionResult<ItemDto>> ReturnItemTaskToGroup(int itemTaskId)
+        {
+            await _itemService.ReturnItemTaskToGroupAsync(itemTaskId);
+
+            return Ok();
+        }
 
         //bez {id} bi morao zvat metodu preko query parametra Get?id=123, 
         //a sa {id} mogu Get/1
-        [HttpGet("Get/{id}")]
-        public async Task<ActionResult<ItemDto>> Get(int id)
+        [HttpGet("GetItemTask/{id}")]
+        public async Task<ActionResult<ItemTaskDto>> GetItemTask(int id)
         {
-            var item = await _itemService.GetItemByIdAsync(id);
+            var itemTask = await _itemService.GetItemTaskByIdAsync(id);
 
-            var ItemDto = item.Adapt<ItemDto>();
-            return Ok(ItemDto);
+            var itemTaskDto = itemTask.Adapt<ItemTaskDto>();
+            return Ok(itemTaskDto);
         }
 
         [HttpPost("Create")]
@@ -53,14 +86,14 @@ namespace MyFeatures.Controllers
         }
 
         [HttpPut("Update/{id}")]
-        public async Task<IActionResult> Update(int id, ItemDto ItemDto)
+        public async Task<IActionResult> Update(int id, ItemTaskDto itemTaskDto)
         {
-            var itemDomain = ItemDto.Adapt<Item>();
-            var updatedItem = await _itemService.UpdateItemAsync(id, itemDomain);
+            var itemTaskDomain = itemTaskDto.Adapt<ItemTask>();
+            var updatedItemTask = await _itemService.UpdateItemAsync(id, itemTaskDomain);
 
-            var updatedItemDto = updatedItem.Adapt<ItemDto>();
+            var updatedItemTaskDto = updatedItemTask.Adapt<ItemTaskDto>();
 
-            return Ok(updatedItemDto);
+            return Ok(updatedItemTaskDto);
         }
 
         [HttpDelete("Delete/{id}")]
@@ -70,9 +103,13 @@ namespace MyFeatures.Controllers
             return NoContent();  // Indicate successful deletion with HTTP 204 No Content
         }
 
-        [HttpPost("Complete/{id}")]
-        public void Complete(int id, ItemDto item)
+        [HttpPost("CompleteItemTask/{id}")]
+        public async Task<IActionResult> CompleteItemTask(int itemTaskId)
         {
+            await _itemService.CompleteItemTaskAsync(itemTaskId);
+
+            //provjerit dal vratit nešto drugo osim samo ok?
+            return Ok();
         }
 
         [HttpGet("GetItemsForWeek")]

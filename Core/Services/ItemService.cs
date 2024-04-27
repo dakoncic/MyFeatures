@@ -34,24 +34,24 @@ namespace Core.Services
             return items.Adapt<List<Item>>();
         }
 
-        public async Task<List<Item>> GetOneTimeItemsAsync()
+        public async Task<List<ItemTask>> GetOneTimeItemTasksAsync()
         {
-            //one time itemi, nisu izbrisani (znači nisu completed) i isto nisu već commitani za specifičan dan
-            Expression<Func<Entity.Item, bool>> filter = i => !i.Recurring && !i.Deleted && !i.ItemTasks.Any(ci => ci.CommittedDate != null);
+            //one time taskovi, nisu izbrisani (znači nisu completed) i isto nisu već commitani za specifičan dan
+            Expression<Func<Entity.ItemTask, bool>> filter = i => !i.Item.Recurring && !i.Item.Deleted && i.CommittedDate == null;
 
-            var items = await _itemRepository.GetAllAsync(filter);
+            var items = await _itemTaskRepository.GetAllAsync(filter);
 
-            return items.Adapt<List<Item>>();
+            return items.Adapt<List<ItemTask>>();
         }
 
-        public async Task<List<Item>> GetRecurringItemsAsync()
+        public async Task<List<ItemTask>> GetRecurringItemTasksAsync()
         {
-            //ponavljajući itemi, nisu izbrisani. *U budućnosti možda ne dohvaćat ako su commited, al za sad da
-            Expression<Func<Entity.Item, bool>> filter = i => i.Recurring && !i.Deleted;
+            //ponavljajući taskovi, nisu izbrisani. *U budućnosti možda ne dohvaćat ako su commited, al za sad da
+            Expression<Func<Entity.ItemTask, bool>> filter = i => i.Item.Recurring && !i.Item.Deleted;
 
-            var items = await _itemRepository.GetAllAsync(filter);
+            var items = await _itemTaskRepository.GetAllAsync(filter);
 
-            return items.Adapt<List<Item>>();
+            return items.Adapt<List<ItemTask>>();
         }
 
         //refaktorat ovo, napravit ItemTask service
@@ -64,17 +64,16 @@ namespace Core.Services
         }
 
 
-        public async Task<Item> GetItemByIdAsync(int itemId)
+        public async Task<ItemTask> GetItemTaskByIdAsync(int itemTaskId)
         {
-            var itemEntity = await _itemRepository.GetByIdAsync(itemId);
-            if (itemEntity == null)
+            var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId);
+            if (itemTaskEntity == null)
             {
-                throw new NotFoundException($"Item with ID {itemId} not found.");
+                throw new NotFoundException($"ItemTask with ID {itemTaskId} not found.");
             }
 
-            return itemEntity.Adapt<Item>();
+            return itemTaskEntity.Adapt<ItemTask>();
         }
-
 
 
         public async Task<Item> CreateItemAsync(NewItem newItemDomain)
@@ -82,17 +81,15 @@ namespace Core.Services
             //mapiram ono što mogu s NewItem u Item entity.
             var itemEntity = newItemDomain.Adapt<Entity.Item>();
 
-            //ako je odabran DueDate, odma kreiraj ItemTask za taj parent
-            if (newItemDomain.DueDate is not null)
-            {
-                var itemTaskEntity = new Entity.ItemTask
-                {
-                    Description = newItemDomain.Description,
-                    DueDate = newItemDomain.DueDate
-                };
+            //odma se po defaulta kreira ItemTask za taj parent
 
-                itemEntity.ItemTasks.Add(itemTaskEntity);
-            }
+            var itemTaskEntity = new Entity.ItemTask
+            {
+                Description = newItemDomain.Description,
+                DueDate = newItemDomain.DueDate
+            };
+
+            itemEntity.ItemTasks.Add(itemTaskEntity);
 
             _itemRepository.Add(itemEntity);
 
@@ -105,7 +102,7 @@ namespace Core.Services
             return itemEntity.Adapt<Item>();
         }
 
-        public async Task<Item> UpdateItemAsync(int itemId, Item updatedItem)
+        public async Task<ItemTask> UpdateItemAsync(int itemTaskId, ItemTask updatedItemTask)
         {
             //radi se prvo get a ne odma update, zbog concurrency npr.
             //da ne može commitat na bazu ako je netko drugi u
@@ -113,20 +110,26 @@ namespace Core.Services
             //ili "you might have a rule that says a transaction can only be updated if it is in a pending state"
             //znači ima neki uvjet, neki "if" za neki property
 
-            var itemEntity = await _itemRepository.GetByIdAsync(itemId);
-            if (itemEntity == null)
+            //include properties fali kao parametar u ovoj metodi
+            var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId);
+            if (itemTaskEntity == null)
             {
-                throw new NotFoundException($"Item with ID {itemId} not found.");
+                throw new NotFoundException($"ItemTask with ID {itemTaskId} not found.");
             }
 
-            //ovo će pregazit entity property-e sa updatedItem objektom
-            //tako da pripremimo itemEntity za update na bazu
-            updatedItem.Adapt(itemEntity);
+            //eksplicitno update-amo itemTaskEntity sa novim vrijednostima .Adapt()
+            //ovo neće transformirat entity objekt u domain, samo update se radi
+            updatedItemTask.Adapt(itemTaskEntity);
 
-            //ne treba ako je iz istog DbContext scope-a (može samo get), ali neće štetit
-            _itemRepository.Update(itemEntity);
-            await _itemRepository.SaveAsync();
-            return itemEntity.Adapt<Item>();
+            //parenta eksplicitno adaptat za potencijalne promjene
+            //child i parent svaki za sebe kad nema posebne konfiguracije
+            updatedItemTask.Item.Adapt(itemTaskEntity.Item);
+
+            //ne trebam zvat .Update() ako je iz istog DbContext scope-a (može samo get)
+
+            await _itemTaskRepository.SaveAsync();
+
+            return itemTaskEntity.Adapt<ItemTask>();
         }
 
         public async Task DeleteItemAsync(int itemId)
@@ -142,32 +145,17 @@ namespace Core.Services
             await _itemRepository.SaveAsync();
         }
 
-        //refaktorat ovo, nije dobro
-        public async Task<ItemTask> CommitItemAsync(Item item)
+        //ova metoda nije dobra, mora primati i dan na koji commitam, nije uvijek danas!
+        public async Task<ItemTask> CommitItemTaskAsync(int itemTaskId)
         {
-            //prvo dohvaćamo ItemTask po: ItemID-u i gdje item još nije committan, to je source of truth
-            //ako postoji DueDate, onda item već postoji
-            Expression<Func<Entity.ItemTask, bool>> filter = itemTask =>
-                itemTask.ItemId.Equals(item.Id) && itemTask.CommittedDate == null;
+            var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId);
 
-            var itemTaskEntity = await _itemTaskRepository.GetFirstOrDefaultAsync(filter);
-
-            //ako ne postoji radimo insert
-            if (itemTaskEntity is null)
+            //ako nije obrisanm radimo update
+            if (itemTaskEntity is not null)
             {
-                itemTaskEntity = new Entity.ItemTask
-                {
-                    ItemId = item.Id,
-                    CommittedDate = DateTime.UtcNow
-                    //due date se ne postavlja ako originalno ni nije bio
-                };
-
-                _itemTaskRepository.Add(itemTaskEntity);
+                //postavi committed date
+                itemTaskEntity.CommittedDate = DateTime.UtcNow;
             }
-
-            //postavi committed date neovisno jel novi ili postojeći
-            itemTaskEntity.CommittedDate = DateTime.UtcNow;
-
 
             //ne moramo eksplicitno Update zvat, sam će skužit zbog Get metode
             await _itemRepository.SaveAsync();
@@ -175,31 +163,74 @@ namespace Core.Services
             return itemTaskEntity.Adapt<ItemTask>();
         }
 
-        public async Task<ItemTask> CompleteItemAsync(Item item)
+        //jel ok ako ništa ne vraćamo kao i za delete?
+        public async Task CompleteItemTaskAsync(int itemTaskId)
         {
             //one time item se može complete-at koji ima commited date već i koji nema
             //recurring se može complete-at koji ima datum
             //recurring koji nema datum će se samo vratit u svoju listu (novi ItemTask sa committedDate = null)
 
-            //DEFINIRAT:
-            //što je Item a što ItemTask, gdje je koji prikazan, problem je sad što su ispremješani na UI
-            //u listi itema i recurring itema koji nisu prešli gore u Weekdays
-
-            //ako je na UI sve item task, onda bi kod kreiranja itema odma morao postojat, makar i prazan
-            //pozitivno je što child ima direktnu referencu na parenta
-
-
-            Expression<Func<Entity.ItemTask, bool>> filter = itemTask =>
-                itemTask.ItemId.Equals(item.Id) && itemTask.CommittedDate == null;
-
-            var itemTaskEntity = await _itemTaskRepository.GetFirstOrDefaultAsync(filter);
+            var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId);
+            if (itemTaskEntity == null)
+            {
+                throw new NotFoundException($"ItemTask with ID {itemTaskId} not found.");
+            }
 
 
+            //vrijeme complete-anja je sad, i tu završavamo s ovim taskom
+            itemTaskEntity.CompletionDate = DateTime.UtcNow;
+
+            //ako je recurring i ako ima due date, onda moram postavit novi due date
+            //i kreira se novi ItemTask
+            if (itemTaskEntity.Item.Recurring)
+            {
+
+                var newItemTaskEntity = new Entity.ItemTask
+                {
+                    ItemId = itemTaskEntity.Item.Id,
+                    Description = itemTaskEntity.Description
+                };
+
+                //ako npr. se uzima riblje ulje ned., neovisno zakasnio dan-2
+                //onda uvečavam na DueDate
+                //ali ako je ponavljajući bez datuma, npr. posjet zubarici (ja određujem kad, nema DueDate)
+                //onda se ne uvečava ništa
+                if (itemTaskEntity.DueDate is not null)
+                {
+                    if (itemTaskEntity.Item.RenewOnDueDate)
+                    {
+                        newItemTaskEntity.DueDate = itemTaskEntity.DueDate.Value.AddDays(itemTaskEntity.Item.DaysBetween);
+                    }
+                    //inače se obnavlja na completion date a ti he sad (npr. registracija auta)
+                    else
+                    {
+                        newItemTaskEntity.DueDate = itemTaskEntity.CompletionDate.Value.AddDays(itemTaskEntity.Item.DaysBetween);
+                    }
+                }
 
 
+                _itemTaskRepository.Add(newItemTaskEntity);
 
-
-            return itemTaskEntity.Adapt<ItemTask>();
+                await _itemTaskRepository.SaveAsync();
+            }
         }
+
+        public async Task ReturnItemTaskToGroupAsync(int itemTaskId)
+        {
+            var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId);
+            if (itemTaskEntity == null)
+            {
+                throw new NotFoundException($"ItemTask with ID {itemTaskId} not found.");
+            }
+
+            //za sada samo task više nije comittan na određen datum i to je to
+            //TO DO: u budućnosti ako ima daysBetween, preskočit će ovaj put
+            //(npr.preskočit ću pranje balkona ovaj put)
+
+            itemTaskEntity.CommittedDate = null;
+
+            await _itemTaskRepository.SaveAsync();
+        }
+
     }
 }
