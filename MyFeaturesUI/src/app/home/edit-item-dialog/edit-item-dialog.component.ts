@@ -9,7 +9,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { RippleModule } from 'primeng/ripple';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { Subject, combineLatest, take, takeUntil } from 'rxjs';
-import { ItemDTO, ItemService } from '../../../infrastructure';
+import { ItemDto, ItemService } from '../../../infrastructure';
 import { ItemExtendedService } from '../../extended-services/item-extended-service';
 
 @Component({
@@ -31,7 +31,7 @@ import { ItemExtendedService } from '../../extended-services/item-extended-servi
 export class EditItemDialogComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
-  item: ItemDTO = {}; //trenutno selektiran
+  item: ItemDto = {}; //trenutno selektiran
   stateOptions: any[] = [{ label: 'One time task', value: true }, { label: 'Repeating', value: false }];
 
   form!: FormGroup;
@@ -83,13 +83,13 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
       });
   }
 
-  completeItem(item: ItemDTO) {
+  completeItem(item: ItemDto) {
     this.itemExtendedService.completeItem(item);
   }
 
   //povlači item za edit s backenda
-  editItem(item: ItemDTO) {
-    this.itemService.getItem(item.id!)
+  editItem(item: ItemDto) {
+    this.itemService.getItemTaskItem(item.id!)
       .pipe(take(1))
       .subscribe((item) => {
         this.displayItem(item);
@@ -97,7 +97,7 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
   }
 
   //popunjava se forma za edit
-  displayItem(item: ItemDTO): void {
+  displayItem(item: ItemDto): void {
     this.form.reset();
 
     this.item = item;
@@ -110,7 +110,7 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
     //ako nije dirty onda nemoj zvat backend
     if (this.form.dirty) {
 
-      const item: ItemDTO = {
+      const item: ItemDto = {
         //prvo stare vrijednosti npr. rowId (concurrency)
         ...this.item,
         //onda vrijednosti forme

@@ -1,3 +1,4 @@
-export * from './itemDTO';
-export * from './userDTO';
-export * from './weekDayDTO';
+export * from './itemDto';
+export * from './itemTaskDto';
+export * from './newItemDto';
+export * from './weekDayDto';

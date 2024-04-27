@@ -11,8 +11,12 @@
  */
 
 
-export interface UserDTO { 
+export interface ItemTaskDto { 
     id?: number;
-    content: string;
+    itemId?: number;
+    committedDate?: string | null;
+    dueDate?: string | null;
+    description?: string | null;
+    completionDate?: string | null;
 }
 

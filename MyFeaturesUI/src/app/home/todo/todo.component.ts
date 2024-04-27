@@ -7,7 +7,7 @@ import { DialogService } from 'primeng/dynamicdialog';
 import { RippleModule } from 'primeng/ripple';
 import { TableModule } from 'primeng/table';
 import { Observable } from 'rxjs';
-import { ItemDTO } from '../../../infrastructure';
+import { ItemDto } from '../../../infrastructure';
 import { ItemExtendedService } from '../../extended-services/item-extended-service';
 import { EditItemDialogComponent } from '../edit-item-dialog/edit-item-dialog.component';
 
@@ -85,7 +85,7 @@ export class TodoComponent {
     }
   }
 
-  editItem(item: ItemDTO) {
+  editItem(item: ItemDto) {
     this.dialogService.open(EditItemDialogComponent, {
       data: {
         item: item
@@ -94,7 +94,7 @@ export class TodoComponent {
     });
   }
 
-  deleteItem(item: ItemDTO) {
+  deleteItem(item: ItemDto) {
     this.confirmationService.confirm({
       header: 'Delete Confirmation',
       message: 'Do you want to delete this record?',

@@ -5,6 +5,47 @@
     "version": "1.0"
   },
   "paths": {
+    "/api/Item/CommitItemTask/{itemTaskId}": {
+      "post": {
+        "tags": [
+          "Item"
+        ],
+        "operationId": "CommitItemTaskItem",
+        "parameters": [
+          {
+            "name": "itemTaskId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemTaskDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemTaskDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemTaskDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Item/GetAll": {
       "get": {
         "tags": [
@@ -19,7 +60,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ItemDTO"
+                    "$ref": "#/components/schemas/ItemDto"
                   }
                 }
               },
@@ -27,7 +68,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ItemDTO"
+                    "$ref": "#/components/schemas/ItemDto"
                   }
                 }
               },
@@ -35,7 +76,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ItemDTO"
+                    "$ref": "#/components/schemas/ItemDto"
                   }
                 }
               }
@@ -44,12 +85,130 @@
         }
       }
     },
-    "/api/Item/Get/{id}": {
+    "/api/Item/GetOneTimeItemTasks": {
       "get": {
         "tags": [
           "Item"
         ],
-        "operationId": "GetItem",
+        "operationId": "GetOneTimeItemTasksItem",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ItemDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ItemDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ItemDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Item/GetRecurringItemTasks": {
+      "get": {
+        "tags": [
+          "Item"
+        ],
+        "operationId": "GetRecurringItemTasksItem",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ItemDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ItemDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ItemDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Item/ReturnItemTaskToGroup": {
+      "post": {
+        "tags": [
+          "Item"
+        ],
+        "operationId": "ReturnItemTaskToGroupItem",
+        "parameters": [
+          {
+            "name": "itemTaskId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Item/GetItemTask/{id}": {
+      "get": {
+        "tags": [
+          "Item"
+        ],
+        "operationId": "GetItemTaskItem",
         "parameters": [
           {
             "name": "id",
@@ -67,17 +226,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ItemDTO"
+                  "$ref": "#/components/schemas/ItemTaskDto"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ItemDTO"
+                  "$ref": "#/components/schemas/ItemTaskDto"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ItemDTO"
+                  "$ref": "#/components/schemas/ItemTaskDto"
                 }
               }
             }
@@ -95,24 +254,41 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ItemDTO"
+                "$ref": "#/components/schemas/NewItemDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/ItemDTO"
+                "$ref": "#/components/schemas/NewItemDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/ItemDTO"
+                "$ref": "#/components/schemas/NewItemDto"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemDto"
+                }
+              }
+            }
           }
         }
       }
@@ -138,17 +314,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ItemDTO"
+                "$ref": "#/components/schemas/ItemTaskDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/ItemDTO"
+                "$ref": "#/components/schemas/ItemTaskDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/ItemDTO"
+                "$ref": "#/components/schemas/ItemTaskDto"
               }
             }
           }
@@ -184,42 +360,30 @@
         }
       }
     },
-    "/api/Item/Complete/{id}": {
+    "/api/Item/CompleteItemTask/{id}": {
       "post": {
         "tags": [
           "Item"
         ],
-        "operationId": "CompleteItem",
+        "operationId": "CompleteItemTaskItem",
         "parameters": [
+          {
+            "name": "itemTaskId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
           {
             "name": "id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string"
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ItemDTO"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ItemDTO"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/ItemDTO"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Success"
@@ -241,7 +405,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/WeekDayDTO"
+                    "$ref": "#/components/schemas/WeekDayDto"
                   }
                 }
               },
@@ -249,7 +413,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/WeekDayDTO"
+                    "$ref": "#/components/schemas/WeekDayDto"
                   }
                 }
               },
@@ -257,96 +421,8 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/WeekDayDTO"
+                    "$ref": "#/components/schemas/WeekDayDto"
                   }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/User/GetAll": {
-      "get": {
-        "tags": [
-          "User"
-        ],
-        "operationId": "GetAllUser",
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserDTO"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserDTO"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserDTO"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/User/CreatePost": {
-      "post": {
-        "tags": [
-          "User"
-        ],
-        "operationId": "CreatePostUser",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDTO"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDTO"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDTO"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserDTO"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserDTO"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserDTO"
                 }
               }
             }
@@ -357,7 +433,7 @@
   },
   "components": {
     "schemas": {
-      "ItemDTO": {
+      "ItemDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -371,44 +447,95 @@
           "recurring": {
             "type": "boolean"
           },
-          "dueDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "completed": {
+          "renewOnDueDate": {
             "type": "boolean"
+          },
+          "daysBetween": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "itemTasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemTaskDto"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
       },
-      "UserDTO": {
-        "required": [
-          "content"
-        ],
+      "ItemTaskDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "integer",
             "format": "int32"
           },
-          "content": {
-            "minLength": 1,
-            "type": "string"
+          "itemId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "committedDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "completionDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
           }
         },
         "additionalProperties": false
       },
-      "WeekDayDTO": {
+      "NewItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "recurring": {
+            "type": "boolean"
+          },
+          "renewOnDueDate": {
+            "type": "boolean"
+          },
+          "daysBetween": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "WeekDayDto": {
         "type": "object",
         "properties": {
           "weekDayDate": {
             "type": "string",
             "format": "date-time"
           },
-          "items": {
+          "itemTasks": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ItemDTO"
+              "$ref": "#/components/schemas/ItemTaskDto"
             },
             "nullable": true
           }

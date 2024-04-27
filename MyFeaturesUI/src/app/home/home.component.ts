@@ -10,7 +10,7 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { TableModule } from 'primeng/table';
 import { ToolbarModule } from 'primeng/toolbar';
 import { map, of, tap } from 'rxjs';
-import { ItemDTO } from '../../infrastructure';
+import { ItemDto } from '../../infrastructure';
 import { ItemExtendedService } from '../extended-services/item-extended-service';
 import { EditItemDialogComponent } from './edit-item-dialog/edit-item-dialog.component';
 import { TodoComponent } from './todo/todo.component';
@@ -43,7 +43,6 @@ export class HomeComponent implements OnInit {
   private itemExtendedService = inject(ItemExtendedService);
   private dialogService = inject(DialogService);
 
-  selectedItems: ItemDTO[] = [];
   editDialogVisible: boolean = false;
   cols: any[] = [];
   currentDay!: number;
@@ -65,7 +64,7 @@ export class HomeComponent implements OnInit {
     tap((data) => console.log(data)),
     map(weekdata => weekdata.map(daydata => ({
       weekDayDate: daydata.weekDayDate!,
-      items$: of(daydata.items!)
+      items$: of(daydata.itemTasks!)
     })))
   );
 
@@ -81,7 +80,7 @@ export class HomeComponent implements OnInit {
 
   }
 
-  editItem(item: ItemDTO) {
+  editItem(item: ItemDto) {
     this.dialogService.open(EditItemDialogComponent, {
       data: {
         item: item
@@ -90,7 +89,7 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  deleteItem(item: ItemDTO) {
+  deleteItem(item: ItemDto) {
     this.confirmationService.confirm({
       header: 'Delete Confirmation',
       message: 'Do you want to delete this record?',
@@ -111,7 +110,7 @@ export class HomeComponent implements OnInit {
     //   );
   }
 
-  completeItem(item: ItemDTO) {
+  completeItem(item: ItemDto) {
     this.itemExtendedService.completeItem(item);
   }
 

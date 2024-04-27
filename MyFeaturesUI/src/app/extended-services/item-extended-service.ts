@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, switchMap, take } from 'rxjs';
-import { ItemDTO, ItemService } from '../../infrastructure';
+import { ItemDto, ItemService, ItemTaskDto } from '../../infrastructure';
 
 @Injectable({
   providedIn: 'root'
@@ -8,8 +8,8 @@ import { ItemDTO, ItemService } from '../../infrastructure';
 export class ItemExtendedService {
   private itemService = inject(ItemService);
 
-  private itemsSourceSubject = new BehaviorSubject<ItemDTO[]>([]);
-  private weekDaysSourceSubject = new BehaviorSubject<ItemDTO[]>([]);
+  private itemsSourceSubject = new BehaviorSubject<ItemDto[]>([]);
+  private weekDaysSourceSubject = new BehaviorSubject<ItemDto[]>([]);
 
   //ovo se poziva prvi put u trenutku kad se komponenta
   //subscribe-a sa async pipe-om u htmlu
@@ -27,7 +27,7 @@ export class ItemExtendedService {
     .pipe(switchMap(() => this.itemService.getItemsForWeekItem()));
 
   //na create item, za sad osvježavamo sve
-  createItem(item: ItemDTO) {
+  createItem(item: ItemDto) {
     return this.itemService.createItem(item).pipe(
       take(1),
     )
@@ -37,7 +37,7 @@ export class ItemExtendedService {
   }
 
   //na update item, za sad osvježavamo sve
-  updateItem(item: ItemDTO) {
+  updateItem(item: ItemDto) {
     return this.itemService.updateItem(item.id!, item).pipe(
       take(1),
     )
@@ -58,8 +58,8 @@ export class ItemExtendedService {
       });
   }
 
-  completeItem(item: ItemDTO) {
-    return this.itemService.completeItem(item.id!, item).pipe(
+  completeItem(itemTask: ItemTaskDto) {
+    return this.itemService.commitItemTaskItem(itemTask.id!).pipe(
       take(1),
     )
       .subscribe(() => {

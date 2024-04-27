@@ -19,12 +19,13 @@ namespace Infrastructure.DAL
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // veza između Itema i ItemTaska
-            // trebao biti eksplicitno postavljeno, iako već imamo data annotations u entity klasama
-            modelBuilder.Entity<Item>()
-                .HasMany<ItemTask>()
-                .WithOne(ci => ci.Item)
-                .HasForeignKey(ci => ci.ItemId)
+            // trebao biti eksplicitno postavljeno
+            modelBuilder.Entity<ItemTask>()
+                .HasOne(it => it.Item)
+                .WithMany(i => i.ItemTasks)
+                .HasForeignKey(it => it.ItemId)
                 .OnDelete(DeleteBehavior.Cascade); // kaskadno deletamo
+
 
             // indexi
             modelBuilder.Entity<ItemTask>()

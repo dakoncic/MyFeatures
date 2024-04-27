@@ -9,13 +9,15 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { ItemTaskDto } from './itemTaskDto';
 
 
-export interface ItemDTO { 
+export interface ItemDto { 
     id?: number;
     description?: string | null;
     recurring?: boolean;
-    dueDate?: string;
-    completed?: boolean;
+    renewOnDueDate?: boolean;
+    daysBetween?: number;
+    itemTasks?: Array<ItemTaskDto> | null;
 }
 

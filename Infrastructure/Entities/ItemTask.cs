@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Infrastructure.Entities
 {
@@ -9,7 +8,6 @@ namespace Infrastructure.Entities
         public int Id { get; set; }
 
         [Required]
-        [ForeignKey("Item")]
         public int ItemId { get; set; }
 
         //zadnji dan (datum) kad se nešto može izvršit,
