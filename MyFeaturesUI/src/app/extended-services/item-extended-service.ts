@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, switchMap, take } from 'rxjs';
-import { ItemDto, ItemService, ItemTaskDto } from '../../infrastructure';
+import { ItemService, ItemTaskDto, WeekDayDto } from '../../infrastructure';
 
 @Injectable({
   providedIn: 'root'
@@ -8,8 +8,9 @@ import { ItemDto, ItemService, ItemTaskDto } from '../../infrastructure';
 export class ItemExtendedService {
   private itemService = inject(ItemService);
 
-  private itemsSourceSubject = new BehaviorSubject<ItemDto[]>([]);
-  private weekDaysSourceSubject = new BehaviorSubject<ItemDto[]>([]);
+  private oneTimeItemsSourceSubject = new BehaviorSubject<ItemTaskDto[]>([]);
+  private recurringItemsSourceSubject = new BehaviorSubject<ItemTaskDto[]>([]);
+  private weekDaysSourceSubject = new BehaviorSubject<WeekDayDto[]>([]);
 
   //ovo se poziva prvi put u trenutku kad se komponenta
   //subscribe-a sa async pipe-om u htmlu
@@ -20,29 +21,40 @@ export class ItemExtendedService {
   //zbog default vrijednosti, što će aktivirat switchMap,
   //koji prekida emittanje default i poziva getAllItem.
   //običan Subject neće triggerat na prvi subscribe, nego tek na ".next()"
-  items$ = this.itemsSourceSubject
-    .pipe(switchMap(() => this.itemService.getAllItem()));
+  oneTimeItems$ = this.oneTimeItemsSourceSubject
+    .pipe(switchMap(() => this.itemService.getOneTimeItemTasksItem()));
+
+  recurringItems$ = this.recurringItemsSourceSubject
+    .pipe(switchMap(() => this.itemService.getRecurringItemTasksItem()));
 
   weekData$ = this.weekDaysSourceSubject
     .pipe(switchMap(() => this.itemService.getItemsForWeekItem()));
 
   //na create item, za sad osvježavamo sve
-  createItem(item: ItemDto) {
-    return this.itemService.createItem(item).pipe(
+  createItem(itemTask: ItemTaskDto) {
+    return this.itemService.createItem(itemTask).pipe(
       take(1),
     )
       .subscribe(() => {
-        this.itemsSourceSubject.next([]);
+        //ovdje ćemo za prvu sve liste osvježit
+
+        this.oneTimeItemsSourceSubject.next([]);
+        this.recurringItemsSourceSubject.next([]);
+        this.weekDaysSourceSubject.next([]);
       });
   }
 
   //na update item, za sad osvježavamo sve
-  updateItem(item: ItemDto) {
-    return this.itemService.updateItem(item.id!, item).pipe(
+  updateItem(itemTask: ItemTaskDto) {
+    return this.itemService.updateItem(itemTask.id!, itemTask).pipe(
       take(1),
     )
       .subscribe(() => {
-        this.itemsSourceSubject.next([]);
+        //ovdje ćemo za prvu sve liste osvježit
+
+        this.oneTimeItemsSourceSubject.next([]);
+        this.recurringItemsSourceSubject.next([]);
+        this.weekDaysSourceSubject.next([]);
       });
   }
 
@@ -54,16 +66,30 @@ export class ItemExtendedService {
       take(1),
     )
       .subscribe(() => {
-        this.itemsSourceSubject.next([]);
+        //ovdje ćemo za prvu sve liste osvježit
+
+        this.oneTimeItemsSourceSubject.next([]);
+        this.recurringItemsSourceSubject.next([]);
+        this.weekDaysSourceSubject.next([]);
       });
   }
 
-  completeItem(itemTask: ItemTaskDto) {
-    return this.itemService.commitItemTaskItem(itemTask.id!).pipe(
+  completeItem(itemTaskId: number) {
+    return this.itemService.completeItemTaskItem(itemTaskId).pipe(
       take(1),
     )
       .subscribe(() => {
-        this.itemsSourceSubject.next([]);
+        //ovdje ćemo za prvu sve liste osvježit
+
+        this.oneTimeItemsSourceSubject.next([]);
+        this.recurringItemsSourceSubject.next([]);
+        this.weekDaysSourceSubject.next([]);
       });
   }
 }
+
+
+// const commitItem: CommitItemTaskDto = {
+//   commitDay: commitDay,
+//   itemTaskId: itemTask.id!,
+// };

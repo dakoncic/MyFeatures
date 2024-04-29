@@ -7,7 +7,7 @@ import { DialogService } from 'primeng/dynamicdialog';
 import { RippleModule } from 'primeng/ripple';
 import { TableModule } from 'primeng/table';
 import { Observable } from 'rxjs';
-import { ItemDto } from '../../../infrastructure';
+import { ItemTaskDto } from '../../../infrastructure';
 import { ItemExtendedService } from '../../extended-services/item-extended-service';
 import { EditItemDialogComponent } from '../edit-item-dialog/edit-item-dialog.component';
 
@@ -85,16 +85,16 @@ export class TodoComponent {
     }
   }
 
-  editItem(item: ItemDto) {
+  editItem(itemTask: ItemTaskDto) {
     this.dialogService.open(EditItemDialogComponent, {
       data: {
-        item: item
+        itemTask: itemTask
       },
       //header: this.translate.instant('measurement.dialog.manualChannels')
     });
   }
 
-  deleteItem(item: ItemDto) {
+  deleteItem(itemTask: ItemTaskDto) {
     this.confirmationService.confirm({
       header: 'Delete Confirmation',
       message: 'Do you want to delete this record?',
@@ -102,7 +102,7 @@ export class TodoComponent {
       rejectLabel: 'Odustani',
       accept: () => {
         //obriši i osvježi liste svima
-        this.itemExtendedService.deleteItem(item.id!);
+        this.itemExtendedService.deleteItem(itemTask.id!);
       }
     });
   }

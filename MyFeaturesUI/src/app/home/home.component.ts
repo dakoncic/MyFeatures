@@ -10,7 +10,7 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { TableModule } from 'primeng/table';
 import { ToolbarModule } from 'primeng/toolbar';
 import { map, of, tap } from 'rxjs';
-import { ItemDto } from '../../infrastructure';
+import { ItemTaskDto } from '../../infrastructure';
 import { ItemExtendedService } from '../extended-services/item-extended-service';
 import { EditItemDialogComponent } from './edit-item-dialog/edit-item-dialog.component';
 import { TodoComponent } from './todo/todo.component';
@@ -45,20 +45,12 @@ export class HomeComponent implements OnInit {
 
   editDialogVisible: boolean = false;
   cols: any[] = [];
-  currentDay!: number;
+  currentDay!: string;
 
-  weekdays: any[] = [
-    { name: 'Today', value: 1 },
-    { name: 'Tuesday', value: 2 },
-    { name: 'Wendesday', value: 3 },
-    { name: 'Thursday', value: 4 },
-    { name: 'Friday', value: 5 },
-    { name: 'Saturday', value: 6 },
-    { name: 'Sunday', value: 7 }
+  weekdays: any[] = [];
 
-  ];
-
-  items$ = this.itemExtendedService.items$;
+  oneTimeItems$ = this.itemExtendedService.oneTimeItems$;
+  recurringItems$ = this.itemExtendedService.recurringItems$;
 
   weekData$ = this.itemExtendedService.weekData$.pipe(
     tap((data) => console.log(data)),
@@ -74,22 +66,44 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.initializeWeekdays();
+
     this.cols = [
       { field: 'description', header: 'Opis' }
     ];
 
   }
 
-  editItem(item: ItemDto) {
+  initializeWeekdays(): void {
+    // Function to add days to a date
+    const addDays = (date: Date, days: number): Date => {
+      let result = new Date(date);
+      result.setDate(result.getDate() + days);
+      return result;
+    };
+
+    // Generate weekdays starting from today
+    for (let i = 0; i < 7; i++) {
+      let dateToAdd = addDays(new Date(), i);
+      let dayName = i === 0 ? 'Today' : new Intl.DateTimeFormat('hr-HR', { weekday: 'long' }).format(dateToAdd);
+      this.weekdays.push({
+        name: dayName,
+        value: dateToAdd.toISOString() // Full ISO 8601 date and time format
+      });
+    }
+  }
+
+
+  editItem(itemTask: ItemTaskDto) {
     this.dialogService.open(EditItemDialogComponent, {
       data: {
-        item: item
+        itemTask: itemTask
       },
       //header: this.translate.instant('measurement.dialog.manualChannels')
     });
   }
 
-  deleteItem(item: ItemDto) {
+  deleteItem(itemTask: ItemTaskDto) {
     this.confirmationService.confirm({
       header: 'Delete Confirmation',
       message: 'Do you want to delete this record?',
@@ -97,21 +111,21 @@ export class HomeComponent implements OnInit {
       rejectLabel: 'Odustani',
       accept: () => {
         //obriši i osvježi liste svima
-        this.itemExtendedService.deleteItem(item.id!);
+        this.itemExtendedService.deleteItem(itemTask.id!);
       }
     });
 
     //switchMap će biti unsubscribe-an kada i njegov parent
     //items$ budu unsubscribe-ani, a bit će zbog async pipe-a u html-u
     // ide kroz extended servis, ne lokalno
-    // this.items$ = this.itemService.deleteItem(this.item.id!)
+    // this.items$ = this.itemService.deleteItem(this.itemTask.id!)
     //   .pipe(
     //     switchMap(() => this.itemService.getAllItem())
     //   );
   }
 
-  completeItem(item: ItemDto) {
-    this.itemExtendedService.completeItem(item);
+  completeItem(itemTask: ItemTaskDto) {
+    this.itemExtendedService.completeItem(itemTask.id!);
   }
 
   openNew() {

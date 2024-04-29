@@ -7,7 +7,7 @@ namespace Core.Interfaces
     {
         Task<ItemTask> CommitItemTaskAsync(DateTime commitDay, int itemTaskId);
         Task CompleteItemTaskAsync(int itemTaskId);
-        Task<Item> CreateItemAsync(NewItem newItemDomain);
+        Task<ItemTask> CreateItemAsync(ItemTask itemTaskDomain);
         Task DeleteItemAsync(int itemId);
         Task<List<Item>> GetAllItemsAsync();
         Task<ItemTask> GetItemTaskByIdAsync(int itemTaskId);

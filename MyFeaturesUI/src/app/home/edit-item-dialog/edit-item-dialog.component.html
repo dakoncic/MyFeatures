@@ -1,12 +1,3 @@
-<!--
-<p-dialog
-  [style]="{ width: '450px', height: '1000px' }"
-  header="Item Details"
-  [modal]="true"
-  class="p-fluid"
->
-  <ng-template pTemplate="content"> -->
-
 <form [formGroup]="form" style="height: 650px">
   <div class="field flex flex-column">
     <label for="description">Description</label>
@@ -66,24 +57,20 @@
   </div>
 </form>
 
-<!-- </ng-template> -->
-
-<!-- <ng-template pTemplate="footer">
-    <button
-      pButton
-      pRipple
-      label="Cancel"
-      icon="pi pi-times"
-      class="p-button-text"
-      (click)="hideDialog()"
-    ></button>
-    <button
-      pButton
-      pRipple
-      label="Save"
-      icon="pi pi-check"
-      class="p-button-text"
-      (click)="saveItem()"
-    ></button>
-  </ng-template>
-</p-dialog> -->
+<!-- ne smije biti unutar form jer cancel napravit refresh cijelog page-a -->
+<button
+  pButton
+  pRipple
+  label="Cancel"
+  icon="pi pi-times"
+  class="p-button-text"
+  (click)="hideDialog()"
+></button>
+<button
+  pButton
+  pRipple
+  label="Save"
+  icon="pi pi-check"
+  class="p-button-text"
+  (click)="saveItem()"
+></button>

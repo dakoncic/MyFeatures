@@ -76,18 +76,16 @@ namespace Core.Services
         }
 
 
-        public async Task<Item> CreateItemAsync(NewItem newItemDomain)
+        public async Task<ItemTask> CreateItemAsync(ItemTask itemTaskDomain)
         {
-            //mapiram ono što mogu s NewItem u Item entity.
-            var itemEntity = newItemDomain.Adapt<Entity.Item>();
+            //mapiram parent Item u entity
+            var itemEntity = itemTaskDomain.Item.Adapt<Entity.Item>();
 
-            //odma se po defaulta kreira ItemTask za taj parent
-
+            //po biznis logici, mora po defaulta odma biti kreiran ItemTask
             var itemTaskEntity = new Entity.ItemTask
             {
-                Description = newItemDomain.Description,
-                DueDate = newItemDomain.DueDate,
-                ItemId = itemEntity.Id
+                Description = itemTaskDomain.Description,
+                DueDate = itemTaskDomain.DueDate
             };
 
             itemEntity.ItemTasks.Add(itemTaskEntity);
@@ -98,7 +96,7 @@ namespace Core.Services
 
             //fetchano je i dijete iako je isključen LazyLoading zato što sam ga dodao kad i parenta
 
-            return itemEntity.Adapt<Item>();
+            return itemTaskEntity.Adapt<ItemTask>();
         }
 
         public async Task<ItemTask> UpdateItemAsync(int itemTaskId, ItemTask updatedItemTask)
@@ -153,7 +151,7 @@ namespace Core.Services
             if (itemTaskEntity is not null)
             {
                 //postavi committed date
-                itemTaskEntity.CommittedDate = DateTime.UtcNow;
+                itemTaskEntity.CommittedDate = commitDay;
             }
 
             //ne moramo eksplicitno Update zvat, sam će skužit zbog Get metode

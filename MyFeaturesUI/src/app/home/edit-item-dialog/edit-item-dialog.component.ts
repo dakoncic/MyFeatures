@@ -9,7 +9,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { RippleModule } from 'primeng/ripple';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { Subject, combineLatest, take, takeUntil } from 'rxjs';
-import { ItemDto, ItemService } from '../../../infrastructure';
+import { ItemService, ItemTaskDto } from '../../../infrastructure';
 import { ItemExtendedService } from '../../extended-services/item-extended-service';
 
 @Component({
@@ -31,7 +31,7 @@ import { ItemExtendedService } from '../../extended-services/item-extended-servi
 export class EditItemDialogComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
-  item: ItemDto = {}; //trenutno selektiran
+  itemTask: ItemTaskDto = {}; //trenutno selektiran
   stateOptions: any[] = [{ label: 'One time task', value: true }, { label: 'Repeating', value: false }];
 
   form!: FormGroup;
@@ -59,8 +59,8 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
     });
 
     //ako je edit, povuci s backenda i prikaži na formi
-    if (this.config.data?.item) {
-      this.editItem(this.config.data.item);
+    if (this.config.data?.itemTask) {
+      this.editItem(this.config.data.itemTask);
     }
     else {
       //inače za create disable-a by default
@@ -83,26 +83,26 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
       });
   }
 
-  completeItem(item: ItemDto) {
-    this.itemExtendedService.completeItem(item);
+  completeItem(itemTask: ItemTaskDto) {
+    this.itemExtendedService.completeItem(itemTask.id!);
   }
 
-  //povlači item za edit s backenda
-  editItem(item: ItemDto) {
-    this.itemService.getItemTaskItem(item.id!)
+  //povlači itemTask za edit s backenda
+  editItem(itemTask: ItemTaskDto) {
+    this.itemService.getItemTaskItem(itemTask.id!)
       .pipe(take(1))
-      .subscribe((item) => {
-        this.displayItem(item);
+      .subscribe((itemTask) => {
+        this.displayItem(itemTask);
       });
   }
 
   //popunjava se forma za edit
-  displayItem(item: ItemDto): void {
+  displayItem(itemTask: ItemTaskDto): void {
     this.form.reset();
 
-    this.item = item;
+    this.itemTask = itemTask;
     this.form.patchValue({
-      ...item
+      ...itemTask
     });
   }
 
@@ -110,21 +110,21 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
     //ako nije dirty onda nemoj zvat backend
     if (this.form.dirty) {
 
-      const item: ItemDto = {
+      const itemTask: ItemTaskDto = {
         //prvo stare vrijednosti npr. rowId (concurrency)
-        ...this.item,
+        ...this.itemTask,
         //onda vrijednosti forme
         ...this.form.value
       };
 
-      if (!this.item.id) {
-        this.itemExtendedService.createItem(item)
+      if (!this.itemTask.id) {
+        this.itemExtendedService.createItem(itemTask)
       } else {
-        this.itemExtendedService.updateItem(item);
+        this.itemExtendedService.updateItem(itemTask);
       }
     }
 
-    this.item = {}; //resetiraj trenutni edit item
+    this.itemTask = {}; //resetiraj trenutni edit itemTask
     this.form.reset();
 
     //provjerit jel potrebno
@@ -132,6 +132,7 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
   }
 
   hideDialog(): void {
+    //zašto Cancel button reload-a stranicu
     this.ref.close();
   }
 

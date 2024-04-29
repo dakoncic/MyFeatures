@@ -25,8 +25,6 @@ import { ItemDto } from '../model/itemDto';
 // @ts-ignore
 import { ItemTaskDto } from '../model/itemTaskDto';
 // @ts-ignore
-import { NewItemDto } from '../model/newItemDto';
-// @ts-ignore
 import { WeekDayDto } from '../model/weekDayDto';
 
 // @ts-ignore
@@ -236,14 +234,14 @@ export class ItemService {
     }
 
     /**
-     * @param newItemDto 
+     * @param itemTaskDto 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public createItem(newItemDto?: NewItemDto, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<ItemDto>;
-    public createItem(newItemDto?: NewItemDto, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<ItemDto>>;
-    public createItem(newItemDto?: NewItemDto, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<ItemDto>>;
-    public createItem(newItemDto?: NewItemDto, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public createItem(itemTaskDto?: ItemTaskDto, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<ItemTaskDto>;
+    public createItem(itemTaskDto?: ItemTaskDto, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<ItemTaskDto>>;
+    public createItem(itemTaskDto?: ItemTaskDto, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<ItemTaskDto>>;
+    public createItem(itemTaskDto?: ItemTaskDto, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarHeaders = this.defaultHeaders;
 
@@ -295,10 +293,10 @@ export class ItemService {
         }
 
         let localVarPath = `/api/Item/Create`;
-        return this.httpClient.request<ItemDto>('post', `${this.configuration.basePath}${localVarPath}`,
+        return this.httpClient.request<ItemTaskDto>('post', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: newItemDto,
+                body: itemTaskDto,
                 responseType: <any>responseType_,
                 withCredentials: this.configuration.withCredentials,
                 headers: localVarHeaders,
@@ -751,10 +749,10 @@ export class ItemService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public updateItem(id: number, itemTaskDto?: ItemTaskDto, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any>;
-    public updateItem(id: number, itemTaskDto?: ItemTaskDto, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
-    public updateItem(id: number, itemTaskDto?: ItemTaskDto, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
-    public updateItem(id: number, itemTaskDto?: ItemTaskDto, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public updateItem(id: number, itemTaskDto?: ItemTaskDto, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<ItemTaskDto>;
+    public updateItem(id: number, itemTaskDto?: ItemTaskDto, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<ItemTaskDto>>;
+    public updateItem(id: number, itemTaskDto?: ItemTaskDto, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<ItemTaskDto>>;
+    public updateItem(id: number, itemTaskDto?: ItemTaskDto, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling updateItem.');
         }
@@ -765,6 +763,9 @@ export class ItemService {
         if (localVarHttpHeaderAcceptSelected === undefined) {
             // to determine the Accept header
             const httpHeaderAccepts: string[] = [
+                'text/plain',
+                'application/json',
+                'text/json'
             ];
             localVarHttpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
         }
@@ -806,7 +807,7 @@ export class ItemService {
         }
 
         let localVarPath = `/api/Item/Update/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int32"})}`;
-        return this.httpClient.request<any>('put', `${this.configuration.basePath}${localVarPath}`,
+        return this.httpClient.request<ItemTaskDto>('put', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 body: itemTaskDto,

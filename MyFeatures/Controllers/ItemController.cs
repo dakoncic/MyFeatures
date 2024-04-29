@@ -75,18 +75,18 @@ namespace MyFeatures.Controllers
 
         [HttpPost("Create")]
         //mogao sam i [Route("[action]")] pa iznad [HttpPost], isto je, ali je čišće u jednoj liniji
-        public async Task<ActionResult<ItemDto>> Create(NewItemDto newItemDto)
+        public async Task<ActionResult<ItemTaskDto>> Create(ItemTaskDto itemTaskDto)
         {
-            var newItemDomain = newItemDto.Adapt<NewItem>();  // Map DTO to Domain Model
+            var itemTaskDomain = itemTaskDto.Adapt<ItemTask>();  // Map DTO to Domain Model
 
-            var createdItem = await _itemService.CreateItemAsync(newItemDomain);
-            var createdItemDto = createdItem.Adapt<ItemDto>();  // Map Domain Model back to DTO
+            var createdItem = await _itemService.CreateItemAsync(itemTaskDomain);
+            var createdItemTaskDto = createdItem.Adapt<ItemTaskDto>();  // Map Domain Model back to DTO
 
-            return Ok(createdItemDto);
+            return Ok(createdItemTaskDto);
         }
 
         [HttpPut("Update/{id}")]
-        public async Task<IActionResult> Update(int id, ItemTaskDto itemTaskDto)
+        public async Task<ActionResult<ItemTaskDto>> Update(int id, ItemTaskDto itemTaskDto)
         {
             var itemTaskDomain = itemTaskDto.Adapt<ItemTask>();
             var updatedItemTask = await _itemService.UpdateItemAsync(id, itemTaskDomain);

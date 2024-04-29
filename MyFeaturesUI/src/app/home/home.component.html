@@ -30,9 +30,9 @@
     </p-toolbar>
 
     <div class="grid">
-      <div class="col-4">
+      <div class="col-6">
           <p-table
-            [value]="(items$ | async)!"
+            [value]="(oneTimeItems$ | async)!"
             [columns]="cols"
             [rowHover]="true"
             dataKey="id"
@@ -88,9 +88,9 @@
           </p-table>
       </div>
 
-      <div class="col-4">
+      <div class="col-6">
         <p-table
-          [value]="(items$ | async)!"
+          [value]="(recurringItems$ | async)!"
           [columns]="cols"
           [rowHover]="true"
           dataKey="id"
@@ -139,56 +139,6 @@
         </p-table>
       </div>
 
-      <div class="col-4">
-        <p-table
-          [value]="(items$ | async)!"
-          [columns]="cols"
-          [rowHover]="true"
-          dataKey="id"
-        >
-          <ng-template pTemplate="caption">
-            <div
-              class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
-            >
-              <h5 class="m-0">Čekam, ne ovisi o meni</h5>
-            </div>
-          </ng-template>
-          <ng-template pTemplate="header" let-columns=>
-            <tr>
-              <th scope="col" *ngFor="let col of columns">
-                {{ col.header }}
-              </th>
-              <!-- 1 header za custom kolone -->
-              <th scope="col"></th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-rowData let-columns="columns">
-            <tr>
-              <td *ngFor="let col of columns">
-                <span>{{ rowData[col.field] }}</span>
-              </td>
-              <td>
-                <div class="flex justify-content-end">
-                  <button
-                    pButton
-                    pRipple
-                    icon="pi pi-pencil"
-                    class="p-button-rounded p-button-success mr-2"
-                    (click)="editItem(rowData)"
-                  ></button>
-                  <button
-                    pButton
-                    pRipple
-                    icon="pi pi-trash"
-                    class="p-button-rounded p-button-warning"
-                    (click)="deleteItem(rowData)"
-                  ></button>
-                </div>
-              </td>
-            </tr>
-          </ng-template>
-        </p-table>
-      </div>
 
     </div>
   </div>
