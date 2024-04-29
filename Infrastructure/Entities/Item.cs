@@ -2,7 +2,7 @@
 
 namespace Infrastructure.Entities
 {
-    public class Item
+    public class Item : BaseEntity<int>
     {
         [Key]
         public int Id { get; set; }
@@ -22,6 +22,6 @@ namespace Infrastructure.Entities
         public int DaysBetween { get; set; }
 
         // navigacijski property na djecu, nova lista se inicijalizira tako da nikad ne bude null
-        public virtual ICollection<ItemTask> ItemTasks { get; set; } = new List<ItemTask>();
+        public ICollection<ItemTask> ItemTasks { get; set; } = new List<ItemTask>();
     }
 }

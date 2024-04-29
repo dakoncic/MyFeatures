@@ -86,7 +86,8 @@ namespace Core.Services
             var itemTaskEntity = new Entity.ItemTask
             {
                 Description = newItemDomain.Description,
-                DueDate = newItemDomain.DueDate
+                DueDate = newItemDomain.DueDate,
+                ItemId = itemEntity.Id
             };
 
             itemEntity.ItemTasks.Add(itemTaskEntity);
@@ -95,10 +96,8 @@ namespace Core.Services
 
             await _itemRepository.SaveAsync();
 
-            //itemEntity sadrži samo nove promjene koje su se dogodile usred .SaveAsync()
-            //znači ne mora novi poseban get request nakon Save.
-            //ovdje vraćam samo parenta bez osvježene djece
-            //ovo je ok ako mi ne treba za ništa specijalno, mogao sam skroz drugo vraćat
+            //fetchano je i dijete iako je isključen LazyLoading zato što sam ga dodao kad i parenta
+
             return itemEntity.Adapt<Item>();
         }
 
@@ -146,7 +145,7 @@ namespace Core.Services
         }
 
         //ova metoda nije dobra, mora primati i dan na koji commitam, nije uvijek danas!
-        public async Task<ItemTask> CommitItemTaskAsync(int itemTaskId)
+        public async Task<ItemTask> CommitItemTaskAsync(DateTime commitDay, int itemTaskId)
         {
             var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId);
 
@@ -170,7 +169,7 @@ namespace Core.Services
             //recurring se može complete-at koji ima datum
             //recurring koji nema datum će se samo vratit u svoju listu (novi ItemTask sa committedDate = null)
 
-            var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId);
+            var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId, "Item");
             if (itemTaskEntity == null)
             {
                 throw new NotFoundException($"ItemTask with ID {itemTaskId} not found.");
@@ -188,7 +187,7 @@ namespace Core.Services
                 var newItemTaskEntity = new Entity.ItemTask
                 {
                     ItemId = itemTaskEntity.Item.Id,
-                    Description = itemTaskEntity.Description
+                    Description = itemTaskEntity.Item.Description
                 };
 
                 //ako npr. se uzima riblje ulje ned., neovisno zakasnio dan-2

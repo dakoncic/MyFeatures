@@ -2,7 +2,6 @@
 using Infrastructure.DAL;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
-using MyFeatures.DTO;
 using Entity = Infrastructure.Entities;
 
 namespace Infrastructure.Helpers
@@ -30,19 +29,24 @@ namespace Infrastructure.Helpers
 
         public static void ConfigureMapster()
         {
-            //navodno registracija mapiranja za jednostavan property u property
-            //nije potrebno
+            //mapiranja konfigurirati smjer svaki za sebem
+            //.TwoWays() ne radi sa PreserveReference()
 
-            // Configure mapping from DTOs to domain models and back
-            TypeAdapterConfig<ItemDto, Item>.NewConfig()
-                .TwoWays();
 
-            // Configure mapping from domain models to entity models (if needed)
-            TypeAdapterConfig<Item, Entity.Item>.NewConfig()
-                .TwoWays();
+            //za sad ništa ne puca ako su zakomentirani
+            //TypeAdapterConfig<Item, Entity.Item>.NewConfig()
+            //    .PreserveReference(true);
 
-            TypeAdapterConfig<ItemTask, Entity.ItemTask>.NewConfig()
-                .TwoWays();
+            //TypeAdapterConfig<Entity.Item, Item>.NewConfig()
+            //    .PreserveReference(true);
+
+            //TypeAdapterConfig<ItemTask, Entity.ItemTask>.NewConfig()
+            //    .PreserveReference(true);
+
+            //za sad samo ovaj puca kod mapiranja u CreateItem, bez ovog dobim 'Access Violation'
+            //cirkularna referenca
+            TypeAdapterConfig<Entity.ItemTask, ItemTask>.NewConfig()
+                .PreserveReference(true);
 
         }
     }

@@ -2,7 +2,7 @@
 
 namespace Infrastructure.Entities
 {
-    public class ItemTask
+    public class ItemTask : BaseEntity<int>
     {
         [Key]
         public int Id { get; set; }
@@ -26,6 +26,6 @@ namespace Infrastructure.Entities
         public DateTime? CompletionDate { get; set; }
 
         // Navigation property na parenta
-        public virtual Item Item { get; set; }
+        public Item Item { get; set; }
     }
 }

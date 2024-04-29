@@ -6,6 +6,7 @@ using Infrastructure.Interfaces.IRepository;
 using Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
 using MyFeatures.Helpers;
+using MyFeatures.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 var _configuration = builder.Configuration;
@@ -70,6 +71,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 //dodano zbog UI 
 app.UseStaticFiles();

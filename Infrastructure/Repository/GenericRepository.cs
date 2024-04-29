@@ -1,11 +1,13 @@
 ﻿using Infrastructure.DAL;
+using Infrastructure.Entities;
 using Infrastructure.Interfaces.IRepository;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace Infrastructure.Repository
 {
-    public class GenericRepository<TEntity, TKeyType> : IGenericRepository<TEntity, TKeyType> where TEntity : class
+    public class GenericRepository<TEntity, TKeyType> : IGenericRepository<TEntity, TKeyType>
+        where TEntity : BaseEntity<TKeyType>
     {
         protected readonly MyFeaturesDbContext _context;
         protected readonly DbSet<TEntity> _dbSet;
@@ -58,14 +60,16 @@ namespace Infrastructure.Repository
             return await query.ToListAsync();
         }
 
-        public async Task<TEntity> GetByIdAsync(TKeyType id)
+        public async Task<TEntity> GetByIdAsync(TKeyType id, string includeProperties = "")
         {
-            //ne želimo ovdje bacit exception zato što ponekad možda i nije exception
-            //zato hendlaemo u Core (business logika/odluka dali je exception)
-            //a ne u data retrieval layeru
+            IQueryable<TEntity> query = _dbSet;
 
-            //first or default ovdje ili ovako?
-            return await _dbSet.FindAsync(id);
+            foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProperty);
+            }
+
+            return await query.FirstOrDefaultAsync(e => e.Id.Equals(id));
         }
 
         public async Task<TEntity> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> filter)

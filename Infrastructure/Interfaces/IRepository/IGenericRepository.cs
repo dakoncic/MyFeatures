@@ -11,7 +11,7 @@ namespace Infrastructure.Interfaces.IRepository
             string includeProperties = "",
             int? skip = null,
             int? take = null);
-        Task<TEntity> GetByIdAsync(TKeyType id);
+        Task<TEntity> GetByIdAsync(TKeyType id, string includeProperties = "");
         Task<TEntity> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> filter);
 
         // Synchronous write operations

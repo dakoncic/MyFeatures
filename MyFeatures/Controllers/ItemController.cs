@@ -18,10 +18,10 @@ namespace MyFeatures.Controllers
             _itemService = itemService;
         }
 
-        [HttpPost("CommitItemTask/{itemTaskId}")]
-        public async Task<ActionResult<ItemTaskDto>> CommitItemTask(int itemTaskId)
+        [HttpPost("CommitItemTask")]
+        public async Task<ActionResult<ItemTaskDto>> CommitItemTask(CommitItemTaskDto itemTaskDto)
         {
-            await _itemService.CommitItemTaskAsync(itemTaskId);
+            await _itemService.CommitItemTaskAsync(itemTaskDto.CommitDay, itemTaskDto.ItemTaskId);
 
             return Ok();
         }
@@ -37,24 +37,24 @@ namespace MyFeatures.Controllers
         }
 
         [HttpGet("GetOneTimeItemTasks")]
-        public async Task<ActionResult<IEnumerable<ItemDto>>> GetOneTimeItemTasks()
+        public async Task<ActionResult<IEnumerable<ItemTaskDto>>> GetOneTimeItemTasks()
         {
             var itemTasks = await _itemService.GetOneTimeItemTasksAsync();
-            var itemTaskDto = itemTasks.Adapt<List<ItemTaskDto>>();
+            var itemTasksDto = itemTasks.Adapt<List<ItemTaskDto>>();
 
-            return Ok(itemTaskDto);
+            return Ok(itemTasksDto);
         }
 
         [HttpGet("GetRecurringItemTasks")]
-        public async Task<ActionResult<IEnumerable<ItemDto>>> GetRecurringItemTasks()
+        public async Task<ActionResult<IEnumerable<ItemTaskDto>>> GetRecurringItemTasks()
         {
             var itemTasks = await _itemService.GetRecurringItemTasksAsync();
-            var itemTaskDto = itemTasks.Adapt<List<ItemTaskDto>>();
+            var itemTasksDto = itemTasks.Adapt<List<ItemTaskDto>>();
 
-            return Ok(itemTaskDto);
+            return Ok(itemTasksDto);
         }
 
-        [HttpPost("ReturnItemTaskToGroup")]
+        [HttpPost("ReturnItemTaskToGroup/{itemTaskId}")]
         public async Task<ActionResult<ItemDto>> ReturnItemTaskToGroup(int itemTaskId)
         {
             await _itemService.ReturnItemTaskToGroupAsync(itemTaskId);
@@ -103,7 +103,7 @@ namespace MyFeatures.Controllers
             return NoContent();  // Indicate successful deletion with HTTP 204 No Content
         }
 
-        [HttpPost("CompleteItemTask/{id}")]
+        [HttpPost("CompleteItemTask/{itemTaskId}")]
         public async Task<IActionResult> CompleteItemTask(int itemTaskId)
         {
             await _itemService.CompleteItemTaskAsync(itemTaskId);
