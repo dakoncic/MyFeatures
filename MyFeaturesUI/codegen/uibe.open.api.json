@@ -5,23 +5,31 @@
     "version": "1.0"
   },
   "paths": {
-    "/api/Item/CommitItemTask/{itemTaskId}": {
+    "/api/Item/CommitItemTask": {
       "post": {
         "tags": [
           "Item"
         ],
         "operationId": "CommitItemTaskItem",
-        "parameters": [
-          {
-            "name": "itemTaskId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommitItemTaskDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommitItemTaskDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommitItemTaskDto"
+              }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
             "description": "Success",
@@ -99,7 +107,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ItemDto"
+                    "$ref": "#/components/schemas/ItemTaskDto"
                   }
                 }
               },
@@ -107,7 +115,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ItemDto"
+                    "$ref": "#/components/schemas/ItemTaskDto"
                   }
                 }
               },
@@ -115,7 +123,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ItemDto"
+                    "$ref": "#/components/schemas/ItemTaskDto"
                   }
                 }
               }
@@ -138,7 +146,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ItemDto"
+                    "$ref": "#/components/schemas/ItemTaskDto"
                   }
                 }
               },
@@ -146,7 +154,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ItemDto"
+                    "$ref": "#/components/schemas/ItemTaskDto"
                   }
                 }
               },
@@ -154,7 +162,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ItemDto"
+                    "$ref": "#/components/schemas/ItemTaskDto"
                   }
                 }
               }
@@ -163,7 +171,7 @@
         }
       }
     },
-    "/api/Item/ReturnItemTaskToGroup": {
+    "/api/Item/ReturnItemTaskToGroup/{itemTaskId}": {
       "post": {
         "tags": [
           "Item"
@@ -172,7 +180,8 @@
         "parameters": [
           {
             "name": "itemTaskId",
-            "in": "query",
+            "in": "path",
+            "required": true,
             "schema": {
               "type": "integer",
               "format": "int32"
@@ -360,7 +369,7 @@
         }
       }
     },
-    "/api/Item/CompleteItemTask/{id}": {
+    "/api/Item/CompleteItemTask/{itemTaskId}": {
       "post": {
         "tags": [
           "Item"
@@ -369,18 +378,11 @@
         "parameters": [
           {
             "name": "itemTaskId",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],
@@ -433,6 +435,20 @@
   },
   "components": {
     "schemas": {
+      "CommitItemTaskDto": {
+        "type": "object",
+        "properties": {
+          "itemTaskId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "commitDay": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
       "ItemDto": {
         "type": "object",
         "properties": {
