@@ -18,8 +18,8 @@ namespace Infrastructure.Entities
         //ako je false, onda će se days between dodat na completion date
         //za novi DueDate
         //ako je true onda na DueDate
-        public bool RenewOnDueDate { get; set; }
-        public int DaysBetween { get; set; }
+        public bool? RenewOnDueDate { get; set; }
+        public int? DaysBetween { get; set; }
 
         // navigacijski property na djecu, nova lista se inicijalizira tako da nikad ne bude null
         public ICollection<ItemTask> ItemTasks { get; set; } = new List<ItemTask>();

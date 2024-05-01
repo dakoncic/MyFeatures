@@ -16,8 +16,8 @@ export interface ItemDto {
     id?: number;
     description?: string | null;
     recurring?: boolean;
-    renewOnDueDate?: boolean;
-    daysBetween?: number;
+    renewOnDueDate?: boolean | null;
+    daysBetween?: number | null;
     itemTasks?: Array<ItemTaskDto> | null;
 }
 

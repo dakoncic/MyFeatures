@@ -20,10 +20,21 @@
   </div>
 
   <div class="field">
-    <label for="oneTimeTask">To do only once?</label>
+    <label for="recurring">To do only once?</label>
     <p-selectButton
       [options]="stateOptions"
-      formControlName="oneTimeTask"
+      formControlName="recurring"
+      optionLabel="label"
+      optionValue="value"
+    >
+    </p-selectButton>
+  </div>
+
+  <div class="field">
+    <label for="recurring">Renew on Due date or completion date?</label>
+    <p-selectButton
+      [options]="renewOptions"
+      formControlName="renewOnDueDate"
       optionLabel="label"
       optionValue="value"
     >
@@ -38,22 +49,10 @@
   </div>
 
   <div class="field">
-    <label class="w-full" for="daysBetweenRepeat"
+    <label class="w-full" for="daysBetween"
       >How many days between task repeats?
     </label>
-    <p-inputNumber
-      formControlName="daysBetweenRepeat"
-      [ngClass]="{
-        'ng-invalid ng-dirty': description?.invalid && description?.dirty
-      }"
-    >
-    </p-inputNumber>
-    <small
-      *ngIf="daysBetweenRepeat?.invalid && daysBetweenRepeat?.dirty"
-      class="ng-dirty ng-invalid"
-    >
-      Days between repeat is required.
-    </small>
+    <p-inputNumber formControlName="daysBetween"> </p-inputNumber>
   </div>
 </form>
 

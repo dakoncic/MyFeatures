@@ -415,7 +415,7 @@
         "tags": [
           "Item"
         ],
-        "operationId": "GetItemsForWeekItem",
+        "operationId": "GetCommitedItemsForNextWeekItem",
         "responses": {
           "200": {
             "description": "Success",
@@ -481,11 +481,13 @@
             "type": "boolean"
           },
           "renewOnDueDate": {
-            "type": "boolean"
+            "type": "boolean",
+            "nullable": true
           },
           "daysBetween": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "nullable": true
           },
           "itemTasks": {
             "type": "array",
@@ -526,6 +528,9 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
+          },
+          "item": {
+            "$ref": "#/components/schemas/ItemDto"
           }
         },
         "additionalProperties": false

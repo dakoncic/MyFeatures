@@ -28,7 +28,7 @@ export class ItemExtendedService {
     .pipe(switchMap(() => this.itemService.getRecurringItemTasksItem()));
 
   weekData$ = this.weekDaysSourceSubject
-    .pipe(switchMap(() => this.itemService.getItemsForWeekItem()));
+    .pipe(switchMap(() => this.itemService.getCommitedItemsForNextWeekItem()));
 
   //na create item, za sad osvježavamo sve
   createItem(itemTask: ItemTaskDto) {

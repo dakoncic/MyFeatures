@@ -20,8 +20,8 @@ namespace Infrastructure.Migrations
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     Recurring = table.Column<bool>(type: "bit", nullable: false),
                     Deleted = table.Column<bool>(type: "bit", nullable: false),
-                    RenewOnDueDate = table.Column<bool>(type: "bit", nullable: false),
-                    DaysBetween = table.Column<int>(type: "int", nullable: false)
+                    RenewOnDueDate = table.Column<bool>(type: "bit", nullable: true),
+                    DaysBetween = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {

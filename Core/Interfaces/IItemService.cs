@@ -11,7 +11,7 @@ namespace Core.Interfaces
         Task DeleteItemAsync(int itemId);
         Task<List<Item>> GetAllItemsAsync();
         Task<ItemTask> GetItemTaskByIdAsync(int itemTaskId);
-        Task<Dictionary<DateTime, List<Entity.ItemTask>>> GetItemsForNextWeekAsync();
+        Task<Dictionary<DateTime, List<Entity.ItemTask>>> GetCommitedItemsForNextWeekAsync();
         Task<List<ItemTask>> GetOneTimeItemTasksAsync();
         Task<List<ItemTask>> GetRecurringItemTasksAsync();
         Task ReturnItemTaskToGroupAsync(int itemTaskId);

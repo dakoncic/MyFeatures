@@ -8,6 +8,7 @@ import { RippleModule } from 'primeng/ripple';
 import { TableModule } from 'primeng/table';
 import { Observable } from 'rxjs';
 import { ItemTaskDto } from '../../../infrastructure';
+import { DescriptionType } from '../../enum/description-type.enum';
 import { ItemExtendedService } from '../../extended-services/item-extended-service';
 import { EditItemDialogComponent } from '../edit-item-dialog/edit-item-dialog.component';
 
@@ -88,6 +89,7 @@ export class TodoComponent {
   editItem(itemTask: ItemTaskDto) {
     this.dialogService.open(EditItemDialogComponent, {
       data: {
+        descriptionType: DescriptionType.TaskItemDescription,
         itemTask: itemTask
       },
       //header: this.translate.instant('measurement.dialog.manualChannels')

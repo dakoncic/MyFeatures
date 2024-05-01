@@ -10,6 +10,7 @@ import { RippleModule } from 'primeng/ripple';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { Subject, combineLatest, take, takeUntil } from 'rxjs';
 import { ItemService, ItemTaskDto } from '../../../infrastructure';
+import { DescriptionType } from '../../enum/description-type.enum';
 import { ItemExtendedService } from '../../extended-services/item-extended-service';
 
 @Component({
@@ -32,7 +33,10 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   itemTask: ItemTaskDto = {}; //trenutno selektiran
-  stateOptions: any[] = [{ label: 'One time task', value: true }, { label: 'Repeating', value: false }];
+  stateOptions: any[] = [{ label: 'One time task', value: false }, { label: 'Repeating', value: true }];
+
+  renewOptions: any[] = [{ label: 'Due date', value: true }, { label: 'Completion date', value: false }];
+  descriptionType!: DescriptionType;
 
   form!: FormGroup;
   private formBuilder = inject(FormBuilder);
@@ -46,20 +50,23 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
     return this.form.get('description');
   }
 
-  get daysBetweenRepeat() {
-    return this.form.get('daysBetweenRepeat');
+  get daysBetween() {
+    return this.form.get('daysBetween');
   }
 
   ngOnInit() {
     this.form = this.formBuilder.group({
       description: ['', Validators.required],
-      oneTimeTask: [true],
+      recurring: [false],
+      renewOnDueDate: [null],
       dueDate: [null],
-      daysBetweenRepeat: [null, Validators.required],
+      daysBetween: [null],
     });
 
     //ako je edit, povuci s backenda i prikaži na formi
     if (this.config.data?.itemTask) {
+      this.descriptionType = this.config.data.descriptionType;
+
       this.editItem(this.config.data.itemTask);
     }
     else {
@@ -68,18 +75,18 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
     }
 
     combineLatest([
-      this.form.get('oneTimeTask')!.valueChanges,
+      this.form.get('recurring')!.valueChanges,
       this.form.get('dueDate')!.valueChanges,
     ])
       .pipe(takeUntil(this.destroy$))
       .subscribe(([oneTime, dueDate]) => {
         if (!oneTime && dueDate) {
-          this.form.get('daysBetweenRepeat')?.enable();
+          this.form.get('daysBetween')?.enable();
         } else {
-          this.form.get('daysBetweenRepeat')?.disable();
+          this.form.get('daysBetween')?.disable();
         }
 
-        this.form.get('daysBetweenRepeat')?.updateValueAndValidity();
+        this.form.get('daysBetween')?.updateValueAndValidity();
       });
   }
 
@@ -101,8 +108,15 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
     this.form.reset();
 
     this.itemTask = itemTask;
+
+    const description = this.descriptionType === DescriptionType.OriginalDescription ? itemTask.item!.description : itemTask.description;
+
     this.form.patchValue({
-      ...itemTask
+      description: description,
+      recurring: itemTask.item!.recurring,
+      renewOnDueDate: itemTask.item!.renewOnDueDate,
+      dueDate: itemTask.dueDate,
+      daysBetween: itemTask.item!.daysBetween
     });
   }
 
@@ -110,16 +124,43 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
     //ako nije dirty onda nemoj zvat backend
     if (this.form.dirty) {
 
-      const itemTask: ItemTaskDto = {
-        //prvo stare vrijednosti npr. rowId (concurrency)
-        ...this.itemTask,
-        //onda vrijednosti forme
-        ...this.form.value
-      };
-
       if (!this.itemTask.id) {
+        const itemTask: ItemTaskDto = {
+
+          dueDate: this.form.value.dueDate,
+          description: this.form.value.description,
+          item: {
+            description: this.form.value.description,
+            recurring: this.form.value.recurring,
+            renewOnDueDate: this.form.value.renewOnDueDate,
+            daysBetween: this.form.value.daysBetween
+          }
+        };
+
         this.itemExtendedService.createItem(itemTask)
       } else {
+
+        const itemTask: ItemTaskDto = {
+          //prvo stare vrijednosti npr. rowId (concurrency)
+          ...this.itemTask,
+
+          dueDate: this.form.value.dueDate,
+          item: {
+            ...this.itemTask.item,
+            recurring: this.form.value.recurring,
+            renewOnDueDate: this.form.value.renewOnDueDate,
+            daysBetween: this.form.value.daysBetween
+          }
+        };
+
+        //ako je update uncommitted item-a (original), onda njega update-at iz forme
+        if (this.descriptionType === DescriptionType.OriginalDescription) {
+          itemTask.item!.description = this.form.value.description;
+        } else {
+          //inače update-at child item
+          itemTask.description = this.form.value.description;
+        }
+
         this.itemExtendedService.updateItem(itemTask);
       }
     }
@@ -132,7 +173,6 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
   }
 
   hideDialog(): void {
-    //zašto Cancel button reload-a stranicu
     this.ref.close();
   }
 

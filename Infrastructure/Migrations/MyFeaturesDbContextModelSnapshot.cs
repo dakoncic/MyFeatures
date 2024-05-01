@@ -30,7 +30,7 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("DaysBetween")
+                    b.Property<int?>("DaysBetween")
                         .HasColumnType("int");
 
                     b.Property<bool>("Deleted")
@@ -44,7 +44,7 @@ namespace Infrastructure.Migrations
                     b.Property<bool>("Recurring")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("RenewOnDueDate")
+                    b.Property<bool?>("RenewOnDueDate")
                         .HasColumnType("bit");
 
                     b.HasKey("Id");

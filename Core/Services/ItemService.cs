@@ -46,7 +46,7 @@ namespace Core.Services
 
         public async Task<List<ItemTask>> GetRecurringItemTasksAsync()
         {
-            //ponavljajući taskovi, nisu izbrisani. *U budućnosti možda ne dohvaćat ako su commited, al za sad da
+            //ponavljajući taskovi, mogu bit committed
             Expression<Func<Entity.ItemTask, bool>> filter = i => i.Item.Recurring && !i.Item.Deleted;
 
             var items = await _itemTaskRepository.GetAllAsync(filter);
@@ -54,11 +54,12 @@ namespace Core.Services
             return items.Adapt<List<ItemTask>>();
         }
 
-        //refaktorat ovo, napravit ItemTask service
-        //i mapirat ovo u kontroleru, odma entitet jer nije bitno stvarno
-        public async Task<Dictionary<DateTime, List<Entity.ItemTask>>> GetItemsForNextWeekAsync()
+        public async Task<Dictionary<DateTime, List<Entity.ItemTask>>> GetCommitedItemsForNextWeekAsync()
         {
-            var groupedItems = await _itemTaskExtendedRepository.GetItemTasksGroupedByDueDateForNextWeek();
+            //refaktor da se zove prije prvog fetcha u danu
+            await _itemTaskExtendedRepository.UpdateWeekDayTaskItems();
+
+            var groupedItems = await _itemTaskExtendedRepository.GetItemTasksGroupedByCommitDateForNextWeek();
 
             return groupedItems;
         }
@@ -76,17 +77,15 @@ namespace Core.Services
         }
 
 
+        //pitat chat gpt jel ima smisla flow od frontend forme to backend ove metode što radim
         public async Task<ItemTask> CreateItemAsync(ItemTask itemTaskDomain)
         {
-            //mapiram parent Item u entity
+            //*provjerit kako dođe s frontenda, hoće li potencijalo već držat dijete ovdje
+            //ili ga moram eksplicitno ubacit u listu sa .Add(itemTaskEntity);
             var itemEntity = itemTaskDomain.Item.Adapt<Entity.Item>();
 
             //po biznis logici, mora po defaulta odma biti kreiran ItemTask
-            var itemTaskEntity = new Entity.ItemTask
-            {
-                Description = itemTaskDomain.Description,
-                DueDate = itemTaskDomain.DueDate
-            };
+            var itemTaskEntity = itemTaskDomain.Adapt<Entity.ItemTask>();
 
             itemEntity.ItemTasks.Add(itemTaskEntity);
 
@@ -96,7 +95,7 @@ namespace Core.Services
 
             //fetchano je i dijete iako je isključen LazyLoading zato što sam ga dodao kad i parenta
 
-            return itemTaskEntity.Adapt<ItemTask>();
+            return itemTaskEntity.Adapt<ItemTask>(); //access violation opet
         }
 
         public async Task<ItemTask> UpdateItemAsync(int itemTaskId, ItemTask updatedItemTask)
@@ -119,7 +118,7 @@ namespace Core.Services
             updatedItemTask.Adapt(itemTaskEntity);
 
             //parenta eksplicitno adaptat za potencijalne promjene
-            //child i parent svaki za sebe kad nema posebne konfiguracije
+            //TESTIRAT jel moram eksplicitno ili preko childa se može? ^linija iznad
             updatedItemTask.Item.Adapt(itemTaskEntity.Item);
 
             //ne trebam zvat .Update() ako je iz istog DbContext scope-a (može samo get)
@@ -142,7 +141,6 @@ namespace Core.Services
             await _itemRepository.SaveAsync();
         }
 
-        //ova metoda nije dobra, mora primati i dan na koji commitam, nije uvijek danas!
         public async Task<ItemTask> CommitItemTaskAsync(DateTime commitDay, int itemTaskId)
         {
             var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId);
@@ -177,7 +175,7 @@ namespace Core.Services
             //vrijeme complete-anja je sad, i tu završavamo s ovim taskom
             itemTaskEntity.CompletionDate = DateTime.UtcNow;
 
-            //ako je recurring i ako ima due date, onda moram postavit novi due date
+            //ako je recurring, kreiram novi itemTask
             //i kreira se novi ItemTask
             if (itemTaskEntity.Item.Recurring)
             {
@@ -192,18 +190,23 @@ namespace Core.Services
                 //onda uvečavam na DueDate
                 //ali ako je ponavljajući bez datuma, npr. posjet zubarici (ja određujem kad, nema DueDate)
                 //onda se ne uvečava ništa
-                if (itemTaskEntity.DueDate is not null)
+
+                //ako je DueDate not null i ako ima daysBetween, a ne samo ako je DueDate not null
+                if (itemTaskEntity.DueDate is not null && itemTaskEntity.Item.DaysBetween is not null)
                 {
-                    if (itemTaskEntity.Item.RenewOnDueDate)
+                    //ako due date
+                    if (itemTaskEntity.Item.RenewOnDueDate!.Value)
                     {
-                        newItemTaskEntity.DueDate = itemTaskEntity.DueDate.Value.AddDays(itemTaskEntity.Item.DaysBetween);
+                        newItemTaskEntity.DueDate = itemTaskEntity.DueDate.Value.AddDays(itemTaskEntity.Item.DaysBetween!.Value);
                     }
                     //inače se obnavlja na completion date a ti he sad (npr. registracija auta)
                     else
                     {
-                        newItemTaskEntity.DueDate = itemTaskEntity.CompletionDate.Value.AddDays(itemTaskEntity.Item.DaysBetween);
+                        newItemTaskEntity.DueDate = itemTaskEntity.CompletionDate.Value.AddDays(itemTaskEntity.Item.DaysBetween!.Value);
                     }
                 }
+
+                //ako DueDate nije null, onda ostaje null, ne postavljen
 
 
                 _itemTaskRepository.Add(newItemTaskEntity);

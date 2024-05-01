@@ -11,6 +11,7 @@ import { TableModule } from 'primeng/table';
 import { ToolbarModule } from 'primeng/toolbar';
 import { map, of, tap } from 'rxjs';
 import { ItemTaskDto } from '../../infrastructure';
+import { DescriptionType } from '../enum/description-type.enum';
 import { ItemExtendedService } from '../extended-services/item-extended-service';
 import { EditItemDialogComponent } from './edit-item-dialog/edit-item-dialog.component';
 import { TodoComponent } from './todo/todo.component';
@@ -97,6 +98,7 @@ export class HomeComponent implements OnInit {
   editItem(itemTask: ItemTaskDto) {
     this.dialogService.open(EditItemDialogComponent, {
       data: {
+        descriptionType: DescriptionType.OriginalDescription,
         itemTask: itemTask
       },
       //header: this.translate.instant('measurement.dialog.manualChannels')

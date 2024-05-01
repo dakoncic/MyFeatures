@@ -9,6 +9,7 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { ItemDto } from './itemDto';
 
 
 export interface ItemTaskDto { 
@@ -18,5 +19,6 @@ export interface ItemTaskDto {
     dueDate?: string | null;
     description?: string | null;
     completionDate?: string | null;
+    item?: ItemDto;
 }
 

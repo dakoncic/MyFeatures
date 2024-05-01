@@ -113,11 +113,11 @@ namespace MyFeatures.Controllers
         }
 
         [HttpGet("GetItemsForWeek")]
-        public async Task<IEnumerable<WeekDayDto>> GetItemsForWeekAsync()
+        public async Task<IEnumerable<WeekDayDto>> GetCommitedItemsForNextWeek()
         {
             var weekDays = new List<WeekDayDto>();
 
-            var groupedItems = await _itemService.GetItemsForNextWeekAsync();
+            var groupedItems = await _itemService.GetCommitedItemsForNextWeekAsync();
             var weekDayDtos = groupedItems
                 .Select(group => new WeekDayDto
                 {

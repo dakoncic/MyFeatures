@@ -2,6 +2,7 @@
 using Infrastructure.DAL;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
+using MyFeatures.DTO;
 using Entity = Infrastructure.Entities;
 
 namespace Infrastructure.Helpers
@@ -46,6 +47,9 @@ namespace Infrastructure.Helpers
             //za sad samo ovaj puca kod mapiranja u CreateItem, bez ovog dobim 'Access Violation'
             //cirkularna referenca
             TypeAdapterConfig<Entity.ItemTask, ItemTask>.NewConfig()
+                .PreserveReference(true);
+
+            TypeAdapterConfig<ItemTask, ItemTaskDto>.NewConfig()
                 .PreserveReference(true);
 
         }
