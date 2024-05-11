@@ -19,7 +19,7 @@ namespace MyFeatures.Controllers
         }
 
         [HttpPost("CommitItemTask")]
-        public async Task<ActionResult<ItemTaskDto>> CommitItemTask(CommitItemTaskDto itemTaskDto)
+        public async Task<ActionResult> CommitItemTask(CommitItemTaskDto itemTaskDto)
         {
             await _itemService.CommitItemTaskAsync(itemTaskDto.CommitDay, itemTaskDto.ItemTaskId);
 
@@ -55,7 +55,7 @@ namespace MyFeatures.Controllers
         }
 
         [HttpPost("ReturnItemTaskToGroup/{itemTaskId}")]
-        public async Task<ActionResult<ItemDto>> ReturnItemTaskToGroup(int itemTaskId)
+        public async Task<ActionResult> ReturnItemTaskToGroup(int itemTaskId)
         {
             await _itemService.ReturnItemTaskToGroupAsync(itemTaskId);
 

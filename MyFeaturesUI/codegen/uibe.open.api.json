@@ -32,24 +32,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ItemTaskDto"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ItemTaskDto"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ItemTaskDto"
-                }
-              }
-            }
+            "description": "Success"
           }
         }
       }
@@ -190,24 +173,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ItemDto"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ItemDto"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ItemDto"
-                }
-              }
-            }
+            "description": "Success"
           }
         }
       }
@@ -487,13 +453,6 @@
           "daysBetween": {
             "type": "integer",
             "format": "int32",
-            "nullable": true
-          },
-          "itemTasks": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ItemTaskDto"
-            },
             "nullable": true
           }
         },

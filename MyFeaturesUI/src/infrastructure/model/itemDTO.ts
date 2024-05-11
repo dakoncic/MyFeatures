@@ -9,7 +9,6 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { ItemTaskDto } from './itemTaskDto';
 
 
 export interface ItemDto { 
@@ -18,6 +17,5 @@ export interface ItemDto {
     recurring?: boolean;
     renewOnDueDate?: boolean | null;
     daysBetween?: number | null;
-    itemTasks?: Array<ItemTaskDto> | null;
 }
 

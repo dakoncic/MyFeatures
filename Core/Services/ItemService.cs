@@ -4,6 +4,7 @@ using Core.Interfaces;
 using Infrastructure.Interfaces.IRepository;
 using Mapster;
 using System.Linq.Expressions;
+//using Infrastructure.Entities; ako imam error ambiguous reference, onda maknut ovu liniju
 using Entity = Infrastructure.Entities;
 
 namespace Core.Services
@@ -67,7 +68,7 @@ namespace Core.Services
 
         public async Task<ItemTask> GetItemTaskByIdAsync(int itemTaskId)
         {
-            var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId);
+            var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId, "Item");
             if (itemTaskEntity == null)
             {
                 throw new NotFoundException($"ItemTask with ID {itemTaskId} not found.");
@@ -80,8 +81,6 @@ namespace Core.Services
         //pitat chat gpt jel ima smisla flow od frontend forme to backend ove metode što radim
         public async Task<ItemTask> CreateItemAsync(ItemTask itemTaskDomain)
         {
-            //*provjerit kako dođe s frontenda, hoće li potencijalo već držat dijete ovdje
-            //ili ga moram eksplicitno ubacit u listu sa .Add(itemTaskEntity);
             var itemEntity = itemTaskDomain.Item.Adapt<Entity.Item>();
 
             //po biznis logici, mora po defaulta odma biti kreiran ItemTask
@@ -95,7 +94,7 @@ namespace Core.Services
 
             //fetchano je i dijete iako je isključen LazyLoading zato što sam ga dodao kad i parenta
 
-            return itemTaskEntity.Adapt<ItemTask>(); //access violation opet
+            return itemTaskEntity.Adapt<ItemTask>();
         }
 
         public async Task<ItemTask> UpdateItemAsync(int itemTaskId, ItemTask updatedItemTask)
@@ -103,11 +102,10 @@ namespace Core.Services
             //radi se prvo get a ne odma update, zbog concurrency npr.
             //da ne može commitat na bazu ako je netko drugi u
             //međuvremenu save-ao a mi onda immao krivi row version
-            //ili "you might have a rule that says a transaction can only be updated if it is in a pending state"
-            //znači ima neki uvjet, neki "if" za neki property
+            //ili npr. ako je u međuvremenu obrisan pa i ne postoji više
 
             //include properties fali kao parametar u ovoj metodi
-            var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId);
+            var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId, "Item");
             if (itemTaskEntity == null)
             {
                 throw new NotFoundException($"ItemTask with ID {itemTaskId} not found.");
@@ -117,11 +115,10 @@ namespace Core.Services
             //ovo neće transformirat entity objekt u domain, samo update se radi
             updatedItemTask.Adapt(itemTaskEntity);
 
-            //parenta eksplicitno adaptat za potencijalne promjene
-            //TESTIRAT jel moram eksplicitno ili preko childa se može? ^linija iznad
-            updatedItemTask.Item.Adapt(itemTaskEntity.Item);
-
-            //ne trebam zvat .Update() ako je iz istog DbContext scope-a (može samo get)
+            //ako dto child ima referencu na parent, parent dto nebi trebao imat na child
+            //zato što se dogodi da kad s frontenda šaljem child s ref. na parenta
+            //onda parent nema natrag na child, što mi kod .Adapt(itemTaskEntity) mapiranja ta prazna child lista
+            //pregazi itemTaskEntity povučen s frontenda, i na update se obriše child.
 
             await _itemTaskRepository.SaveAsync();
 
@@ -141,21 +138,21 @@ namespace Core.Services
             await _itemRepository.SaveAsync();
         }
 
-        public async Task<ItemTask> CommitItemTaskAsync(DateTime commitDay, int itemTaskId)
+        public async Task CommitItemTaskAsync(DateTime commitDay, int itemTaskId)
         {
             var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId);
 
             //ako nije obrisanm radimo update
-            if (itemTaskEntity is not null)
+            if (itemTaskEntity is null)
             {
-                //postavi committed date
-                itemTaskEntity.CommittedDate = commitDay;
+                throw new NotFoundException($"ItemTask with ID {itemTaskId} not found.");
             }
+
+            //postavi committed date
+            itemTaskEntity.CommittedDate = commitDay;
 
             //ne moramo eksplicitno Update zvat, sam će skužit zbog Get metode
             await _itemRepository.SaveAsync();
-
-            return itemTaskEntity.Adapt<ItemTask>();
         }
 
         //jel ok ako ništa ne vraćamo kao i za delete?

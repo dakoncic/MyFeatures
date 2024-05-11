@@ -73,10 +73,20 @@ export class HomeComponent implements OnInit {
       { field: 'description', header: 'Opis' }
     ];
 
+
+  }
+
+  onDayChange(event: any) {
+    console.log(event.value);
+  }
+
+  assignItemToSelectedWeekday(itemTask: ItemTaskDto, commitDay: string) {
+    if (this.currentDay) {
+      this.itemExtendedService.commitItem(itemTask.id!, commitDay);
+    }
   }
 
   initializeWeekdays(): void {
-    // Function to add days to a date
     const addDays = (date: Date, days: number): Date => {
       let result = new Date(date);
       result.setDate(result.getDate() + days);

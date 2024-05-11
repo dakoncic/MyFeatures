@@ -7,6 +7,7 @@ using Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
 using MyFeatures.Helpers;
 using MyFeatures.Middlewares;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 var _configuration = builder.Configuration;
@@ -33,7 +34,12 @@ builder.Services.AddScoped<IItemTaskRepository, ItemTaskRepository>();
 
 builder.Services.AddScoped<IItemService, ItemService>();
 
-builder.Services.AddControllers();
+//ovo je dodatak konfiguracije za cirkularnu referencu
+//kada return u akciji već uspješno prođe zbog Mapstera
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
 
 //mapster registracija nakon servisa
 StartupHelper.ConfigureMapster();

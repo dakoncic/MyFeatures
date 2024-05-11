@@ -7,12 +7,6 @@
         public bool Recurring { get; set; }
         public bool? RenewOnDueDate { get; set; }
         public int? DaysBetween { get; set; }
-        public ICollection<ItemTask> ItemTasks { get; set; }
-
-        public Item()
-        {
-            ItemTasks = new List<ItemTask>();
-        }
     }
 
 }

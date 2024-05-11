@@ -44,7 +44,7 @@ namespace Infrastructure.Helpers
             //TypeAdapterConfig<ItemTask, Entity.ItemTask>.NewConfig()
             //    .PreserveReference(true);
 
-            //za sad samo ovaj puca kod mapiranja u CreateItem, bez ovog dobim 'Access Violation'
+            //za sad samo ovi pucaju kod mapiranja u CreateItem, bez ovog dobim 'Access Violation'
             //cirkularna referenca
             TypeAdapterConfig<Entity.ItemTask, ItemTask>.NewConfig()
                 .PreserveReference(true);

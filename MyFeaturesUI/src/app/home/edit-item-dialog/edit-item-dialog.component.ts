@@ -153,8 +153,13 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
           }
         };
 
+        //ako je one time item, onda se mora update-at i original i task
+        if (itemTask.item!.recurring === false) {
+          itemTask.item!.description = this.form.value.description;
+          itemTask.description = this.form.value.description;
+        }
         //ako je update uncommitted item-a (original), onda njega update-at iz forme
-        if (this.descriptionType === DescriptionType.OriginalDescription) {
+        else if (this.descriptionType === DescriptionType.OriginalDescription) {
           itemTask.item!.description = this.form.value.description;
         } else {
           //inače update-at child item
