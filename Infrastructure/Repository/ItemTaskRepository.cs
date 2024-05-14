@@ -48,8 +48,9 @@ namespace Infrastructure.Repository
 
         public async Task<Dictionary<DateTime, List<ItemTask>>> GetItemTasksGroupedByCommitDateForNextWeek()
         {
+            const int DaysInWeek = 7;
             var today = DateTime.Today;
-            var endOfWeek = today.AddDays(7); //7 bi trebalo u konstantu izvuć
+            var endOfWeek = today.AddDays(DaysInWeek);
 
             // dohvati sve committane taskove koji nisu complete-ani, al da su unutar 7 dana
             var tasks = await _context.ItemTasks
@@ -68,7 +69,10 @@ namespace Infrastructure.Repository
             for (DateTime day = today; day < endOfWeek; day = day.AddDays(1))
             {
                 // commitani taskovi za specifičan dan
-                var tasksForDay = tasks.Where(t => t.CommittedDate.HasValue && t.CommittedDate.Value.Date == day).ToList();
+                var tasksForDay = tasks
+                    .Where(t => t.CommittedDate.HasValue && t.CommittedDate.Value.Date == day)
+                    .OrderBy(t => t.RowIndex)
+                    .ToList();
 
                 // dodaj dan i taskove za taj dan u dictionary
                 groupedTasks.Add(day, tasksForDay);
@@ -76,7 +80,6 @@ namespace Infrastructure.Repository
 
             return groupedTasks;
         }
-
 
     }
 }

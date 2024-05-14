@@ -9,7 +9,7 @@ import { RippleModule } from 'primeng/ripple';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { TableModule } from 'primeng/table';
 import { ToolbarModule } from 'primeng/toolbar';
-import { map, of, tap } from 'rxjs';
+import { map, of } from 'rxjs';
 import { ItemTaskDto } from '../../infrastructure';
 import { DescriptionType } from '../enum/description-type.enum';
 import { ItemExtendedService } from '../extended-services/item-extended-service';
@@ -54,7 +54,6 @@ export class HomeComponent implements OnInit {
   recurringItems$ = this.itemExtendedService.recurringItems$;
 
   weekData$ = this.itemExtendedService.weekData$.pipe(
-    tap((data) => console.log(data)),
     map(weekdata => weekdata.map(daydata => ({
       weekDayDate: daydata.weekDayDate!,
       items$: of(daydata.itemTasks!)

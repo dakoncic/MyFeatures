@@ -12,7 +12,10 @@ namespace Infrastructure.Interfaces.IRepository
             int? skip = null,
             int? take = null);
         Task<TEntity> GetByIdAsync(TKeyType id, string includeProperties = "");
-        Task<TEntity> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> filter);
+        Task<TEntity> GetFirstOrDefaultAsync(
+            Expression<Func<TEntity, bool>> filter,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null
+            );
 
         // Synchronous write operations
         void Add(TEntity entity);

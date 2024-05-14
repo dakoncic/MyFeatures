@@ -25,6 +25,9 @@ namespace Infrastructure.Entities
         [DataType(DataType.Date)]
         public DateTime? CompletionDate { get; set; }
 
+        [Required]
+        public int RowIndex { get; set; }
+
         // Navigation property na parenta
         public Item Item { get; set; }
     }

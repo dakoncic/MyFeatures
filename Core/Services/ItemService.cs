@@ -65,7 +65,6 @@ namespace Core.Services
             return groupedItems;
         }
 
-
         public async Task<ItemTask> GetItemTaskByIdAsync(int itemTaskId)
         {
             var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId, "Item");
@@ -142,17 +141,93 @@ namespace Core.Services
         {
             var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId);
 
-            //ako nije obrisanm radimo update
             if (itemTaskEntity is null)
             {
                 throw new NotFoundException($"ItemTask with ID {itemTaskId} not found.");
             }
 
-            //postavi committed date
+            //Commit date iz kojeg odlazi item na drugi dan
+            var originalCommitDate = itemTaskEntity.CommittedDate;
+
             itemTaskEntity.CommittedDate = commitDay;
 
-            //ne moramo eksplicitno Update zvat, sam će skužit zbog Get metode
-            await _itemRepository.SaveAsync();
+            // Use GetFirstOrDefaultAsync from the generic repository
+            var maxRowIndexItem = await _itemTaskRepository.GetFirstOrDefaultAsync(
+                x => x.CommittedDate.HasValue && x.CommittedDate.Value.Date == commitDay.Date,
+                q => q.OrderByDescending(x => x.RowIndex)
+            );
+
+
+            int newRowIndex = maxRowIndexItem != null ? maxRowIndexItem.RowIndex + 1 : 0;
+
+            itemTaskEntity.RowIndex = newRowIndex;
+
+            await _itemTaskRepository.SaveAsync();
+
+            // reorderanje itema koji su ostali u svojoj grupi
+            if (originalCommitDate.HasValue)
+            {
+                var itemsInOriginalGroup = await _itemTaskRepository.GetAllAsync(
+                    x => x.CommittedDate.HasValue && x.CommittedDate.Value.Date == originalCommitDate.Value.Date,
+                    q => q.OrderBy(x => x.RowIndex)
+                );
+
+                int currentIndex = 0;
+                foreach (var item in itemsInOriginalGroup)
+                {
+                    item.RowIndex = currentIndex++;
+                }
+
+                await _itemTaskRepository.SaveAsync();
+            }
+        }
+
+
+        public async Task UpdateItemTaskIndex(int itemId, DateTime commitDate, int newIndex)
+        {
+            var itemToUpdate = await _itemTaskRepository.GetByIdAsync(itemId);
+
+            if (itemToUpdate == null)
+            {
+                throw new NotFoundException($"ItemTask with ID {itemId} not found.");
+            }
+
+            int currentIndex = itemToUpdate.RowIndex;
+
+            Expression<Func<Entity.ItemTask, bool>> filter = x => x.CommittedDate.Value.Date == commitDate.Date && x.Id != itemId;
+            Func<IQueryable<Entity.ItemTask>, IOrderedQueryable<Entity.ItemTask>> orderBy = q => q.OrderBy(x => x.RowIndex);
+
+            var itemsForDate = await _itemTaskRepository.GetAllAsync(filter, orderBy);
+
+            // Reorder the items based on the new index
+            if (newIndex < currentIndex)
+            {
+                // The item is moving up in the order
+                foreach (var item in itemsForDate)
+                {
+                    if (item.RowIndex >= newIndex && item.RowIndex < currentIndex)
+                    {
+                        item.RowIndex += 1;
+                    }
+                }
+            }
+            else if (newIndex > currentIndex)
+            {
+                // The item is moving down in the order
+                foreach (var item in itemsForDate)
+                {
+                    if (item.RowIndex > currentIndex && item.RowIndex <= newIndex)
+                    {
+                        item.RowIndex -= 1;
+                    }
+                }
+            }
+
+            // Set the new index for the item to be updated
+            itemToUpdate.RowIndex = newIndex;
+
+            // Save all changes to the database
+            await _itemTaskRepository.SaveAsync();
         }
 
         //jel ok ako ništa ne vraćamo kao i za delete?
@@ -191,20 +266,26 @@ namespace Core.Services
                 //ako je DueDate not null i ako ima daysBetween, a ne samo ako je DueDate not null
                 if (itemTaskEntity.DueDate is not null && itemTaskEntity.Item.DaysBetween is not null)
                 {
-                    //ako due date
+                    var daysBetween = itemTaskEntity.Item.DaysBetween.Value;
+
                     if (itemTaskEntity.Item.RenewOnDueDate!.Value)
                     {
-                        newItemTaskEntity.DueDate = itemTaskEntity.DueDate.Value.AddDays(itemTaskEntity.Item.DaysBetween!.Value);
+                        newItemTaskEntity.DueDate = itemTaskEntity.DueDate.Value;
+
+                        // novi DueDate ne smije biti u prošlosti ako sam zakasnio i za novi datum
+                        while (newItemTaskEntity.DueDate < DateTime.UtcNow.Date)
+                        {
+                            newItemTaskEntity.DueDate = newItemTaskEntity.DueDate.Value.AddDays(daysBetween);
+                        }
                     }
-                    //inače se obnavlja na completion date a ti he sad (npr. registracija auta)
+                    //inače se obnavlja na completion date npr. registracija auta
                     else
                     {
-                        newItemTaskEntity.DueDate = itemTaskEntity.CompletionDate.Value.AddDays(itemTaskEntity.Item.DaysBetween!.Value);
+                        newItemTaskEntity.DueDate = itemTaskEntity.CompletionDate.Value.AddDays(daysBetween);
                     }
                 }
 
                 //ako DueDate nije null, onda ostaje null, ne postavljen
-
 
                 _itemTaskRepository.Add(newItemTaskEntity);
 
@@ -212,6 +293,7 @@ namespace Core.Services
             }
         }
 
+        //razmislit možda ne treba jer možemo reuse-at commitItemTask metodu?
         public async Task ReturnItemTaskToGroupAsync(int itemTaskId)
         {
             var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId);

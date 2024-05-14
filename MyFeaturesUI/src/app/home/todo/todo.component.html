@@ -1,11 +1,21 @@
+<!-- p-draggable - enter omogućava hover efekt na drop zoni pDroppable - definira
+drop zonu drop - definira što će se dogoditi kad se sputi item tu dragover -
+definira što se događa kada se drži na drop zoni item prije spuštanja
+p-draggable-enter - kada draggable uđe u droppable zonu, onda div poprimi ovu klasu
+PrimeNG klasu# feef# -->
+
 <div
   class="drop-column"
   [ngClass]="{ 'p-draggable-enter': isDragOver }"
   pDroppable="true"
-  (drop)="onDrop($event, weekDayDate)"
+  (drop)="onDrop($event)"
   (dragover)="onDragOver($event)"
 >
-  <p-table [value]="(items$ | async)!" [columns]="cols">
+  <p-table
+    [value]="(items$ | async)!"
+    [columns]="cols"
+    (onRowReorder)="onRowReorder($event)"
+  >
     <ng-template pTemplate="caption">
       <div
         class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"

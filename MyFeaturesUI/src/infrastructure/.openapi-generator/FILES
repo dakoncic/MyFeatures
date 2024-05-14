@@ -12,6 +12,7 @@ model/commitItemTaskDto.ts
 model/itemDto.ts
 model/itemTaskDto.ts
 model/models.ts
+model/updateItemTaskIndexDto.ts
 model/weekDayDto.ts
 param.ts
 variables.ts

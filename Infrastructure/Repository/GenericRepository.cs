@@ -72,10 +72,26 @@ namespace Infrastructure.Repository
             return await query.FirstOrDefaultAsync(e => e.Id.Equals(id));
         }
 
-        public async Task<TEntity> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> filter)
+        public async Task<TEntity> GetFirstOrDefaultAsync(
+            Expression<Func<TEntity, bool>> filter,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null
+            )
         {
-            return await _dbSet.FirstOrDefaultAsync(filter);
+            IQueryable<TEntity> query = _dbSet;
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            if (orderBy != null)
+            {
+                query = orderBy(query);
+            }
+
+            return await query.FirstOrDefaultAsync();
         }
+
 
         public void Add(TEntity entity)
         {

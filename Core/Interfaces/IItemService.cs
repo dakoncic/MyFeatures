@@ -6,6 +6,7 @@ namespace Core.Interfaces
     public interface IItemService
     {
         Task CommitItemTaskAsync(DateTime commitDay, int itemTaskId);
+        Task UpdateItemTaskIndex(int itemId, DateTime commitDate, int newIndex);
         Task CompleteItemTaskAsync(int itemTaskId);
         Task<ItemTask> CreateItemAsync(ItemTask itemTaskDomain);
         Task DeleteItemAsync(int itemId);

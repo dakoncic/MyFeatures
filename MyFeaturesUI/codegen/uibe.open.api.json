@@ -37,6 +37,38 @@
         }
       }
     },
+    "/api/Item/UpdateItemTaskIndex": {
+      "post": {
+        "tags": [
+          "Item"
+        ],
+        "operationId": "UpdateItemTaskIndexItem",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateItemTaskIndexDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateItemTaskIndexDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateItemTaskIndexDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/Item/GetAll": {
       "get": {
         "tags": [
@@ -490,6 +522,24 @@
           },
           "item": {
             "$ref": "#/components/schemas/ItemDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateItemTaskIndexDto": {
+        "type": "object",
+        "properties": {
+          "itemTaskId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "commitDay": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "newIndex": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false

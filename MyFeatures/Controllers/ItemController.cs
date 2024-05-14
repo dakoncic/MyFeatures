@@ -26,6 +26,18 @@ namespace MyFeatures.Controllers
             return Ok();
         }
 
+        [HttpPost("UpdateItemTaskIndex")]
+        public async Task<ActionResult> UpdateItemTaskIndex(UpdateItemTaskIndexDto updateItemTaskIndexDto)
+        {
+            await _itemService.UpdateItemTaskIndex(
+                updateItemTaskIndexDto.ItemTaskId,
+                updateItemTaskIndexDto.CommitDay,
+                updateItemTaskIndexDto.NewIndex
+                );
+
+            return Ok();
+        }
+
         //vjv ne treba, obrisat kasnije
         [HttpGet("GetAll")]
         public async Task<ActionResult<IEnumerable<ItemDto>>> GetAll()

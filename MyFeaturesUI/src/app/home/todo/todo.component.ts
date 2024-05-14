@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { Component, Input, inject } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
+import { Component, ElementRef, Input, ViewChild, inject } from '@angular/core';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { DragDropModule } from 'primeng/dragdrop';
@@ -22,19 +22,23 @@ import { EditItemDialogComponent } from '../edit-item-dialog/edit-item-dialog.co
     ButtonModule,
     RippleModule
   ],
+  providers: [DatePipe],
   templateUrl: './todo.component.html',
   styleUrl: './todo.component.scss'
 })
 export class TodoComponent {
+  @ViewChild('dropZoneRef') dropZoneRef!: ElementRef;
   private confirmationService = inject(ConfirmationService);
   private itemExtendedService = inject(ItemExtendedService);
   private dialogService = inject(DialogService);
+  private datePipe = inject(DatePipe);
 
   @Input() items$!: Observable<any[]>;
   @Input() cols!: any[];
   @Input() weekDayDate!: string;
 
-  isDragOver: boolean = false;
+  isDragOver = false;
+  newIndex: number | null = null;
 
   onDragStart(event: DragEvent, rowData: any) {
     // Convert the rowData object to a JSON string
@@ -45,32 +49,68 @@ export class TodoComponent {
     event.dataTransfer?.setData('application/json', data);
   }
 
+  //ovo mi ne treba
   dragEnd() {
-    console.log('drag end happening');
+    //console.log('drag end happening');
   }
 
-  onDragOver(event: any) {
-    event.preventDefault(); // Necessary to allow the drop
+  onDragOver(event: DragEvent) {
+    event.preventDefault(); //just in case ako neki browser ne dopušta
+
+    //isDragOver je inicijalno false da tablica nema obrub
+    //kada počnem radit drag, poprimi true, ali kad kursor izađe iz droppable zone
+    //makne se 'p-draggable-enter' klasa sama zbog PrimeNG-a.
+    //ali property ostane true. (neće se odma syncat isDragOver i [ngClass])
+    //na onDrop, postavi se na false, što onda makne klasu.
+    //moram ovdje postavit true, jer ako je inicijalno false
+    //a onDrop postavi na false, change detection neće registrirat
+    //promjenu
+    //onDragLeave radi konflike sa onDragOver ako je drag zone i drop zone isti
+    //kao u mom slučaju
+
     this.isDragOver = true;
-    console.log(this.isDragOver);
   }
 
-  onDrop(event: DragEvent, weekDayDate: string) {
-    event.preventDefault();
-    event.stopPropagation();
+  onDrop(event: DragEvent) {
+    event.preventDefault(); //just in case ako neki browser ne dopušta
+    //moramo ovdje stavit false inače bi ostao border
+    this.isDragOver = false;
 
     const data = event.dataTransfer?.getData('application/json');
     const rowData = JSON.parse(data!);
 
-    this.isDragOver = false;
-    console.log(weekDayDate);
-    console.log(rowData);
+    //potencijalno napravit if else, a ne 2 if, testirat prvo
+    if (this.newIndex !== null) {
+      const formattedDate = this.formatDate(rowData.committedDate);
+      this.itemExtendedService.updateItemTaskIndex(rowData.id, formattedDate, this.newIndex);
+      console.log('reordering item');
 
+      this.newIndex = null;
+    }
+
+    //logika za commitanje itema na neki drugi dan#
+    const committedDate = this.formatDate(rowData.committedDate);
+    const weekDayDateFormatted = this.formatDate(this.weekDayDate);
+
+    //sad provjera ako item želim prebacit na neki drugi dan, onda zovi backend#
+    if (committedDate !== weekDayDateFormatted) {
+      console.log('moving item to another day');
+
+      this.itemExtendedService.commitItem(rowData.id, this.weekDayDate);
+    }
+  }
+
+  onRowReorder(event: any) {
+    this.newIndex = event.dropIndex;
+  }
+
+  formatDate(dateString: string): string {
+    return this.datePipe.transform(dateString, 'yyyy-MM-dd')!;
   }
 
   generateCaption(weekDayDate: string): string {
     const dueDate = new Date(weekDayDate);
-    dueDate.setHours(0, 0, 0, 0); // Normalize to start of the day, timezone is implicitly UTC
+    dueDate.setHours(0, 0, 0, 0); // postavi na početak dana, timezone je UTC
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);

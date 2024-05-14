@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, switchMap, take } from 'rxjs';
-import { CommitItemTaskDto, ItemService, ItemTaskDto, WeekDayDto } from '../../infrastructure';
+import { CommitItemTaskDto, ItemService, ItemTaskDto, UpdateItemTaskIndexDto, WeekDayDto } from '../../infrastructure';
 
 @Injectable({
   providedIn: 'root'
@@ -101,6 +101,21 @@ export class ItemExtendedService {
 
         this.oneTimeItemsSourceSubject.next([]);
         this.recurringItemsSourceSubject.next([]);
+        this.weekDaysSourceSubject.next([]);
+      });
+  }
+
+  updateItemTaskIndex(itemTaskId: number, commitDay: string, newIndex: number) {
+    const updatedItemTaskIndex: UpdateItemTaskIndexDto = {
+      commitDay: commitDay,
+      itemTaskId: itemTaskId,
+      newIndex: newIndex
+    };
+
+    return this.itemService.updateItemTaskIndexItem(updatedItemTaskIndex).pipe(
+      take(1),
+    )
+      .subscribe(() => {
         this.weekDaysSourceSubject.next([]);
       });
   }
