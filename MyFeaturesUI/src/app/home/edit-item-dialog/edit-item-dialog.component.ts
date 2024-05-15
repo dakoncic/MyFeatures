@@ -146,8 +146,6 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
           }
         };
 
-        console.log(itemTask.item?.intervalType);
-
         this.itemExtendedService.createItem(itemTask)
       } else {
 

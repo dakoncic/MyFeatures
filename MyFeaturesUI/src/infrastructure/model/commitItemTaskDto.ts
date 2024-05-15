@@ -13,6 +13,6 @@
 
 export interface CommitItemTaskDto { 
     itemTaskId?: number;
-    commitDay?: string;
+    commitDay?: string | null;
 }
 

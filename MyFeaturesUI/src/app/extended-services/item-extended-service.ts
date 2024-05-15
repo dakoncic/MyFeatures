@@ -37,7 +37,6 @@ export class ItemExtendedService {
     )
       .subscribe(() => {
         //ovdje ćemo za prvu sve liste osvježit
-        console.log('refetch');
         this.oneTimeItemsSourceSubject.next([]);
         this.recurringItemsSourceSubject.next([]);
         this.weekDaysSourceSubject.next([]);
@@ -87,7 +86,7 @@ export class ItemExtendedService {
       });
   }
 
-  commitItem(itemTaskId: number, commitDay: string) {
+  commitItem(itemTaskId: number, commitDay: string | null) {
     const commitItem: CommitItemTaskDto = {
       commitDay: commitDay,
       itemTaskId: itemTaskId,

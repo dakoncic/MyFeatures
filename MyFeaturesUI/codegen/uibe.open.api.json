@@ -459,7 +459,8 @@
           },
           "commitDay": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "nullable": true
           }
         },
         "additionalProperties": false

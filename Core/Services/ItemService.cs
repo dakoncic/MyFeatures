@@ -163,7 +163,7 @@ namespace Core.Services
             await _itemRepository.SaveAsync();
         }
 
-        public async Task CommitItemTaskAsync(DateTime commitDay, int itemTaskId)
+        public async Task CommitItemTaskAsync(DateTime? commitDay, int itemTaskId)
         {
             var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId);
 
@@ -172,25 +172,32 @@ namespace Core.Services
                 throw new NotFoundException($"ItemTask with ID {itemTaskId} not found.");
             }
 
-            //Commit date iz kojeg odlazi item na drugi dan
+            //spremamo originalni commit date iz kojeg odlazi item na drugi dan
             var originalCommitDate = itemTaskEntity.CommittedDate;
 
-            itemTaskEntity.CommittedDate = commitDay;
+            if (commitDay.HasValue)
+            {
+                //ako se postavlja novi commit datum, onda ga postavi
+                itemTaskEntity.CommittedDate = commitDay;
 
-            // Use GetFirstOrDefaultAsync from the generic repository
-            var maxRowIndexItem = await _itemTaskRepository.GetFirstOrDefaultAsync(
-                x => x.CommittedDate.HasValue && x.CommittedDate.Value.Date == commitDay.Date,
-                q => q.OrderByDescending(x => x.RowIndex)
-            );
+                var maxRowIndexItem = await _itemTaskRepository.GetFirstOrDefaultAsync(
+                    x => x.CommittedDate.HasValue && x.CommittedDate.Value.Date == commitDay.Value.Date,
+                    q => q.OrderByDescending(x => x.RowIndex)
+                );
 
-
-            int newRowIndex = maxRowIndexItem != null ? maxRowIndexItem.RowIndex + 1 : 0;
-
-            itemTaskEntity.RowIndex = newRowIndex;
+                int newRowIndex = maxRowIndexItem != null ? maxRowIndexItem.RowIndex + 1 : 0;
+                itemTaskEntity.RowIndex = newRowIndex;
+            }
+            else
+            {
+                //ako se vraća u svoju grupu
+                itemTaskEntity.CommittedDate = null;
+            }
 
             await _itemTaskRepository.SaveAsync();
 
             // reorderanje itema koji su ostali u svojoj grupi
+            // ako je item uopće bio commitan prije ovog
             if (originalCommitDate.HasValue)
             {
                 var itemsInOriginalGroup = await _itemTaskRepository.GetAllAsync(
@@ -207,7 +214,6 @@ namespace Core.Services
                 await _itemTaskRepository.SaveAsync();
             }
         }
-
 
         public async Task UpdateItemTaskIndex(int itemId, DateTime commitDate, int newIndex)
         {

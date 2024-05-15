@@ -83,8 +83,6 @@ export class TodoComponent {
     if (this.newIndex !== null) {
       const formattedDate = this.formatDate(rowData.committedDate);
       this.itemExtendedService.updateItemTaskIndex(rowData.id, formattedDate, this.newIndex);
-      console.log('reordering item');
-
       this.newIndex = null;
     }
 
@@ -94,8 +92,6 @@ export class TodoComponent {
 
     //sad provjera ako item želim prebacit na neki drugi dan, onda zovi backend#
     if (committedDate !== weekDayDateFormatted) {
-      console.log('moving item to another day');
-
       this.itemExtendedService.commitItem(rowData.id, this.weekDayDate);
     }
   }
@@ -134,6 +130,10 @@ export class TodoComponent {
       },
       //header: this.translate.instant('measurement.dialog.manualChannels')
     });
+  }
+
+  returnItemTaskToGroup(itemTask: ItemTaskDto) {
+    this.itemExtendedService.commitItem(itemTask.id!, null);
   }
 
   deleteItem(itemTask: ItemTaskDto) {
