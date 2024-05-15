@@ -23,16 +23,6 @@ PrimeNG klasu# feef# -->
         <h5 class="m-0">{{ generateCaption(weekDayDate) }}</h5>
       </div>
     </ng-template>
-    <ng-template pTemplate="header" let-columns>
-      <tr>
-        <th scope="col" style="width: 3rem"></th>
-        <th scope="col" *ngFor="let col of columns">
-          {{ col.header }}
-        </th>
-        <!-- 1 header za custom kolone -->
-        <th scope="col"></th>
-      </tr>
-    </ng-template>
     <ng-template
       pTemplate="body"
       let-rowData

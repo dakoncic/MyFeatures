@@ -1,7 +1,7 @@
 <div class="flex flex-column" style="height: 100%">
   <div class="card">
     <div class="grid">
-      <ng-container *ngFor="let dayData of (weekData$ | async)">
+      <ng-container *ngFor="let dayData of weekData$ | async">
         <div class="col-3">
           <app-todo
             [items$]="dayData.items$"
@@ -24,86 +24,76 @@
           (click)="openNew()"
         ></button>
       </div>
-    <p-selectButton
-      [options]="weekdays"
-      [(ngModel)]="currentDay"
-      optionLabel="name"
-      optionValue="value"
-      (onChange)="onDayChange($event)"
-    >
-    </p-selectButton>
+      <p-selectButton
+        [options]="weekdays"
+        [(ngModel)]="currentDay"
+        optionLabel="name"
+        optionValue="value"
+        (onChange)="onDayChange($event)"
+      >
+      </p-selectButton>
     </p-toolbar>
 
     <div class="grid">
       <div class="col-6">
-          <p-table
-            [value]="(oneTimeItems$ | async)!"
-            [columns]="cols"
-            [rowHover]="true"
-            dataKey="id"
-          >
-            <ng-template pTemplate="caption">
-              <div
-                class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
-              >
-                <h5 class="m-0">Samo jednom</h5>
-              </div>
-            </ng-template>
-            <ng-template pTemplate="header" let-columns=>
-              <tr>
-                <th scope="col" style="width: 3rem"></th>
-                <th scope="col" *ngFor="let col of columns">
-                  {{ col.header }}
-                </th>
-                <!-- 1 header za custom kolone -->
-                <th scope="col"></th>
-              </tr>
-            </ng-template>
-            <ng-template
-              pTemplate="body"
-              let-rowData
-              let-columns="columns"
-              let-index="rowIndex"
+        <p-table
+          [value]="(oneTimeItems$ | async)!"
+          [columns]="cols"
+          [rowHover]="true"
+          dataKey="id"
+        >
+          <ng-template pTemplate="caption">
+            <div
+              class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
             >
-              <tr
-                [ngClass]="{ 'cursor-pointer': currentDay }"
-                [pReorderableRow]="index"
-                (click)="assignItemToSelectedWeekday(rowData, currentDay)"
-              >
-                <td>
-                  <span class="pi pi-bars" pReorderableRowHandle></span>
-                </td>
-                <td *ngFor="let col of columns">
-                  <span>{{ rowData[col.field] }}</span>
-                </td>
-                <td>
-                  <div class="flex justify-content-end">
-                    <button
-                      pButton
-                      pRipple
-                      icon="pi pi-check"
-                      class="p-button-rounded p-button-info mr-2"
-                      (click)="completeItem(rowData)"
-                    ></button>
-                    <button
-                      pButton
-                      pRipple
-                      icon="pi pi-pencil"
-                      class="p-button-rounded p-button-success mr-2"
-                      (click)="editItem(rowData)"
-                    ></button>
-                    <button
-                      pButton
-                      pRipple
-                      icon="pi pi-trash"
-                      class="p-button-rounded p-button-warning"
-                      (click)="deleteItem(rowData)"
-                    ></button>
-                  </div>
-                </td>
-              </tr>
-            </ng-template>
-          </p-table>
+              <h5 class="m-0">Samo jednom</h5>
+            </div>
+          </ng-template>
+          <ng-template
+            pTemplate="body"
+            let-rowData
+            let-columns="columns"
+            let-index="rowIndex"
+          >
+            <tr
+              [ngClass]="{ 'cursor-pointer': currentDay }"
+              [pReorderableRow]="index"
+              (click)="assignItemToSelectedWeekday(rowData, currentDay)"
+            >
+              <td>
+                <span class="pi pi-bars" pReorderableRowHandle></span>
+              </td>
+              <td *ngFor="let col of columns">
+                <span>{{ rowData[col.field] }}</span>
+              </td>
+              <td>
+                <div class="flex justify-content-end">
+                  <button
+                    pButton
+                    pRipple
+                    icon="pi pi-check"
+                    class="p-button-rounded p-button-info mr-2"
+                    (click)="completeItem(rowData)"
+                  ></button>
+                  <button
+                    pButton
+                    pRipple
+                    icon="pi pi-pencil"
+                    class="p-button-rounded p-button-success mr-2"
+                    (click)="editItem(rowData)"
+                  ></button>
+                  <button
+                    pButton
+                    pRipple
+                    icon="pi pi-trash"
+                    class="p-button-rounded p-button-warning"
+                    (click)="deleteItem(rowData)"
+                  ></button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
       </div>
 
       <div class="col-6">
@@ -120,21 +110,11 @@
               <h5 class="m-0">Ponavljajući</h5>
             </div>
           </ng-template>
-          <ng-template pTemplate="header" let-columns=>
-            <tr>
-              <th scope="col" style="width: 3rem"></th>
-              <th scope="col" *ngFor="let col of columns">
-                {{ col.header }}
-              </th>
-              <!-- 1 header za custom kolone -->
-              <th scope="col"></th>
-            </tr>
-          </ng-template>
           <ng-template
             pTemplate="body"
-              let-rowData
-              let-columns="columns"
-              let-index="rowIndex"
+            let-rowData
+            let-columns="columns"
+            let-index="rowIndex"
           >
             <tr
               [ngClass]="{
@@ -172,8 +152,6 @@
           </ng-template>
         </p-table>
       </div>
-
-
     </div>
   </div>
 </div>
