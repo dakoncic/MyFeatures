@@ -464,6 +464,13 @@
         },
         "additionalProperties": false
       },
+      "IntervalType": {
+        "enum": [
+          "Days",
+          "Months"
+        ],
+        "type": "string"
+      },
       "ItemDto": {
         "type": "object",
         "properties": {
@@ -482,10 +489,13 @@
             "type": "boolean",
             "nullable": true
           },
-          "daysBetween": {
+          "intervalValue": {
             "type": "integer",
             "format": "int32",
             "nullable": true
+          },
+          "intervalType": {
+            "$ref": "#/components/schemas/IntervalType"
           }
         },
         "additionalProperties": false

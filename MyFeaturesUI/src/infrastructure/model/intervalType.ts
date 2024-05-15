@@ -9,18 +9,12 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { IntervalType } from './intervalType';
 
 
-export interface ItemDto { 
-    id?: number;
-    description?: string | null;
-    recurring?: boolean;
-    renewOnDueDate?: boolean | null;
-    intervalValue?: number | null;
-    intervalType?: IntervalType;
-}
-export namespace ItemDto {
-}
+export type IntervalType = 'Days' | 'Months';
 
+export const IntervalType = {
+    Days: 'Days' as IntervalType,
+    Months: 'Months' as IntervalType
+};
 

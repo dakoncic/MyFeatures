@@ -85,6 +85,19 @@ namespace Core.Services
             //po biznis logici, mora po defaulta odma biti kreiran ItemTask
             var itemTaskEntity = itemTaskDomain.Adapt<Entity.ItemTask>();
 
+            //prvo so mapirali što možemo, a sad eksplicitno postavljamo value za days between property
+            if (itemTaskDomain.Item.IntervalValue is not null)
+            {
+                if (itemTaskDomain.Item.IntervalType == IntervalType.Months)
+                {
+                    itemTaskEntity.Item.DaysBetween = CalculateDaysBetweenForMonths(itemTaskDomain.Item.IntervalValue.Value);
+                }
+                else
+                {
+                    itemTaskEntity.Item.DaysBetween = itemTaskDomain.Item.IntervalValue;
+                }
+            }
+
             itemEntity.ItemTasks.Add(itemTaskEntity);
 
             _itemRepository.Add(itemEntity);
@@ -113,6 +126,19 @@ namespace Core.Services
             //eksplicitno update-amo itemTaskEntity sa novim vrijednostima .Adapt()
             //ovo neće transformirat entity objekt u domain, samo update se radi
             updatedItemTask.Adapt(itemTaskEntity);
+
+            //moramo kalkulirat dane opet za slučaj da je mijenjao
+            if (updatedItemTask.Item.IntervalValue is not null)
+            {
+                if (updatedItemTask.Item.IntervalType == IntervalType.Months)
+                {
+                    itemTaskEntity.Item.DaysBetween = CalculateDaysBetweenForMonths(updatedItemTask.Item.IntervalValue.Value);
+                }
+                else
+                {
+                    itemTaskEntity.Item.DaysBetween = updatedItemTask.Item.IntervalValue;
+                }
+            }
 
             //ako dto child ima referencu na parent, parent dto nebi trebao imat na child
             //zato što se dogodi da kad s frontenda šaljem child s ref. na parenta
@@ -309,6 +335,16 @@ namespace Core.Services
             itemTaskEntity.CommittedDate = null;
 
             await _itemTaskRepository.SaveAsync();
+        }
+
+        private int CalculateDaysBetweenForMonths(int months)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            DateTime endDate = startDate.AddMonths(months);
+
+            int daysBetween = (endDate - startDate).Days;
+
+            return daysBetween;
         }
 
     }

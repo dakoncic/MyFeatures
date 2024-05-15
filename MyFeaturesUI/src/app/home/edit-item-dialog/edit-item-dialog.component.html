@@ -1,4 +1,4 @@
-<form [formGroup]="form" style="height: 650px">
+<form [formGroup]="form" style="height: 500px">
   <div class="field flex flex-column">
     <label for="description">Description</label>
     <input
@@ -49,10 +49,34 @@
   </div>
 
   <div class="field">
-    <label class="w-full" for="daysBetween"
+    <label class="w-full" for="intervalValue"
       >How many days between task repeats?
     </label>
-    <p-inputNumber formControlName="daysBetween"> </p-inputNumber>
+    <p-inputNumber formControlName="intervalValue"> </p-inputNumber>
+  </div>
+
+  <div class="field flex justify-content-center">
+    <div class="flex flex-wrap gap-3">
+      <div class="flex align-items-center">
+        <p-radioButton
+          name="intervalType"
+          [value]="intervalType.Days"
+          formControlName="intervalType"
+          inputId="ingredient1"
+        />
+        <label for="ingredient1" class="ml-2"> Days </label>
+      </div>
+
+      <div class="flex align-items-center">
+        <p-radioButton
+          name="intervalType"
+          [value]="intervalType.Months"
+          formControlName="intervalType"
+          inputId="ingredient2"
+        />
+        <label for="ingredient2" class="ml-2"> Months </label>
+      </div>
+    </div>
   </div>
 </form>
 
@@ -67,7 +91,7 @@
 ></button>
 <button
   pButton
-  pRipple
+  [disabled]="form.invalid"
   label="Save"
   icon="pi pi-check"
   class="p-button-text"

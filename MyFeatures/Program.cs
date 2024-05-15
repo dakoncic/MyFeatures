@@ -39,6 +39,7 @@ builder.Services.AddScoped<IItemService, ItemService>();
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 
 //mapster registracija nakon servisa

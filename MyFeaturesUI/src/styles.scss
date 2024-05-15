@@ -28,3 +28,14 @@ $gutter: 1rem; //for primeflex grid system
   border-color: var(--primary-color); /* Ensure this variable is defined or use a specific color */
 }
 
+
+//privremeno overrideam ovdje default stilove da vidim kak će izgledat
+.p-datatable .p-datatable-tbody > tr > td {
+  padding: unset;
+  padding-left: 0.5rem;
+}
+
+.p-button.p-button-icon-only.p-button-rounded {
+  height: 2rem;
+  width: 2rem;
+}

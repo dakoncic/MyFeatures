@@ -1,15 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CalendarModule } from 'primeng/calendar';
 import { DialogModule } from 'primeng/dialog';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
+import { RadioButtonModule } from 'primeng/radiobutton';
 import { RippleModule } from 'primeng/ripple';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { Subject, combineLatest, take, takeUntil } from 'rxjs';
-import { ItemService, ItemTaskDto } from '../../../infrastructure';
+import { IntervalType, ItemService, ItemTaskDto } from '../../../infrastructure';
 import { DescriptionType } from '../../enum/description-type.enum';
 import { ItemExtendedService } from '../../extended-services/item-extended-service';
 
@@ -24,7 +25,9 @@ import { ItemExtendedService } from '../../extended-services/item-extended-servi
     ReactiveFormsModule,
     SelectButtonModule,
     RippleModule,
-    InputTextModule
+    InputTextModule,
+    FormsModule,
+    RadioButtonModule
   ],
   templateUrl: './edit-item-dialog.component.html',
   styleUrl: './edit-item-dialog.component.scss'
@@ -37,6 +40,7 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
 
   renewOptions: any[] = [{ label: 'Due date', value: true }, { label: 'Completion date', value: false }];
   descriptionType!: DescriptionType;
+  ingredient!: string;
 
   form!: FormGroup;
   private formBuilder = inject(FormBuilder);
@@ -50,9 +54,11 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
     return this.form.get('description');
   }
 
-  get daysBetween() {
-    return this.form.get('daysBetween');
+  get intervalValue() {
+    return this.form.get('intervalValue');
   }
+
+  intervalType = IntervalType;
 
   ngOnInit() {
     this.form = this.formBuilder.group({
@@ -60,7 +66,8 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
       recurring: [false],
       renewOnDueDate: [null],
       dueDate: [null],
-      daysBetween: [null],
+      intervalValue: [null],
+      intervalType: [null]
     });
 
     //ako je edit, povuci s backenda i prikaži na formi
@@ -71,7 +78,7 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
     }
     else {
       //inače za create disable-a by default
-      this.form.get('daysBetweenRepeat')?.disable();
+      this.form.get('intervalValue')?.disable();
     }
 
     combineLatest([
@@ -79,14 +86,14 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
       this.form.get('dueDate')!.valueChanges,
     ])
       .pipe(takeUntil(this.destroy$))
-      .subscribe(([oneTime, dueDate]) => {
-        if (!oneTime && dueDate) {
-          this.form.get('daysBetween')?.enable();
+      .subscribe(([recurring, dueDate]) => {
+        if (recurring && dueDate) {
+          this.form.get('intervalValue')?.enable();
         } else {
-          this.form.get('daysBetween')?.disable();
+          this.form.get('intervalValue')?.disable();
         }
 
-        this.form.get('daysBetween')?.updateValueAndValidity();
+        this.form.get('intervalValue')?.updateValueAndValidity();
       });
   }
 
@@ -116,7 +123,8 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
       recurring: itemTask.item!.recurring,
       renewOnDueDate: itemTask.item!.renewOnDueDate,
       dueDate: itemTask.dueDate,
-      daysBetween: itemTask.item!.daysBetween
+      intervalValue: itemTask.item!.intervalValue,
+      intervalType: itemTask.item!.intervalType
     });
   }
 
@@ -133,9 +141,12 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
             description: this.form.value.description,
             recurring: this.form.value.recurring,
             renewOnDueDate: this.form.value.renewOnDueDate,
-            daysBetween: this.form.value.daysBetween
+            intervalValue: this.form.value.intervalValue,
+            intervalType: this.form.value.intervalType
           }
         };
+
+        console.log(itemTask.item?.intervalType);
 
         this.itemExtendedService.createItem(itemTask)
       } else {
@@ -149,7 +160,8 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
             ...this.itemTask.item,
             recurring: this.form.value.recurring,
             renewOnDueDate: this.form.value.renewOnDueDate,
-            daysBetween: this.form.value.daysBetween
+            intervalValue: this.form.value.intervalValue,
+            intervalType: this.form.value.intervalType
           }
         };
 

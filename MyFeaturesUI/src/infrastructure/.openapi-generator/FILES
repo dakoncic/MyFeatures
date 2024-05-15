@@ -9,6 +9,7 @@ encoder.ts
 git_push.sh
 index.ts
 model/commitItemTaskDto.ts
+model/intervalType.ts
 model/itemDto.ts
 model/itemTaskDto.ts
 model/models.ts

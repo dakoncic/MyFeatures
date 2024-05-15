@@ -122,6 +122,7 @@
           </ng-template>
           <ng-template pTemplate="header" let-columns=>
             <tr>
+              <th scope="col" style="width: 3rem"></th>
               <th scope="col" *ngFor="let col of columns">
                 {{ col.header }}
               </th>
@@ -129,8 +130,23 @@
               <th scope="col"></th>
             </tr>
           </ng-template>
-          <ng-template pTemplate="body" let-rowData let-columns="columns">
-            <tr>
+          <ng-template
+            pTemplate="body"
+              let-rowData
+              let-columns="columns"
+              let-index="rowIndex"
+          >
+            <tr
+              [ngClass]="{
+                'cursor-pointer': currentDay,
+                'row-background-color': rowData.committedDate !== null
+              }"
+              [pReorderableRow]="index"
+              (click)="assignItemToSelectedWeekday(rowData, currentDay)"
+            >
+              <td>
+                <span class="pi pi-bars" pReorderableRowHandle></span>
+              </td>
               <td *ngFor="let col of columns">
                 <span>{{ rowData[col.field] }}</span>
               </td>
