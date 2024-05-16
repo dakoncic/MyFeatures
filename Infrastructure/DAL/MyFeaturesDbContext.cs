@@ -12,6 +12,7 @@ namespace Infrastructure.DAL
 
         public DbSet<Item> Items { get; set; }
         public DbSet<ItemTask> ItemTasks { get; set; }
+        public DbSet<Notepad> Notepads { get; set; }
 
         //znači data annotations radimo za jednostavnije stvari direktno u entity klasi
         //a ovdje kompliciranije (fluent API) koje se tamo ne mogu, npr. veze, cascade delete itd.

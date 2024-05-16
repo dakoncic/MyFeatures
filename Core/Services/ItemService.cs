@@ -76,8 +76,6 @@ namespace Core.Services
             return itemTaskEntity.Adapt<ItemTask>();
         }
 
-
-        //pitat chat gpt jel ima smisla flow od frontend forme to backend ove metode što radim
         public async Task<ItemTask> CreateItemAsync(ItemTask itemTaskDomain)
         {
             var itemEntity = itemTaskDomain.Item.Adapt<Entity.Item>();

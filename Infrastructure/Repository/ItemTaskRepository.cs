@@ -20,8 +20,6 @@ namespace Infrastructure.Repository
             _itemTaskRepository = itemTaskRepository;
         }
 
-
-
         public async Task UpdateWeekDayTaskItems()
         {
             var today = DateTime.Today;
@@ -70,7 +68,7 @@ namespace Infrastructure.Repository
                 }
             }
 
-            return (expiredTasks, dueTasks); // Returning a tuple
+            return (expiredTasks, dueTasks);
         }
 
         private async Task UpdateExpiredTasks(List<ItemTask> expiredTasks, DateTime today, IGenericRepository<Entity.ItemTask, int> itemTaskRepository)
@@ -111,45 +109,6 @@ namespace Infrastructure.Repository
             }
         }
 
-
-
-
-
-        //public async Task UpdateWeekDayTaskItems()
-        //{
-        //    var today = DateTime.Today;
-        //    var endOfWeek = today.AddDays(7);
-
-        //    // dohvaćam ne complete-ane taskove, koji su commitani prije današnjeg dana (istekli) 
-        //    //ili je due date unutar tjedan dana a nisu commitani -> automatski ih postavlja
-        //    var relevantItemTasks = await _context.ItemTasks
-        //        .Where(itemTask => itemTask.CompletionDate == null &&
-        //                           (itemTask.CommittedDate < today ||
-        //                            (itemTask.DueDate >= today && itemTask.DueDate < endOfWeek && itemTask.CommittedDate == null)))
-        //        .ToListAsync();
-
-        //    //mi ovdje update-amo ne samo za danas i nego za druge dane u tjednu
-        //    //te znači da za sve te dane moram update-at index
-        //    foreach (var task in relevantItemTasks)
-        //    {
-        //        if (task.CommittedDate < today)
-        //        {
-        //            task.CommittedDate = today;
-        //        }
-        //        //keeping redundant check to safeguard future change
-        //        else if (task.DueDate >= today && task.DueDate < endOfWeek && task.CommittedDate == null)
-        //        {
-        //            task.CommittedDate = task.DueDate;
-        //        }
-        //    }
-
-        //    //razmislit dali je over engineerano malo, može li odma save, pa čak i ako možda i nema promjena
-        //    if (_context.ChangeTracker.HasChanges())
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //}
-
         public async Task<Dictionary<DateTime, List<ItemTask>>> GetItemTasksGroupedByCommitDateForNextWeek()
         {
             const int DaysInWeek = 7;
@@ -185,6 +144,5 @@ namespace Infrastructure.Repository
 
             return groupedTasks;
         }
-
     }
 }
