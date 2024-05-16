@@ -46,6 +46,13 @@ PrimeNG klasu# feef# -->
             <button
               pButton
               pRipple
+              icon="pi pi-check"
+              class="p-button-rounded p-button-info mr-2"
+              (click)="completeItem(rowData)"
+            ></button>
+            <button
+              pButton
+              pRipple
               icon="pi pi-pencil"
               class="p-button-rounded p-button-success mr-2"
               (click)="editItem(rowData)"

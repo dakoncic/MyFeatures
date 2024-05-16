@@ -122,7 +122,7 @@ export class HomeComponent implements OnInit {
       rejectLabel: 'Odustani',
       accept: () => {
         //obriši i osvježi liste svima
-        this.itemExtendedService.deleteItem(itemTask.id!);
+        this.itemExtendedService.deleteItem(itemTask.item!.id!);
       }
     });
 

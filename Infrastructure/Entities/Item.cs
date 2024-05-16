@@ -13,8 +13,6 @@ namespace Infrastructure.Entities
 
         public bool Recurring { get; set; }
 
-        public bool Deleted { get; set; }
-
         //ako je false, onda će se days between dodat na completion date
         //za novi DueDate
         //ako je true onda na DueDate

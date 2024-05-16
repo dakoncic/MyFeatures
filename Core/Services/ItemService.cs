@@ -38,9 +38,9 @@ namespace Core.Services
         public async Task<List<ItemTask>> GetOneTimeItemTasksAsync()
         {
             //one time taskovi, nisu izbrisani (znači nisu completed) i isto nisu već commitani za specifičan dan
-            Expression<Func<Entity.ItemTask, bool>> filter = i => !i.Item.Recurring && !i.Item.Deleted && i.CommittedDate == null;
+            Expression<Func<Entity.ItemTask, bool>> filter = i => !i.Item.Recurring && i.CommittedDate == null && i.CompletionDate == null;
 
-            var items = await _itemTaskRepository.GetAllAsync(filter);
+            var items = await _itemTaskRepository.GetAllAsync(filter: filter, includeProperties: "Item");
 
             return items.Adapt<List<ItemTask>>();
         }
@@ -48,9 +48,9 @@ namespace Core.Services
         public async Task<List<ItemTask>> GetRecurringItemTasksAsync()
         {
             //ponavljajući taskovi, mogu bit committed
-            Expression<Func<Entity.ItemTask, bool>> filter = i => i.Item.Recurring && !i.Item.Deleted;
+            Expression<Func<Entity.ItemTask, bool>> filter = i => i.Item.Recurring && i.CompletionDate == null;
 
-            var items = await _itemTaskRepository.GetAllAsync(filter);
+            var items = await _itemTaskRepository.GetAllAsync(filter: filter, includeProperties: "Item");
 
             return items.Adapt<List<ItemTask>>();
         }
@@ -116,7 +116,6 @@ namespace Core.Services
             //međuvremenu save-ao a mi onda immao krivi row version
             //ili npr. ako je u međuvremenu obrisan pa i ne postoji više
 
-            //include properties fali kao parametar u ovoj metodi
             var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId, "Item");
             if (itemTaskEntity == null)
             {
@@ -275,7 +274,6 @@ namespace Core.Services
                 throw new NotFoundException($"ItemTask with ID {itemTaskId} not found.");
             }
 
-
             //vrijeme complete-anja je sad, i tu završavamo s ovim taskom
             itemTaskEntity.CompletionDate = DateTime.UtcNow;
 
@@ -321,8 +319,10 @@ namespace Core.Services
 
                 _itemTaskRepository.Add(newItemTaskEntity);
 
-                await _itemTaskRepository.SaveAsync();
             }
+
+
+            await _itemTaskRepository.SaveAsync();
         }
 
         //razmislit možda ne treba jer možemo reuse-at commitItemTask metodu?

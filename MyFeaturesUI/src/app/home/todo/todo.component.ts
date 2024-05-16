@@ -122,6 +122,10 @@ export class TodoComponent {
     }
   }
 
+  completeItem(itemTask: ItemTaskDto) {
+    this.itemExtendedService.completeItem(itemTask.id!);
+  }
+
   editItem(itemTask: ItemTaskDto) {
     this.dialogService.open(EditItemDialogComponent, {
       data: {
@@ -144,7 +148,7 @@ export class TodoComponent {
       rejectLabel: 'Odustani',
       accept: () => {
         //obriši i osvježi liste svima
-        this.itemExtendedService.deleteItem(itemTask.id!);
+        this.itemExtendedService.deleteItem(itemTask.item!.id!);
       }
     });
   }

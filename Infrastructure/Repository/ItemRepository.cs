@@ -16,10 +16,11 @@ namespace Infrastructure.Repository
 
         //ako želim naglasit da je ovo potpuna materijalizirana lista koje se neće query-at još
         //ond ostavit List
+        //ne treba mi ova metoda, izbrisat
         public async Task<List<Item>> GetNonRecurringUnitemTasksAsync()
         {
             return await _context.Items
-                .Where(i => !i.Recurring && !i.Deleted && !i.ItemTasks.Any(ci => ci.CommittedDate != null))
+                .Where(i => !i.Recurring && !i.ItemTasks.Any(ci => ci.CommittedDate != null))
                 .ToListAsync();
         }
     }

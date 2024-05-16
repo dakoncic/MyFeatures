@@ -46,7 +46,7 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
   private formBuilder = inject(FormBuilder);
   private ref = inject(DynamicDialogRef);
   private config = inject(DynamicDialogConfig);
-  private itemService = inject(ItemService)
+  private itemService = inject(ItemService);
   private itemExtendedService = inject(ItemExtendedService);
 
   //TO DO: refaktor ovo u generički validator
