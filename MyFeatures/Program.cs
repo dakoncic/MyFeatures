@@ -33,12 +33,14 @@ builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddScoped<IItemTaskRepository, ItemTaskRepository>();
 
 builder.Services.AddScoped<IItemService, ItemService>();
+builder.Services.AddScoped<INotepadService, NotepadService>();
 
-//ovo je dodatak konfiguracije za cirkularnu referencu
-//kada return u akciji već uspješno prođe zbog Mapstera
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
+    //ovo je dodatak konfiguracije za cirkularnu referencu
+    //kada return u akciji već uspješno prođe zbog Mapstera
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    //potrebno za slanje enuma između frontenda i backenda
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 
@@ -54,7 +56,6 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.OperationFilter<CustomOperationIdFilter>();
 });
-
 
 var allowedOrigins = builder.Configuration.GetSection("CorsOrigins:AllowedOrigins").Get<string[]>();
 

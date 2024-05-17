@@ -1,4 +1,5 @@
 ﻿using Core.DomainModels;
+using Core.Exceptions;
 using Core.Interfaces;
 using Infrastructure.Interfaces.IRepository;
 using Mapster;
@@ -19,9 +20,9 @@ namespace Core.Services
 
         public async Task<List<Notepad>> GetAllNotepadsAsync()
         {
-            var items = await _notepadRepository.GetAllAsync();
+            var notepads = await _notepadRepository.GetAllAsync();
 
-            return items.Adapt<List<Notepad>>();
+            return notepads.Adapt<List<Notepad>>();
         }
 
         public async Task<Notepad> CreateNotepadAsync()
@@ -33,6 +34,34 @@ namespace Core.Services
             await _notepadRepository.SaveAsync();
 
             return notepadEntity.Adapt<Notepad>();
+        }
+
+        public async Task<Notepad> UpdateNotepadAsync(int notepadId, Notepad updatedNotepad)
+        {
+            var notepadEntity = await _notepadRepository.GetByIdAsync(notepadId, "Item");
+            if (notepadEntity == null)
+            {
+                throw new NotFoundException($"Notepad with ID {notepadId} not found.");
+            }
+
+            updatedNotepad.Adapt(notepadEntity);
+
+            await _notepadRepository.SaveAsync();
+
+            return notepadEntity.Adapt<Notepad>();
+        }
+
+        public async Task DeleteNotepadAsync(int notepadId)
+        {
+            var notepadEntity = await _notepadRepository.GetByIdAsync(notepadId);
+
+            if (notepadEntity == null)
+            {
+                throw new NotFoundException($"Notepad with ID {notepadId} not found.");
+            }
+
+            _notepadRepository.Delete(notepadId);
+            await _notepadRepository.SaveAsync();
         }
     }
 }

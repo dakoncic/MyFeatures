@@ -153,5 +153,22 @@
         </p-table>
       </div>
     </div>
+
+    <div class="grid">
+      <div class="col-6">
+        <ng-container *ngFor="let notepad of notepads$ | async">
+          <app-notepad [notepad]="notepad"></app-notepad>
+        </ng-container>
+      </div>
+    </div>
+
+    <button
+      pButton
+      pRipple
+      label="New Editor"
+      icon="pi pi-plus"
+      class="p-button-success mr-2"
+      (click)="createNewNotepad()"
+    ></button>
   </div>
 </div>

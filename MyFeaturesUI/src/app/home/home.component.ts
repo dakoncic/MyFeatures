@@ -15,6 +15,8 @@ import { DescriptionType } from '../enum/description-type.enum';
 import { ItemExtendedService } from '../extended-services/item-extended-service';
 import { EditItemDialogComponent } from './edit-item-dialog/edit-item-dialog.component';
 import { TodoComponent } from './todo/todo.component';
+import { NotepadComponent } from './notepad/notepad.component';
+import { NotepadExtendedService } from '../extended-services/notepad-extended-service';
 
 @Component({
   selector: 'app-home',
@@ -30,7 +32,8 @@ import { TodoComponent } from './todo/todo.component';
     InputTextModule,
     SelectButtonModule,
     EditItemDialogComponent,
-    TodoComponent
+    TodoComponent,
+    NotepadComponent
   ],
   providers: [
     //moram provide-at zbog *null injector error-a*
@@ -42,6 +45,7 @@ import { TodoComponent } from './todo/todo.component';
 export class HomeComponent implements OnInit {
   private confirmationService = inject(ConfirmationService);
   private itemExtendedService = inject(ItemExtendedService);
+  private notepadExtendedService = inject(NotepadExtendedService);
   private dialogService = inject(DialogService);
 
   editDialogVisible: boolean = false;
@@ -52,13 +56,14 @@ export class HomeComponent implements OnInit {
 
   oneTimeItems$ = this.itemExtendedService.oneTimeItems$;
   recurringItems$ = this.itemExtendedService.recurringItems$;
-
   weekData$ = this.itemExtendedService.weekData$.pipe(
     map(weekdata => weekdata.map(daydata => ({
       weekDayDate: daydata.weekDayDate!,
       items$: of(daydata.itemTasks!)
     })))
   );
+
+  notepads$ = this.notepadExtendedService.notepads$;
 
   constructor(
   ) {
@@ -145,5 +150,9 @@ export class HomeComponent implements OnInit {
       },
       //header: this.translate.instant('measurement.dialog.manualChannels')
     });
+  }
+
+  createNewNotepad() {
+    this.notepadExtendedService.createNotepad();
   }
 }

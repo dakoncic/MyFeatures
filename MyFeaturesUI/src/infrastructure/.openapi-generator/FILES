@@ -4,6 +4,7 @@ README.md
 api.module.ts
 api/api.ts
 api/item.service.ts
+api/notepad.service.ts
 configuration.ts
 encoder.ts
 git_push.sh
@@ -13,6 +14,7 @@ model/intervalType.ts
 model/itemDto.ts
 model/itemTaskDto.ts
 model/models.ts
+model/notepadDto.ts
 model/updateItemTaskIndexDto.ts
 model/weekDayDto.ts
 param.ts

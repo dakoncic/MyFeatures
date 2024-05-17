@@ -1,0 +1,5 @@
+<div [formGroup]="form">
+  <p-editor formControlName="content" [style]="{ height: '320px' }"></p-editor>
+  <button type="button" (click)="saveNotepad()">Save</button>
+  <button type="button" (click)="deleteNotepad()">Delete</button>
+</div>
