@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, inject } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { NotepadDto, NotepadService } from '../../../infrastructure';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ButtonModule } from 'primeng/button';
 import { EditorModule } from 'primeng/editor';
+import { NotepadDto, NotepadService } from '../../../infrastructure';
 
 @Component({
   selector: 'app-notepad',
@@ -10,11 +11,17 @@ import { EditorModule } from 'primeng/editor';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    EditorModule
+    EditorModule,
+    ButtonModule,
+    FormsModule
   ],
   templateUrl: './notepad.component.html',
   styleUrl: './notepad.component.scss'
 })
+//za editor moram: npm install quill 1.3.7 (jer se na novom  ne želi bindat vrijednost content-a u p-editor html)
+//ovo je bug do njih izgleda
+//importat EditorModule
+//i dodat "node_modules/quill/dist/quill.snow.css" u angular.json pod "styles"
 export class NotepadComponent implements OnInit {
   @Input() notepad!: NotepadDto;
 
@@ -32,8 +39,9 @@ export class NotepadComponent implements OnInit {
   }
 
   displayNotepad(): void {
+    console.log(this.notepad);
     this.form.patchValue({
-      ...this.notepad
+      content: this.notepad.content
     });
   }
 

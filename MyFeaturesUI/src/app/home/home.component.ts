@@ -3,6 +3,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { DividerModule } from 'primeng/divider';
 import { DialogService } from 'primeng/dynamicdialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { RippleModule } from 'primeng/ripple';
@@ -13,10 +14,10 @@ import { map, of } from 'rxjs';
 import { ItemTaskDto } from '../../infrastructure';
 import { DescriptionType } from '../enum/description-type.enum';
 import { ItemExtendedService } from '../extended-services/item-extended-service';
-import { EditItemDialogComponent } from './edit-item-dialog/edit-item-dialog.component';
-import { TodoComponent } from './todo/todo.component';
-import { NotepadComponent } from './notepad/notepad.component';
 import { NotepadExtendedService } from '../extended-services/notepad-extended-service';
+import { EditItemDialogComponent } from './edit-item-dialog/edit-item-dialog.component';
+import { NotepadComponent } from './notepad/notepad.component';
+import { TodoComponent } from './todo/todo.component';
 
 @Component({
   selector: 'app-home',
@@ -33,7 +34,8 @@ import { NotepadExtendedService } from '../extended-services/notepad-extended-se
     SelectButtonModule,
     EditItemDialogComponent,
     TodoComponent,
-    NotepadComponent
+    NotepadComponent,
+    DividerModule
   ],
   providers: [
     //moram provide-at zbog *null injector error-a*
@@ -100,7 +102,7 @@ export class HomeComponent implements OnInit {
     // Generate weekdays starting from today
     for (let i = 0; i < 7; i++) {
       let dateToAdd = addDays(new Date(), i);
-      let dayName = i === 0 ? 'Today' : new Intl.DateTimeFormat('hr-HR', { weekday: 'long' }).format(dateToAdd);
+      let dayName = i === 0 ? new Intl.DateTimeFormat('hr-HR', { weekday: 'long' }).format(dateToAdd) + ' (danas)' : new Intl.DateTimeFormat('hr-HR', { weekday: 'long' }).format(dateToAdd);
       this.weekdays.push({
         name: dayName,
         value: dateToAdd.toISOString() // Full ISO 8601 date and time format

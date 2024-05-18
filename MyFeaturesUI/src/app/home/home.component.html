@@ -20,7 +20,7 @@
           pRipple
           label="New"
           icon="pi pi-plus"
-          class="p-button-success mr-2"
+          class="p-button-info mr-2"
           (click)="openNew()"
         ></button>
       </div>
@@ -46,7 +46,7 @@
             <div
               class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
             >
-              <h5 class="m-0">Samo jednom</h5>
+              <h5 class="m-0">Jednokratni</h5>
             </div>
           </ng-template>
           <ng-template
@@ -154,21 +154,23 @@
       </div>
     </div>
 
-    <div class="grid">
+    <p-divider />
+
+    <button
+      pButton
+      pRipple
+      label="New Notepad"
+      icon="pi pi-plus"
+      class="p-button-info mr-2"
+      (click)="createNewNotepad()"
+    ></button>
+
+    <div class="grid mt-3">
       <div class="col-6">
         <ng-container *ngFor="let notepad of notepads$ | async">
           <app-notepad [notepad]="notepad"></app-notepad>
         </ng-container>
       </div>
     </div>
-
-    <button
-      pButton
-      pRipple
-      label="New Editor"
-      icon="pi pi-plus"
-      class="p-button-success mr-2"
-      (click)="createNewNotepad()"
-    ></button>
   </div>
 </div>

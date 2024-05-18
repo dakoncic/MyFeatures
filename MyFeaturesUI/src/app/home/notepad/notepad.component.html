@@ -1,5 +1,20 @@
-<div [formGroup]="form">
-  <p-editor formControlName="content" [style]="{ height: '320px' }"></p-editor>
-  <button type="button" (click)="saveNotepad()">Save</button>
-  <button type="button" (click)="deleteNotepad()">Delete</button>
-</div>
+<form [formGroup]="form">
+  <p-editor formControlName="content" [style]="{ height: '320px' }"> </p-editor>
+
+  <button
+    pButton
+    pRipple
+    label="Save Notepad"
+    icon="pi pi-save"
+    class="p-button-success mr-2 mt-3"
+    (click)="saveNotepad()"
+  ></button>
+  <button
+    pButton
+    pRipple
+    label="Delete Notepad"
+    icon="pi pi-trash"
+    class="p-button-danger mr-2"
+    (click)="deleteNotepad()"
+  ></button>
+</form>

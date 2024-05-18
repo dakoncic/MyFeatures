@@ -21,9 +21,9 @@ namespace MyFeatures.Controllers
         public async Task<ActionResult<IEnumerable<NotepadDto>>> GetAll()
         {
             var notepads = await _notepadService.GetAllNotepadsAsync();
-            var NotepadDtos = notepads.Adapt<List<NotepadDto>>();
+            var notepadDtos = notepads.Adapt<List<NotepadDto>>();
 
-            return Ok(NotepadDtos);
+            return Ok(notepadDtos);
         }
 
         [HttpPost("Create")]

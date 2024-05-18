@@ -116,7 +116,7 @@ export class TodoComponent {
     tomorrow.setHours(0, 0, 0, 0);
 
     if (dueDate.getTime() === today.getTime()) {
-      return dueDate.toLocaleDateString('hr-HR', { weekday: 'long' }) + ' (Danas)';
+      return dueDate.toLocaleDateString('hr-HR', { weekday: 'long' }) + ' (danas)';
     } else {
       return dueDate.toLocaleDateString('hr-HR', { weekday: 'long' });
     }

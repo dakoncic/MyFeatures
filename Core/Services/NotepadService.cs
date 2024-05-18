@@ -38,7 +38,7 @@ namespace Core.Services
 
         public async Task<Notepad> UpdateNotepadAsync(int notepadId, Notepad updatedNotepad)
         {
-            var notepadEntity = await _notepadRepository.GetByIdAsync(notepadId, "Item");
+            var notepadEntity = await _notepadRepository.GetByIdAsync(notepadId);
             if (notepadEntity == null)
             {
                 throw new NotFoundException($"Notepad with ID {notepadId} not found.");
