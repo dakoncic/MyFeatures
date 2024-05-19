@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, switchMap, take } from 'rxjs';
-import { NotepadService, NotepadDto } from '../../infrastructure';
+import { NotepadDto, NotepadService } from '../../infrastructure';
 
 @Injectable({
   providedIn: 'root'

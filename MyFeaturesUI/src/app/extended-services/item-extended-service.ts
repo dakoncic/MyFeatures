@@ -66,7 +66,6 @@ export class ItemExtendedService {
     )
       .subscribe(() => {
         //ovdje ćemo za prvu sve liste osvježit
-
         this.oneTimeItemsSourceSubject.next([]);
         this.recurringItemsSourceSubject.next([]);
         this.weekDaysSourceSubject.next([]);

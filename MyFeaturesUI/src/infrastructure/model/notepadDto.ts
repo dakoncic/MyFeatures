@@ -14,5 +14,6 @@
 export interface NotepadDto { 
     id?: number;
     content?: string | null;
+    rowIndex?: number;
 }
 

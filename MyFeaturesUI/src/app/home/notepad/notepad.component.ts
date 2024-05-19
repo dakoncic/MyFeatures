@@ -1,9 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, inject } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { EditorModule } from 'primeng/editor';
-import { NotepadDto, NotepadService } from '../../../infrastructure';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { NotepadDto } from '../../../infrastructure';
+import { NotepadExtendedService } from '../../extended-services/notepad-extended-service';
 
 @Component({
   selector: 'app-notepad',
@@ -13,7 +16,8 @@ import { NotepadDto, NotepadService } from '../../../infrastructure';
     ReactiveFormsModule,
     EditorModule,
     ButtonModule,
-    FormsModule
+    FormsModule,
+    InputNumberModule
   ],
   templateUrl: './notepad.component.html',
   styleUrl: './notepad.component.scss'
@@ -28,20 +32,21 @@ export class NotepadComponent implements OnInit {
   form!: FormGroup;
 
   private formBuilder = inject(FormBuilder);
-  private notepadService = inject(NotepadService);
+  private notepadExtendedService = inject(NotepadExtendedService);
+  private confirmationService = inject(ConfirmationService);
 
   ngOnInit(): void {
     this.form = this.formBuilder.group({
-      content: [null]
+      content: [null],
+      rowIndex: [null, Validators.required]
     });
 
     this.displayNotepad();
   }
 
   displayNotepad(): void {
-    console.log(this.notepad);
     this.form.patchValue({
-      content: this.notepad.content
+      ...this.notepad
     });
   }
 
@@ -51,10 +56,18 @@ export class NotepadComponent implements OnInit {
       ...this.form.value
     };
 
-    this.notepadService.updateNotepad(updatedNotepad.id!, updatedNotepad).subscribe();
+    this.notepadExtendedService.updateNotepad(updatedNotepad);
   }
 
-  deleteNotepad(): void {
-    this.notepadService.deleteNotepad(this.notepad.id!).subscribe();
+  deleteNotepad() {
+    this.confirmationService.confirm({
+      header: 'Delete Confirmation',
+      message: 'Do you want to delete this record?',
+      acceptLabel: 'Potvrdi',
+      rejectLabel: 'Odustani',
+      accept: () => {
+        this.notepadExtendedService.deleteNotepad(this.notepad.id!);
+      }
+    });
   }
 }

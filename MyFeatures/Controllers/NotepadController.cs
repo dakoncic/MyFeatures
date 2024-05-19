@@ -50,7 +50,7 @@ namespace MyFeatures.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             await _notepadService.DeleteNotepadAsync(id);
-            return NoContent();
+            return Ok();
         }
     }
 }

@@ -39,3 +39,9 @@ $gutter: 1rem; //for primeflex grid system
   height: 2rem;
   width: 2rem;
 }
+
+.notepad-row-index {
+  .p-inputnumber-input {
+    width: 3rem;
+  }
+}

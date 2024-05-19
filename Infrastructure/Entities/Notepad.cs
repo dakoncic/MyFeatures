@@ -8,5 +8,8 @@ namespace Infrastructure.Entities
         public int Id { get; set; }
 
         public string? Content { get; set; }
+
+        [Required]
+        public int RowIndex { get; set; }
     }
 }

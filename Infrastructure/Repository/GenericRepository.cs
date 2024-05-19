@@ -92,7 +92,6 @@ namespace Infrastructure.Repository
             return await query.FirstOrDefaultAsync();
         }
 
-
         public void Add(TEntity entity)
         {
             _dbSet.Add(entity);

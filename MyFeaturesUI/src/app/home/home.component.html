@@ -165,12 +165,12 @@
       (click)="createNewNotepad()"
     ></button>
 
-    <div class="grid mt-3">
-      <div class="col-6">
-        <ng-container *ngFor="let notepad of notepads$ | async">
+    <div class="grid">
+      <ng-container *ngFor="let notepad of notepads$ | async">
+        <div class="col-6 mt-3">
           <app-notepad [notepad]="notepad"></app-notepad>
-        </ng-container>
-      </div>
+        </div>
+      </ng-container>
     </div>
   </div>
 </div>

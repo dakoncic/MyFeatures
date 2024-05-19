@@ -700,6 +700,10 @@
           "content": {
             "type": "string",
             "nullable": true
+          },
+          "rowIndex": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false

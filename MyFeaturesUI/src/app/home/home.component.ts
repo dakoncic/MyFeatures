@@ -67,11 +67,6 @@ export class HomeComponent implements OnInit {
 
   notepads$ = this.notepadExtendedService.notepads$;
 
-  constructor(
-  ) {
-
-  }
-
   ngOnInit() {
     this.initializeWeekdays();
 
