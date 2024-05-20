@@ -36,9 +36,9 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   itemTask: ItemTaskDto = {}; //trenutno selektiran
-  stateOptions: any[] = [{ label: 'One time task', value: false }, { label: 'Repeating', value: true }];
+  stateOptions: any[] = [{ label: 'Jednokratni', value: false }, { label: 'Ponavljajući', value: true }];
 
-  renewOptions: any[] = [{ label: 'Due date', value: true }, { label: 'Completion date', value: false }];
+  renewOptions: any[] = [{ label: 'Na krajnji rok', value: true }, { label: 'Na datum izvršenja', value: false }];
   descriptionType!: DescriptionType;
   ingredient!: string;
 
@@ -63,11 +63,11 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.form = this.formBuilder.group({
       description: ['', Validators.required],
-      recurring: [false],
-      renewOnDueDate: [null],
+      recurring: [false, Validators.required],
       dueDate: [null],
-      intervalValue: [null],
-      intervalType: [null]
+      renewOnDueDate: [null],
+      intervalType: [null],
+      intervalValue: [null]
     });
 
     //ako je edit, povuci s backenda i prikaži na formi
@@ -78,22 +78,56 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
     }
     else {
       //inače za create disable-a by default
+      this.form.get('renewOnDueDate')?.disable();
+      this.form.get('intervalType')?.disable();
       this.form.get('intervalValue')?.disable();
     }
 
+    //**update value and validity možda i ne treba jer resetam ako je disabled
     combineLatest([
       this.form.get('recurring')!.valueChanges,
       this.form.get('dueDate')!.valueChanges,
     ])
       .pipe(takeUntil(this.destroy$))
       .subscribe(([recurring, dueDate]) => {
+        console.log('changes combine latest');
         if (recurring && dueDate) {
-          this.form.get('intervalValue')?.enable();
+          this.form.get('renewOnDueDate')?.enable();
+          //ako je odabrao datum i recurring je, mora odabrat tip sekvence
+          this.form.get('renewOnDueDate')?.addValidators(Validators.required);
         } else {
-          this.form.get('intervalValue')?.disable();
+          this.form.get('renewOnDueDate')?.disable();
+          this.form.get('renewOnDueDate')?.reset();
         }
+      });
 
-        this.form.get('intervalValue')?.updateValueAndValidity();
+    this.form.get('renewOnDueDate')!.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((renewOnDueDate) => {
+        console.log('changes only renewOnDueDate');
+        //mora bit eksplicitna provjera null-a zbog boolean true/false
+        if (renewOnDueDate !== null) {
+          this.form.get('intervalType')?.enable();
+          //ako je odabrao datum i recurring je, mora odabrat tip sekvence
+          this.form.get('intervalType')?.addValidators(Validators.required);
+        } else {
+          this.form.get('intervalType')?.disable();
+          this.form.get('intervalType')?.reset();
+        }
+      });
+
+    this.form.get('intervalType')!.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((intervalType) => {
+        console.log('changes only intervalType');
+        if (intervalType) {
+          this.form.get('intervalValue')?.enable();
+          this.form.get('intervalValue')?.addValidators(Validators.required);
+        } else {
+          //validator automatski maknut
+          this.form.get('intervalValue')?.disable();
+          this.form.get('intervalValue')?.reset();
+        }
       });
   }
 

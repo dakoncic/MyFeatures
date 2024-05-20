@@ -1,6 +1,6 @@
 <form [formGroup]="form" style="height: 500px">
   <div class="field flex flex-column">
-    <label for="description">Description</label>
+    <label for="description">* Opis</label>
     <input
       type="text"
       pInputText
@@ -15,12 +15,12 @@
       *ngIf="description?.invalid && description?.dirty"
       class="ng-dirty ng-invalid"
     >
-      Description is required.
+      Opis je obavezan.
     </small>
   </div>
 
   <div class="field">
-    <label for="recurring">To do only once?</label>
+    <label for="recurring">* Tip taska</label>
     <p-selectButton
       [options]="stateOptions"
       formControlName="recurring"
@@ -31,7 +31,12 @@
   </div>
 
   <div class="field">
-    <label for="recurring">Renew on Due date or completion date?</label>
+    <label class="w-full" for="dueDate">Krajnji rok </label>
+    <p-calendar formControlName="dueDate" [showButtonBar]="true"></p-calendar>
+  </div>
+
+  <div class="field">
+    <label for="recurring">Automatsko kreiranje novog taska po završetku</label>
     <p-selectButton
       [options]="renewOptions"
       formControlName="renewOnDueDate"
@@ -39,20 +44,6 @@
       optionValue="value"
     >
     </p-selectButton>
-  </div>
-
-  <div class="field">
-    <label class="w-full" for="dueDate"
-      >Must be completed by certain date?
-    </label>
-    <p-calendar formControlName="dueDate" [showButtonBar]="true"></p-calendar>
-  </div>
-
-  <div class="field">
-    <label class="w-full" for="intervalValue"
-      >How many days between task repeats?
-    </label>
-    <p-inputNumber formControlName="intervalValue"> </p-inputNumber>
   </div>
 
   <div class="field flex justify-content-center">
@@ -64,7 +55,7 @@
           formControlName="intervalType"
           inputId="ingredient1"
         />
-        <label for="ingredient1" class="ml-2"> Days </label>
+        <label for="ingredient1" class="ml-2"> Dani </label>
       </div>
 
       <div class="flex align-items-center">
@@ -74,9 +65,16 @@
           formControlName="intervalType"
           inputId="ingredient2"
         />
-        <label for="ingredient2" class="ml-2"> Months </label>
+        <label for="ingredient2" class="ml-2"> Mjeseci </label>
       </div>
     </div>
+  </div>
+
+  <div class="field">
+    <label class="w-full" for="intervalValue"
+      >Broj dana/mjeseci između svakog taska
+    </label>
+    <p-inputNumber formControlName="intervalValue"> </p-inputNumber>
   </div>
 </form>
 
@@ -84,7 +82,7 @@
 <button
   pButton
   pRipple
-  label="Cancel"
+  label="Odustani"
   icon="pi pi-times"
   class="p-button-text"
   (click)="hideDialog()"
@@ -92,7 +90,7 @@
 <button
   pButton
   [disabled]="form.invalid"
-  label="Save"
+  label="Spremi"
   icon="pi pi-check"
   class="p-button-text"
   (click)="saveItem()"

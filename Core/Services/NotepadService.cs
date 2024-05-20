@@ -105,14 +105,25 @@ namespace Core.Services
         public async Task DeleteNotepadAsync(int notepadId)
         {
             var notepadEntity = await _notepadRepository.GetByIdAsync(notepadId);
-
             if (notepadEntity == null)
             {
                 throw new NotFoundException($"Notepad with ID {notepadId} not found.");
             }
 
+            int deletedIndex = notepadEntity.RowIndex;
+            var affectedNotepads = await _notepadRepository.GetAllAsync(
+                filter: n => n.RowIndex > deletedIndex,
+                orderBy: x => x.OrderBy(n => n.RowIndex)
+            );
+
+            foreach (var notepad in affectedNotepads)
+            {
+                notepad.RowIndex--;
+            }
+
             _notepadRepository.Delete(notepadId);
             await _notepadRepository.SaveAsync();
         }
+
     }
 }
