@@ -9,19 +9,11 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { IntervalType } from './intervalType';
 
 
-export interface ItemDto { 
-    id?: number;
-    description?: string | null;
+export interface UpdateItemIndexDto { 
+    itemId?: number;
+    newIndex?: number;
     recurring?: boolean;
-    renewOnDueDate?: boolean | null;
-    intervalValue?: number | null;
-    intervalType?: IntervalType;
-    rowIndex?: number;
 }
-export namespace ItemDto {
-}
-
 

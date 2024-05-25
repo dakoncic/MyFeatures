@@ -69,6 +69,38 @@
         }
       }
     },
+    "/api/Item/UpdateItemIndex": {
+      "post": {
+        "tags": [
+          "Item"
+        ],
+        "operationId": "UpdateItemIndexItem",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateItemIndexDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateItemIndexDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateItemIndexDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/Item/GetAll": {
       "get": {
         "tags": [
@@ -186,26 +218,80 @@
         }
       }
     },
-    "/api/Item/ReturnItemTaskToGroup/{itemTaskId}": {
-      "post": {
+    "/api/Item/GetOneTimeItemTasksWithWeekdays": {
+      "get": {
         "tags": [
           "Item"
         ],
-        "operationId": "ReturnItemTaskToGroupItem",
-        "parameters": [
-          {
-            "name": "itemTaskId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
+        "operationId": "GetOneTimeItemTasksWithWeekdaysItem",
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ItemTaskDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ItemTaskDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ItemTaskDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Item/GetRecurringItemTasksWithWeekdays": {
+      "get": {
+        "tags": [
+          "Item"
+        ],
+        "operationId": "GetRecurringItemTasksWithWeekdaysItem",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ItemTaskDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ItemTaskDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ItemTaskDto"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -650,6 +736,10 @@
           },
           "intervalType": {
             "$ref": "#/components/schemas/IntervalType"
+          },
+          "rowIndex": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -704,6 +794,23 @@
           "rowIndex": {
             "type": "integer",
             "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateItemIndexDto": {
+        "type": "object",
+        "properties": {
+          "itemId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "newIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "recurring": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

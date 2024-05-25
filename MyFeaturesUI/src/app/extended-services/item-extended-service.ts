@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, switchMap, take } from 'rxjs';
-import { CommitItemTaskDto, ItemService, ItemTaskDto, UpdateItemTaskIndexDto, WeekDayDto } from '../../infrastructure';
+import { BehaviorSubject, Observable, switchMap, take } from 'rxjs';
+import { CommitItemTaskDto, ItemService, ItemTaskDto, UpdateItemIndexDto, UpdateItemTaskIndexDto, WeekDayDto } from '../../infrastructure';
 
 @Injectable({
   providedIn: 'root'
@@ -8,8 +8,10 @@ import { CommitItemTaskDto, ItemService, ItemTaskDto, UpdateItemTaskIndexDto, We
 export class ItemExtendedService {
   private itemService = inject(ItemService);
 
-  private oneTimeItemsSourceSubject = new BehaviorSubject<ItemTaskDto[]>([]);
-  private recurringItemsSourceSubject = new BehaviorSubject<ItemTaskDto[]>([]);
+  private oneTimeItemsSourceSubject = new BehaviorSubject<boolean>(true);
+  private recurringItemsSourceSubject = new BehaviorSubject<boolean>(true);
+
+  //refaktor i weekdays da je boolean sa nekim default npr. null?
   private weekDaysSourceSubject = new BehaviorSubject<WeekDayDto[]>([]);
 
   //ovo se poziva prvi put u trenutku kad se komponenta
@@ -22,10 +24,22 @@ export class ItemExtendedService {
   //koji prekida emittanje default i poziva getAllItem.
   //običan Subject neće triggerat na prvi subscribe, nego tek na ".next()"
   oneTimeItems$ = this.oneTimeItemsSourceSubject
-    .pipe(switchMap(() => this.itemService.getOneTimeItemTasksItem()));
+    .pipe(
+      switchMap((isLocked: boolean) =>
+        isLocked
+          ? this.itemService.getOneTimeItemTasksItem()
+          : this.itemService.getOneTimeItemTasksWithWeekdaysItem()
+      )
+    );
 
   recurringItems$ = this.recurringItemsSourceSubject
-    .pipe(switchMap(() => this.itemService.getRecurringItemTasksItem()));
+    .pipe(
+      switchMap((isLocked: boolean) =>
+        isLocked
+          ? this.itemService.getRecurringItemTasksItem()
+          : this.itemService.getRecurringItemTasksWithWeekdaysItem()
+      )
+    );
 
   weekData$ = this.weekDaysSourceSubject
     .pipe(switchMap(() => this.itemService.getCommitedItemsForNextWeekItem()));
@@ -37,8 +51,8 @@ export class ItemExtendedService {
     )
       .subscribe(() => {
         //ovdje ćemo za prvu sve liste osvježit
-        this.oneTimeItemsSourceSubject.next([]);
-        this.recurringItemsSourceSubject.next([]);
+        this.oneTimeItemsSourceSubject.next(true);
+        this.recurringItemsSourceSubject.next(true);
         this.weekDaysSourceSubject.next([]);
       });
   }
@@ -51,8 +65,8 @@ export class ItemExtendedService {
       .subscribe(() => {
         //ovdje ćemo za prvu sve liste osvježit
 
-        this.oneTimeItemsSourceSubject.next([]);
-        this.recurringItemsSourceSubject.next([]);
+        this.oneTimeItemsSourceSubject.next(true);
+        this.recurringItemsSourceSubject.next(true);
         this.weekDaysSourceSubject.next([]);
       });
   }
@@ -66,8 +80,8 @@ export class ItemExtendedService {
     )
       .subscribe(() => {
         //ovdje ćemo za prvu sve liste osvježit
-        this.oneTimeItemsSourceSubject.next([]);
-        this.recurringItemsSourceSubject.next([]);
+        this.oneTimeItemsSourceSubject.next(true);
+        this.recurringItemsSourceSubject.next(true);
         this.weekDaysSourceSubject.next([]);
       });
   }
@@ -79,8 +93,8 @@ export class ItemExtendedService {
       .subscribe(() => {
         //ovdje ćemo za prvu sve liste osvježit
 
-        this.oneTimeItemsSourceSubject.next([]);
-        this.recurringItemsSourceSubject.next([]);
+        this.oneTimeItemsSourceSubject.next(true);
+        this.recurringItemsSourceSubject.next(true);
         this.weekDaysSourceSubject.next([]);
       });
   }
@@ -97,9 +111,28 @@ export class ItemExtendedService {
       .subscribe(() => {
         //ovdje ćemo za prvu sve liste osvježit
 
-        this.oneTimeItemsSourceSubject.next([]);
-        this.recurringItemsSourceSubject.next([]);
+        this.oneTimeItemsSourceSubject.next(true);
+        this.recurringItemsSourceSubject.next(true);
         this.weekDaysSourceSubject.next([]);
+      });
+  }
+
+  updateItemIndex(itemId: number, newIndex: number, recurring: boolean) {
+    const updatedItemIndex: UpdateItemIndexDto = {
+      itemId: itemId,
+      newIndex: newIndex,
+      recurring: recurring,
+    };
+
+    return this.itemService.updateItemIndexItem(updatedItemIndex).pipe(
+      take(1),
+    )
+      .subscribe(() => {
+        if (recurring) {
+          this.recurringItemsSourceSubject.next(false);
+        } else {
+          this.oneTimeItemsSourceSubject.next(false);
+        }
       });
   }
 
@@ -116,5 +149,21 @@ export class ItemExtendedService {
       .subscribe(() => {
         this.weekDaysSourceSubject.next([]);
       });
+  }
+
+  loadOneTimeItems(isLocked: boolean) {
+    this.oneTimeItemsSourceSubject.next(isLocked);
+  }
+
+  loadRecurringItems(isLocked: boolean) {
+    this.recurringItemsSourceSubject.next(isLocked);
+  }
+
+  getOneTimeItemsOrderLocked$(): Observable<boolean> {
+    return this.oneTimeItemsSourceSubject.asObservable();
+  }
+
+  getRecurringItemsOrderLocked$(): Observable<boolean> {
+    return this.recurringItemsSourceSubject.asObservable();
   }
 }

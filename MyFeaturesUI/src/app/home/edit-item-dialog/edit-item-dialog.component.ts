@@ -75,6 +75,9 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
       this.descriptionType = this.config.data.descriptionType;
 
       this.editItem(this.config.data.itemTask);
+
+      //nema mijenjanja recurringa na edit
+      this.form.get('recurring')?.disable();
     }
     else {
       //inače za create disable-a by default

@@ -1,5 +1,6 @@
 ﻿using Core.DomainModels;
 using Core.Exceptions;
+using Core.Helpers;
 using Core.Interfaces;
 using Infrastructure.Interfaces.IRepository;
 using Mapster;
@@ -35,29 +36,25 @@ namespace Core.Services
             return items.Adapt<List<Item>>();
         }
 
-        public async Task<List<ItemTask>> GetOneTimeItemTasksAsync()
+        public async Task<List<ItemTask>> GetActiveItemTasksAsync(bool recurring, bool includeWeekdaysCommitted)
         {
-            //one time taskovi, nisu izbrisani (znači nisu completed) i isto nisu već commitani za specifičan dan
-            Expression<Func<Entity.ItemTask, bool>> filter = i => !i.Item.Recurring && i.CommittedDate == null && i.CompletionDate == null;
+            Expression<Func<Entity.ItemTask, bool>> filter = i =>
+                i.Item.Recurring.Equals(recurring) && i.CompletionDate == null;
 
-            var items = await _itemTaskRepository.GetAllAsync(filter: filter, includeProperties: "Item");
+            if (!includeWeekdaysCommitted)
+            {
+                filter = filter.AndAlso(i =>
+                    i.CommittedDate == null || i.CommittedDate >= DateTime.UtcNow.AddDays(7));
+            }
 
-            return items.Adapt<List<ItemTask>>();
-        }
+            var itemTasks = await _itemTaskRepository.GetAllAsync(filter: filter, orderBy: x => x.OrderBy(n => n.Item.RowIndex), includeProperties: "Item");
 
-        public async Task<List<ItemTask>> GetRecurringItemTasksAsync()
-        {
-            //ponavljajući taskovi, mogu bit committed
-            Expression<Func<Entity.ItemTask, bool>> filter = i => i.Item.Recurring && i.CompletionDate == null;
-
-            var items = await _itemTaskRepository.GetAllAsync(filter: filter, includeProperties: "Item");
-
-            return items.Adapt<List<ItemTask>>();
+            return itemTasks.Adapt<List<ItemTask>>();
         }
 
         public async Task<Dictionary<DateTime, List<Entity.ItemTask>>> GetCommitedItemsForNextWeekAsync()
         {
-            //refaktor da se zove prije prvog fetcha u danu
+            //refaktor da se zove samo jednom prije prvog fetcha u danu, ili nekakav task scheduler koji 1 na dan to radi
             await _itemTaskExtendedRepository.UpdateWeekDayTaskItems();
 
             var groupedItems = await _itemTaskExtendedRepository.GetItemTasksGroupedByCommitDateForNextWeek();
@@ -96,14 +93,39 @@ namespace Core.Services
                 }
             }
 
+            if (itemTaskEntity.DueDate is not null)
+            {
+                itemTaskEntity.CommittedDate = itemTaskEntity.DueDate;
+
+                var maxRowIndexItemTask = await _itemTaskRepository.GetFirstOrDefaultAsync(
+                    x => x.CommittedDate.HasValue && x.CommittedDate.Value.Date == itemTaskEntity.CommittedDate.Value.Date,
+                    q => q.OrderByDescending(x => x.RowIndex)
+                );
+
+                int newRowIndex = maxRowIndexItemTask != null ? maxRowIndexItemTask.RowIndex + 1 : 0;
+
+                itemTaskEntity.RowIndex = newRowIndex;
+            }
+
+            //na create itema, daj row index i parentu, svakako mu treba početna vrijednost
+            //ako će se kliknut sort button da već ima svoju poziciju
+            //ako pustim da je null, sortiranje nije pouzdano
+            var maxRowIndexItem = await _itemRepository.GetFirstOrDefaultAsync(
+                x => x.Recurring.Equals(itemEntity.Recurring),
+                q => q.OrderByDescending(x => x.RowIndex)
+            );
+
+            int startIndex = maxRowIndexItem != null ? maxRowIndexItem.RowIndex + 1 : 0;
+            itemEntity.RowIndex = startIndex;
+
             itemEntity.ItemTasks.Add(itemTaskEntity);
 
             _itemRepository.Add(itemEntity);
 
             await _itemRepository.SaveAsync();
 
-            //fetchano je i dijete iako je isključen LazyLoading zato što sam ga dodao kad i parenta
 
+            //fetchano je i dijete iako je isključen LazyLoading zato što sam ga dodao kad i parenta
             return itemTaskEntity.Adapt<ItemTask>();
         }
 
@@ -120,6 +142,8 @@ namespace Core.Services
                 throw new NotFoundException($"ItemTask with ID {itemTaskId} not found.");
             }
 
+            var originalDueDate = updatedItemTask.DueDate;
+
             //eksplicitno update-amo itemTaskEntity sa novim vrijednostima .Adapt()
             //ovo neće transformirat entity objekt u domain, samo update se radi
             updatedItemTask.Adapt(itemTaskEntity);
@@ -134,6 +158,26 @@ namespace Core.Services
                 else
                 {
                     itemTaskEntity.Item.DaysBetween = updatedItemTask.Item.IntervalValue;
+                }
+            }
+
+            //ako je due date različit od originalnog datuma
+            if (originalDueDate != itemTaskEntity.DueDate)
+            {
+                //ako je postavio due date na null, želim update i committed date
+                itemTaskEntity.CommittedDate = itemTaskEntity.DueDate;
+
+                //ako due date nije null, commita na ipak neki drugi datum na Edit-u
+                if (itemTaskEntity.DueDate is not null)
+                {
+                    var maxRowIndexItem = await _itemTaskRepository.GetFirstOrDefaultAsync(
+                        x => x.CommittedDate.HasValue && x.CommittedDate.Value.Date == itemTaskEntity.CommittedDate.Value.Date,
+                        q => q.OrderByDescending(x => x.RowIndex)
+                    );
+
+                    int newRowIndex = maxRowIndexItem != null ? maxRowIndexItem.RowIndex + 1 : 0;
+
+                    itemTaskEntity.RowIndex = newRowIndex;
                 }
             }
 
@@ -157,6 +201,17 @@ namespace Core.Services
             }
 
             _itemRepository.Delete(itemId);
+
+            var items = await _itemRepository.GetAllAsync(
+                    x => x.Recurring.Equals(itemEntity.Recurring) && x.RowIndex > itemEntity.RowIndex,
+                    q => q.OrderBy(x => x.RowIndex)
+                );
+
+            foreach (var item in items)
+            {
+                item.RowIndex--;
+            }
+
             await _itemRepository.SaveAsync();
         }
 
@@ -169,12 +224,38 @@ namespace Core.Services
                 throw new NotFoundException($"ItemTask with ID {itemTaskId} not found.");
             }
 
-            //spremamo originalni commit date iz kojeg odlazi item na drugi dan
+            if (itemTaskEntity.CommittedDate.HasValue)
+            {
+                await UpdateItemTaskCommittedDateAsync(commitDay, itemTaskEntity);
+            }
+            else
+            {
+                await CommitItemTaskFirstTimeAsync(commitDay.Value, itemTaskEntity);
+            }
+        }
+
+        //manualno commitanje samo iz originalne grupe u dan određen
+        private async Task CommitItemTaskFirstTimeAsync(DateTime commitDay, Entity.ItemTask itemTaskEntity)
+        {
+            var maxRowIndexItem = await _itemTaskRepository.GetFirstOrDefaultAsync(
+                x => x.CommittedDate.HasValue && x.CommittedDate.Value.Date == commitDay.Date,
+                q => q.OrderByDescending(x => x.RowIndex)
+            );
+
+            int newRowIndex = maxRowIndexItem != null ? maxRowIndexItem.RowIndex + 1 : 0;
+            itemTaskEntity.CommittedDate = commitDay;
+            itemTaskEntity.RowIndex = newRowIndex;
+
+            await _itemTaskRepository.SaveAsync();
+        }
+
+        //manualno pomicanje već commitanog itema između dana, ili vraćanje u svoju grupu
+        private async Task UpdateItemTaskCommittedDateAsync(DateTime? commitDay, Entity.ItemTask itemTaskEntity)
+        {
             var originalCommitDate = itemTaskEntity.CommittedDate;
 
             if (commitDay.HasValue)
             {
-                //ako se postavlja novi commit datum, onda ga postavi
                 itemTaskEntity.CommittedDate = commitDay;
 
                 var maxRowIndexItem = await _itemTaskRepository.GetFirstOrDefaultAsync(
@@ -187,31 +268,73 @@ namespace Core.Services
             }
             else
             {
-                //ako se vraća u svoju grupu
                 itemTaskEntity.CommittedDate = null;
             }
 
             await _itemTaskRepository.SaveAsync();
 
-            // reorderanje itema koji su ostali u svojoj grupi
-            // ako je item uopće bio commitan prije ovog
-            if (originalCommitDate.HasValue)
+            // reorderanje taskova koji ostaju u originalnoj grupi
+            var itemsInOriginalGroup = await _itemTaskRepository.GetAllAsync(
+                x => x.CommittedDate.HasValue && x.CommittedDate.Value.Date == originalCommitDate.Value.Date && x.RowIndex > itemTaskEntity.RowIndex,
+                q => q.OrderBy(x => x.RowIndex)
+            );
+
+            foreach (var item in itemsInOriginalGroup)
             {
-                var itemsInOriginalGroup = await _itemTaskRepository.GetAllAsync(
-                    x => x.CommittedDate.HasValue && x.CommittedDate.Value.Date == originalCommitDate.Value.Date,
-                    q => q.OrderBy(x => x.RowIndex)
-                );
-
-                int currentIndex = 0;
-                foreach (var item in itemsInOriginalGroup)
-                {
-                    item.RowIndex = currentIndex++;
-                }
-
-                await _itemTaskRepository.SaveAsync();
+                item.RowIndex--;
             }
+
+            await _itemTaskRepository.SaveAsync();
         }
 
+        //samo reorderanje pozicije unutar svoje grupe
+        public async Task UpdateItemIndex(int itemId, int newIndex, bool recurring)
+        {
+            var itemToUpdate = await _itemRepository.GetByIdAsync(itemId);
+
+            if (itemToUpdate == null)
+            {
+                throw new NotFoundException($"Item with ID {itemId} not found.");
+            }
+
+            int currentIndex = itemToUpdate.RowIndex;
+
+            Expression<Func<Entity.Item, bool>> filter = x => x.Recurring.Equals(recurring) && x.Id != itemId;
+            Func<IQueryable<Entity.Item>, IOrderedQueryable<Entity.Item>> orderBy = q => q.OrderBy(x => x.RowIndex);
+
+            var items = await _itemRepository.GetAllAsync(filter, orderBy);
+
+            // Reorder the items based on the new index
+            if (newIndex < currentIndex)
+            {
+                // The item is moving up in the order
+                foreach (var item in items)
+                {
+                    if (item.RowIndex >= newIndex && item.RowIndex < currentIndex)
+                    {
+                        item.RowIndex += 1;
+                    }
+                }
+            }
+            else if (newIndex > currentIndex)
+            {
+                // The item is moving down in the order
+                foreach (var item in items)
+                {
+                    if (item.RowIndex > currentIndex && item.RowIndex <= newIndex)
+                    {
+                        item.RowIndex -= 1;
+                    }
+                }
+            }
+
+            // Set the new index for the item to be updated
+            itemToUpdate.RowIndex = newIndex;
+
+            await _itemRepository.SaveAsync();
+        }
+
+        //samo reorderanje pozicije unutar svoje grupe
         public async Task UpdateItemTaskIndex(int itemId, DateTime commitDate, int newIndex)
         {
             var itemToUpdate = await _itemTaskRepository.GetByIdAsync(itemId);
@@ -255,11 +378,9 @@ namespace Core.Services
             // Set the new index for the item to be updated
             itemToUpdate.RowIndex = newIndex;
 
-            // Save all changes to the database
             await _itemTaskRepository.SaveAsync();
         }
 
-        //jel ok ako ništa ne vraćamo kao i za delete?
         public async Task CompleteItemTaskAsync(int itemTaskId)
         {
             //one time item se može complete-at koji ima commited date već i koji nema
@@ -279,7 +400,6 @@ namespace Core.Services
             //i kreira se novi ItemTask
             if (itemTaskEntity.Item.Recurring)
             {
-
                 var newItemTaskEntity = new Entity.ItemTask
                 {
                     ItemId = itemTaskEntity.Item.Id,
@@ -300,7 +420,7 @@ namespace Core.Services
                     {
                         newItemTaskEntity.DueDate = itemTaskEntity.DueDate.Value;
 
-                        // novi DueDate ne smije biti u prošlosti ako sam zakasnio i za novi datum
+                        // novi DueDate ne smije biti u prošlosti, ako sam zakasnio čak i za novi datum
                         while (newItemTaskEntity.DueDate < DateTime.UtcNow.Date)
                         {
                             newItemTaskEntity.DueDate = newItemTaskEntity.DueDate.Value.AddDays(daysBetween);
@@ -311,32 +431,29 @@ namespace Core.Services
                     {
                         newItemTaskEntity.DueDate = itemTaskEntity.CompletionDate.Value.AddDays(daysBetween);
                     }
+
+                    //odma committamo, ne čekamo ništa
+                    newItemTaskEntity.CommittedDate = newItemTaskEntity.DueDate;
                 }
 
-                //ako DueDate nije null, onda ostaje null, ne postavljen
-
                 _itemTaskRepository.Add(newItemTaskEntity);
-
             }
-
-
-            await _itemTaskRepository.SaveAsync();
-        }
-
-        //razmislit možda ne treba jer možemo reuse-at commitItemTask metodu?
-        public async Task ReturnItemTaskToGroupAsync(int itemTaskId)
-        {
-            var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId);
-            if (itemTaskEntity == null)
+            //ako je item One Time, onda moram trimmat ostavljeno prazno mjesto
+            else
             {
-                throw new NotFoundException($"ItemTask with ID {itemTaskId} not found.");
+                var nonRecurringItems = await _itemRepository.GetAllAsync(
+                    x => !x.Recurring && x.RowIndex > itemTaskEntity.Item.RowIndex,
+                    q => q.OrderBy(x => x.RowIndex)
+                );
+
+                foreach (var item in nonRecurringItems)
+                {
+                    item.RowIndex--;
+                }
+
+                await _itemRepository.SaveAsync();
             }
 
-            //za sada samo task više nije comittan na određen datum i to je to
-            //TO DO: u budućnosti ako ima daysBetween, preskočit će ovaj put
-            //(npr.preskočit ću pranje balkona ovaj put)
-
-            itemTaskEntity.CommittedDate = null;
 
             await _itemTaskRepository.SaveAsync();
         }

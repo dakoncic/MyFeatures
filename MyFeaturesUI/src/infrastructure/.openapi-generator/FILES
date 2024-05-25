@@ -15,6 +15,7 @@ model/itemDto.ts
 model/itemTaskDto.ts
 model/models.ts
 model/notepadDto.ts
+model/updateItemIndexDto.ts
 model/updateItemTaskIndexDto.ts
 model/weekDayDto.ts
 param.ts

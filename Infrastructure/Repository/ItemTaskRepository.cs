@@ -20,92 +20,39 @@ namespace Infrastructure.Repository
             _itemTaskRepository = itemTaskRepository;
         }
 
+        //rename u "expired" jer samo se za njih primjenjuje
         public async Task UpdateWeekDayTaskItems()
         {
             var today = DateTime.Today;
-            var endOfWeek = today.AddDays(7);
 
-            // dohvaćam ne complete-ane taskove, koji su commitani prije današnjeg dana (istekli) 
-            //ili je due date unutar tjedan dana a nisu commitani -> automatski ih postavlja
-            var relevantItemTasks = await _context.ItemTasks
+            // fetchamo samo istekle taskove
+            var expiredItemTasks = await _context.ItemTasks
                 .Where(itemTask => itemTask.CompletionDate == null &&
-                                   (itemTask.CommittedDate <= today ||
-                                    (itemTask.DueDate >= today && itemTask.DueDate < endOfWeek && itemTask.CommittedDate == null)))
+                                   itemTask.CommittedDate < today)
                 .ToListAsync();
 
-            // Categorize tasks
-            var (expiredTasks, dueTasks) = CategorizeTasks(relevantItemTasks, today, endOfWeek);
-
-            // Update RowIndex for expired tasks
-            await UpdateExpiredTasks(expiredTasks, today, _itemTaskRepository);
-
-            // Update RowIndex for due tasks
-            await UpdateDueTasks(dueTasks, _itemTaskRepository);
-
-            // Save changes if any modifications have been made
-            if (_context.ChangeTracker.HasChanges())
+            if (!expiredItemTasks.Any())
             {
-                await _context.SaveChangesAsync();
-            }
-        }
-
-        private (List<ItemTask> expiredTasks, List<ItemTask> dueTasks) CategorizeTasks(List<ItemTask> tasks, DateTime today, DateTime endOfWeek)
-        {
-            var expiredTasks = new List<ItemTask>();
-            var dueTasks = new List<ItemTask>();
-
-            foreach (var task in tasks)
-            {
-                if (task.CommittedDate < today)
-                {
-                    task.CommittedDate = today;
-                    expiredTasks.Add(task);
-                }
-                else if (task.DueDate >= today && task.DueDate < endOfWeek && task.CommittedDate == null)
-                {
-                    task.CommittedDate = task.DueDate;
-                    dueTasks.Add(task);
-                }
+                return;
             }
 
-            return (expiredTasks, dueTasks);
-        }
-
-        private async Task UpdateExpiredTasks(List<ItemTask> expiredTasks, DateTime today, IGenericRepository<Entity.ItemTask, int> itemTaskRepository)
-        {
-            // Determine the starting RowIndex for expired tasks by fetching the maximum row index of today's tasks
-            var maxRowIndexItem = await itemTaskRepository.GetFirstOrDefaultAsync(
+            // Get the max row index for tasks committed today
+            var maxRowIndexItemForDay = await _itemTaskRepository.GetFirstOrDefaultAsync(
                 x => x.CommittedDate.HasValue && x.CommittedDate.Value.Date == today,
                 q => q.OrderByDescending(x => x.RowIndex)
             );
 
-            int startIndex = maxRowIndexItem != null ? maxRowIndexItem.RowIndex + 1 : 0;
+            int newRowIndex = maxRowIndexItemForDay != null ? maxRowIndexItemForDay.RowIndex + 1 : 0;
 
-            foreach (var task in expiredTasks)
+            foreach (var task in expiredItemTasks)
             {
-                task.RowIndex = startIndex++;
+                task.CommittedDate = today;
+                task.RowIndex = newRowIndex++;
             }
-        }
 
-        private async Task UpdateDueTasks(List<ItemTask> dueTasks, IGenericRepository<Entity.ItemTask, int> itemTaskRepository)
-        {
-            var dueTasksByDay = dueTasks.GroupBy(t => t.CommittedDate.Value.Date);
-
-            foreach (var dueTasksGroup in dueTasksByDay)
+            if (_context.ChangeTracker.HasChanges())
             {
-                var commitDay = dueTasksGroup.Key;
-
-                var maxRowIndexItemForDay = await itemTaskRepository.GetFirstOrDefaultAsync(
-                    x => x.CommittedDate.HasValue && x.CommittedDate.Value.Date == commitDay,
-                    q => q.OrderByDescending(x => x.RowIndex)
-                );
-
-                int newRowIndex = maxRowIndexItemForDay != null ? maxRowIndexItemForDay.RowIndex + 1 : 0;
-
-                foreach (var task in dueTasksGroup)
-                {
-                    task.RowIndex = newRowIndex++;
-                }
+                await _context.SaveChangesAsync();
             }
         }
 

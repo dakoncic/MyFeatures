@@ -79,7 +79,7 @@ export class TodoComponent {
     const data = event.dataTransfer?.getData('application/json');
     const rowData = JSON.parse(data!);
 
-    //potencijalno napravit if else, a ne 2 if, testirat prvo
+    //null je kad dropam item al nije promjenio poziciju ili ga pomičem na drugi dan#
     if (this.newIndex !== null) {
       const formattedDate = this.formatDate(rowData.committedDate);
       this.itemExtendedService.updateItemTaskIndex(rowData.id, formattedDate, this.newIndex);

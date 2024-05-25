@@ -4,15 +4,16 @@ import { FormsModule } from '@angular/forms';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
+import { DragDropModule } from 'primeng/dragdrop';
 import { DialogService } from 'primeng/dynamicdialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { RippleModule } from 'primeng/ripple';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { TableModule } from 'primeng/table';
 import { ToolbarModule } from 'primeng/toolbar';
-import { map, of } from 'rxjs';
+import { map, of, take } from 'rxjs';
 import { ItemTaskDto } from '../../infrastructure';
 import { DescriptionType } from '../enum/description-type.enum';
+import { ItemTaskType } from '../enum/item-task-type.enum';
 import { ItemExtendedService } from '../extended-services/item-extended-service';
 import { NotepadExtendedService } from '../extended-services/notepad-extended-service';
 import { EditItemDialogComponent } from './edit-item-dialog/edit-item-dialog.component';
@@ -27,15 +28,14 @@ import { TodoComponent } from './todo/todo.component';
     TableModule,
     FormsModule,
     ButtonModule,
-    //treba ili ne??
-    RippleModule,
     ToolbarModule,
     InputTextModule,
     SelectButtonModule,
     EditItemDialogComponent,
     TodoComponent,
     NotepadComponent,
-    DividerModule
+    DividerModule,
+    DragDropModule
   ],
   providers: [
     //moram provide-at zbog *null injector error-a*
@@ -50,14 +50,18 @@ export class HomeComponent implements OnInit {
   private notepadExtendedService = inject(NotepadExtendedService);
   private dialogService = inject(DialogService);
 
-  editDialogVisible: boolean = false;
+  newIndex: number | null = null;
   cols: any[] = [];
   currentDay!: string;
+  itemTaskType = ItemTaskType;
 
   weekdays: any[] = [];
 
   oneTimeItems$ = this.itemExtendedService.oneTimeItems$;
   recurringItems$ = this.itemExtendedService.recurringItems$;
+  oneTimeItemsOrderLocked$ = this.itemExtendedService.getOneTimeItemsOrderLocked$();
+  recurringItemsOrderLocked$ = this.itemExtendedService.getRecurringItemsOrderLocked$();
+
   weekData$ = this.itemExtendedService.weekData$.pipe(
     map(weekdata => weekdata.map(daydata => ({
       weekDayDate: daydata.weekDayDate!,
@@ -73,8 +77,6 @@ export class HomeComponent implements OnInit {
     this.cols = [
       { field: 'description', header: 'Opis' }
     ];
-
-
   }
 
   onDayChange(event: any) {
@@ -139,6 +141,45 @@ export class HomeComponent implements OnInit {
 
   completeItem(itemTask: ItemTaskDto) {
     this.itemExtendedService.completeItem(itemTask.id!);
+  }
+
+  lockOrUnlockTableOrder(itemTask: ItemTaskType) {
+    if (itemTask === ItemTaskType.OneTimeItemTask) {
+      this.itemExtendedService.getOneTimeItemsOrderLocked$().pipe(take(1)).subscribe(isLocked => {
+        this.itemExtendedService.loadOneTimeItems(!isLocked);
+      });
+
+    } else {
+      this.itemExtendedService.getRecurringItemsOrderLocked$().pipe(take(1)).subscribe(isLocked => {
+        this.itemExtendedService.loadRecurringItems(!isLocked);
+      });
+    }
+  }
+
+  onRowReorder(event: any) {
+    this.newIndex = event.dropIndex;
+  }
+
+  onDragStart(event: DragEvent, rowData: any) {
+    // Convert the rowData object to a JSON string
+    const data = JSON.stringify(rowData);
+
+    // Use the dataTransfer.setData() method to set the data to be transferred
+    // "application/json" is used as a type identifier to signify the type of data being transferred
+    event.dataTransfer?.setData('application/json', data);
+  }
+
+  onDrop(event: DragEvent, recurring: boolean) {
+    event.preventDefault(); //just in case ako neki browser ne dopušta
+
+    const data = event.dataTransfer?.getData('application/json');
+    const rowData = JSON.parse(data!);
+
+    //null je kad dropam item al nije promjenio poziciju ili ga pomičem na drugi dan#
+    if (this.newIndex !== null) {
+      this.itemExtendedService.updateItemIndex(rowData.item.id, this.newIndex, recurring);
+      this.newIndex = null;
+    }
   }
 
   openNew() {

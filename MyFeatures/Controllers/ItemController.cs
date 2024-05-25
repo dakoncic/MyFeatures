@@ -38,6 +38,18 @@ namespace MyFeatures.Controllers
             return Ok();
         }
 
+        [HttpPost("UpdateItemIndex")]
+        public async Task<ActionResult> UpdateItemIndex(UpdateItemIndexDto updateItemIndexDto)
+        {
+            await _itemService.UpdateItemIndex(
+                updateItemIndexDto.ItemId,
+                updateItemIndexDto.NewIndex,
+                updateItemIndexDto.Recurring
+                );
+
+            return Ok();
+        }
+
         //vjv ne treba, obrisat kasnije
         [HttpGet("GetAll")]
         public async Task<ActionResult<IEnumerable<ItemDto>>> GetAll()
@@ -51,7 +63,7 @@ namespace MyFeatures.Controllers
         [HttpGet("GetOneTimeItemTasks")]
         public async Task<ActionResult<IEnumerable<ItemTaskDto>>> GetOneTimeItemTasks()
         {
-            var itemTasks = await _itemService.GetOneTimeItemTasksAsync();
+            var itemTasks = await _itemService.GetActiveItemTasksAsync(false, false);
             var itemTasksDto = itemTasks.Adapt<List<ItemTaskDto>>();
 
             return Ok(itemTasksDto);
@@ -60,18 +72,28 @@ namespace MyFeatures.Controllers
         [HttpGet("GetRecurringItemTasks")]
         public async Task<ActionResult<IEnumerable<ItemTaskDto>>> GetRecurringItemTasks()
         {
-            var itemTasks = await _itemService.GetRecurringItemTasksAsync();
+            var itemTasks = await _itemService.GetActiveItemTasksAsync(true, false);
             var itemTasksDto = itemTasks.Adapt<List<ItemTaskDto>>();
 
             return Ok(itemTasksDto);
         }
 
-        [HttpPost("ReturnItemTaskToGroup/{itemTaskId}")]
-        public async Task<ActionResult> ReturnItemTaskToGroup(int itemTaskId)
+        [HttpGet("GetOneTimeItemTasksWithWeekdays")]
+        public async Task<ActionResult<IEnumerable<ItemTaskDto>>> GetOneTimeItemTasksWithWeekdays()
         {
-            await _itemService.ReturnItemTaskToGroupAsync(itemTaskId);
+            var itemTasks = await _itemService.GetActiveItemTasksAsync(false, true);
+            var itemTasksDto = itemTasks.Adapt<List<ItemTaskDto>>();
 
-            return Ok();
+            return Ok(itemTasksDto);
+        }
+
+        [HttpGet("GetRecurringItemTasksWithWeekdays")]
+        public async Task<ActionResult<IEnumerable<ItemTaskDto>>> GetRecurringItemTasksWithWeekdays()
+        {
+            var itemTasks = await _itemService.GetActiveItemTasksAsync(true, true);
+            var itemTasksDto = itemTasks.Adapt<List<ItemTaskDto>>();
+
+            return Ok(itemTasksDto);
         }
 
         //bez {id} bi morao zvat metodu preko query parametra Get?id=123, 
