@@ -1,23 +1,7 @@
-<div
-  style="
-    position: fixed;
-    height: 100px;
-    width: 100%;
-    z-index: 999;
-    background-color: blueviolet;
-  "
-></div>
+<div class="topbar"></div>
 
-<div
-  style="
-    position: fixed;
-    height: 100%;
-    width: 100px;
-    z-index: 999;
-    background-color: chocolate;
-    margin-top: 100px;
-  "
-></div>
+<!-- zakomentiran sidebar -->
+<!-- <div class="sidebar"></div> -->
 
 <!-- parent body mu daje 100%, što ja proslijeđujem dalje
      moram dati i flex, i to sve kao wrapper tako da main content mogu pomaknut
@@ -26,7 +10,8 @@
   <!-- margine moraju bit udaljene za visinu i širinu topbar i sidebar, pusha se od flexa
        a ne od topbara, pa se ne collapsa margin -->
   <!-- padding sa svih strana malo odmakne main prema unutra -->
-  <main style="margin-top: 7rem; margin-left: 7rem; width: 100%; padding: 1rem">
+  <!-- margin-left: 7rem; vratit ako koristim sidebar -->
+  <main style="margin-top: 7rem; width: 100%; padding: 1rem">
     <router-outlet></router-outlet>
   </main>
 </div>

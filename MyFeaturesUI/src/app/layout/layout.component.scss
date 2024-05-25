@@ -1,0 +1,16 @@
+.sidebar {
+  position: fixed;
+  height: 100%;
+  width: 100px;
+  z-index: 999;
+  background-color: chocolate;
+  margin-top: 100px;
+}
+
+.topbar {
+  position: fixed;
+  height: 100px;
+  width: 100%;
+  z-index: 999;
+  background-color: blueviolet;
+}
