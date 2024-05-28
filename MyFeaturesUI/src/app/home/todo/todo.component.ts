@@ -142,8 +142,7 @@ export class TodoComponent {
 
   deleteItem(itemTask: ItemTaskDto) {
     this.confirmationService.confirm({
-      header: 'Delete Confirmation',
-      message: 'Do you want to delete this record?',
+      header: 'Potvrda brisanja',
       acceptLabel: 'Potvrdi',
       rejectLabel: 'Odustani',
       accept: () => {
