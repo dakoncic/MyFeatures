@@ -1,16 +1,16 @@
 <div class="flex flex-column" style="height: 100%">
   <div class="card">
     <div class="grid">
-      <ng-container *ngFor="let dayData of weekData$ | async">
-        <div class="col-3">
-          <app-todo
-            [items$]="dayData.items$"
-            [weekDayDate]="dayData.weekDayDate"
-            [cols]="cols"
-          >
-          </app-todo>
-        </div>
-      </ng-container>
+      @for (dayData of weekData$ | async; track dayData) {
+      <div class="col-3">
+        <app-todo
+          [items$]="dayData.items$"
+          [weekDayDate]="dayData.weekDayDate"
+          [cols]="cols"
+        >
+        </app-todo>
+      </div>
+      }
     </div>
 
     <p-toolbar styleClass="mb-4">
@@ -82,15 +82,15 @@
                 (click)="assignItemToSelectedWeekday(rowData, currentDay)"
               >
                 <td class="w-2rem">
-                  <span
-                    *ngIf="!(oneTimeItemsOrderLocked$ | async)"
-                    class="pi pi-bars"
-                    pReorderableRowHandle
-                  ></span>
+                  @if (!(oneTimeItemsOrderLocked$ | async)) {
+                  <span class="pi pi-bars" pReorderableRowHandle></span>
+                  }
                 </td>
-                <td *ngFor="let col of columns">
+                @for (col of columns; track col) {
+                <td>
                   <span>{{ rowData[col.field] }}</span>
                 </td>
+                }
                 <td>
                   <div class="flex justify-content-end">
                     <button
@@ -171,15 +171,15 @@
                 (click)="assignItemToSelectedWeekday(rowData, currentDay)"
               >
                 <td class="w-2rem">
-                  <span
-                    *ngIf="!(recurringItemsOrderLocked$ | async)"
-                    class="pi pi-bars"
-                    pReorderableRowHandle
-                  ></span>
+                  @if (!(recurringItemsOrderLocked$ | async)) {
+                  <span class="pi pi-bars" pReorderableRowHandle></span>
+                  }
                 </td>
-                <td *ngFor="let col of columns">
+                @for (col of columns; track col) {
+                <td>
                   <span>{{ rowData[col.field] }}</span>
                 </td>
+                }
                 <td>
                   <div class="flex justify-content-end">
                     <button
@@ -217,11 +217,11 @@
     ></button>
 
     <div class="grid">
-      <ng-container *ngFor="let notepad of notepads$ | async">
-        <div class="col-6 mt-3">
-          <app-notepad [notepad]="notepad"></app-notepad>
-        </div>
-      </ng-container>
+      @for (notepad of notepads$ | async; track notepad) {
+      <div class="col-6 mt-3">
+        <app-notepad [notepad]="notepad"></app-notepad>
+      </div>
+      }
     </div>
   </div>
 </div>

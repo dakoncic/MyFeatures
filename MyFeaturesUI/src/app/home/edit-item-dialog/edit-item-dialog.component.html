@@ -11,12 +11,9 @@
         'ng-invalid ng-dirty': description?.invalid && description?.dirty
       }"
     />
-    <small
-      *ngIf="description?.invalid && description?.dirty"
-      class="ng-dirty ng-invalid"
-    >
-      Opis je obavezan.
-    </small>
+    @if (description?.invalid && description?.dirty) {
+    <small class="ng-dirty ng-invalid"> Opis je obavezan. </small>
+    }
   </div>
 
   <div class="field">
