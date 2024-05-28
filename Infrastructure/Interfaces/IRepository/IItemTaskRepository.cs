@@ -4,7 +4,7 @@ namespace Infrastructure.Interfaces.IRepository
 {
     public interface IItemTaskRepository
     {
-        Task UpdateWeekDayTaskItems();
+        Task UpdateExpiredItemTasks();
         Task<Dictionary<DateTime, List<ItemTask>>> GetItemTasksGroupedByCommitDateForNextWeek();
     }
 }

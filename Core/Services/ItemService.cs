@@ -28,14 +28,6 @@ namespace Core.Services
             _itemTaskExtendedRepository = itemTaskExtendedRepository;
         }
 
-        //vjerojatno se neće koristiti nigdje
-        public async Task<List<Item>> GetAllItemsAsync()
-        {
-            var items = await _itemRepository.GetAllAsync();
-
-            return items.Adapt<List<Item>>();
-        }
-
         public async Task<List<ItemTask>> GetActiveItemTasksAsync(bool recurring, bool includeWeekdaysCommitted)
         {
             Expression<Func<Entity.ItemTask, bool>> filter = i =>
@@ -44,7 +36,7 @@ namespace Core.Services
             if (!includeWeekdaysCommitted)
             {
                 filter = filter.AndAlso(i =>
-                    i.CommittedDate == null || i.CommittedDate >= DateTime.UtcNow.AddDays(7));
+                    i.CommittedDate == null || i.CommittedDate.Value.Date >= DateTime.UtcNow.Date.AddDays(7));
             }
 
             var itemTasks = await _itemTaskRepository.GetAllAsync(filter: filter, orderBy: x => x.OrderBy(n => n.Item.RowIndex), includeProperties: "Item");
@@ -55,7 +47,7 @@ namespace Core.Services
         public async Task<Dictionary<DateTime, List<Entity.ItemTask>>> GetCommitedItemsForNextWeekAsync()
         {
             //refaktor da se zove samo jednom prije prvog fetcha u danu, ili nekakav task scheduler koji 1 na dan to radi
-            await _itemTaskExtendedRepository.UpdateWeekDayTaskItems();
+            await _itemTaskExtendedRepository.UpdateExpiredItemTasks();
 
             var groupedItems = await _itemTaskExtendedRepository.GetItemTasksGroupedByCommitDateForNextWeek();
 
@@ -123,7 +115,6 @@ namespace Core.Services
             _itemRepository.Add(itemEntity);
 
             await _itemRepository.SaveAsync();
-
 
             //fetchano je i dijete iako je isključen LazyLoading zato što sam ga dodao kad i parenta
             return itemTaskEntity.Adapt<ItemTask>();
@@ -230,6 +221,7 @@ namespace Core.Services
             }
             else
             {
+                //šaljem .Value jer znači definitivno je poslana "not null" vrijednost
                 await CommitItemTaskFirstTimeAsync(commitDay.Value, itemTaskEntity);
             }
         }
@@ -421,7 +413,7 @@ namespace Core.Services
                         newItemTaskEntity.DueDate = itemTaskEntity.DueDate.Value;
 
                         // novi DueDate ne smije biti u prošlosti, ako sam zakasnio čak i za novi datum
-                        while (newItemTaskEntity.DueDate < DateTime.UtcNow.Date)
+                        while (newItemTaskEntity.DueDate.Value.Date < DateTime.UtcNow.Date)
                         {
                             newItemTaskEntity.DueDate = newItemTaskEntity.DueDate.Value.AddDays(daysBetween);
                         }

@@ -11,7 +11,6 @@ namespace Core.Interfaces
         Task CompleteItemTaskAsync(int itemTaskId);
         Task<ItemTask> CreateItemAsync(ItemTask itemTaskDomain);
         Task DeleteItemAsync(int itemId);
-        Task<List<Item>> GetAllItemsAsync();
         Task<ItemTask> GetItemTaskByIdAsync(int itemTaskId);
         Task<Dictionary<DateTime, List<Entity.ItemTask>>> GetCommitedItemsForNextWeekAsync();
         Task<List<ItemTask>> GetActiveItemTasksAsync(bool recurring, bool includeWeekdaysCommitted);

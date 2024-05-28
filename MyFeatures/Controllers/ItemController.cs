@@ -50,16 +50,6 @@ namespace MyFeatures.Controllers
             return Ok();
         }
 
-        //vjv ne treba, obrisat kasnije
-        [HttpGet("GetAll")]
-        public async Task<ActionResult<IEnumerable<ItemDto>>> GetAll()
-        {
-            var items = await _itemService.GetAllItemsAsync();
-            var ItemDtos = items.Adapt<List<ItemDto>>();
-
-            return Ok(ItemDtos);
-        }
-
         [HttpGet("GetOneTimeItemTasks")]
         public async Task<ActionResult<IEnumerable<ItemTaskDto>>> GetOneTimeItemTasks()
         {
@@ -111,10 +101,10 @@ namespace MyFeatures.Controllers
         //mogao sam i [Route("[action]")] pa iznad [HttpPost], isto je, ali je čišće u jednoj liniji
         public async Task<ActionResult<ItemTaskDto>> Create(ItemTaskDto itemTaskDto)
         {
-            var itemTaskDomain = itemTaskDto.Adapt<ItemTask>();  // Map DTO to Domain Model
+            var itemTaskDomain = itemTaskDto.Adapt<ItemTask>();
 
             var createdItem = await _itemService.CreateItemAsync(itemTaskDomain);
-            var createdItemTaskDto = createdItem.Adapt<ItemTaskDto>();  // Map Domain Model back to DTO
+            var createdItemTaskDto = createdItem.Adapt<ItemTaskDto>();
 
             return Ok(createdItemTaskDto);
         }
@@ -134,7 +124,7 @@ namespace MyFeatures.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             await _itemService.DeleteItemAsync(id);
-            return NoContent();  // Indicate successful deletion with HTTP 204 No Content
+            return NoContent();
         }
 
         [HttpPost("CompleteItemTask/{itemTaskId}")]
@@ -142,7 +132,6 @@ namespace MyFeatures.Controllers
         {
             await _itemService.CompleteItemTaskAsync(itemTaskId);
 
-            //provjerit dal vratit nešto drugo osim samo ok?
             return Ok();
         }
 
@@ -156,7 +145,6 @@ namespace MyFeatures.Controllers
                 .Select(group => new WeekDayDto
                 {
                     WeekDayDate = group.Key,
-                    //!fali mapster mapiranje za committed item
                     ItemTasks = group.Value.Select(itemTask => itemTask.Adapt<ItemTaskDto>()).ToList()
                 })
                 .ToList();

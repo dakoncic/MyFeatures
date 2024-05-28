@@ -21,14 +21,14 @@ namespace Infrastructure.Repository
         }
 
         //rename u "expired" jer samo se za njih primjenjuje
-        public async Task UpdateWeekDayTaskItems()
+        public async Task UpdateExpiredItemTasks()
         {
-            var today = DateTime.Today;
+            var today = DateTime.UtcNow.Date;
 
             // fetchamo samo istekle taskove
             var expiredItemTasks = await _context.ItemTasks
                 .Where(itemTask => itemTask.CompletionDate == null &&
-                                   itemTask.CommittedDate < today)
+                                   itemTask.CommittedDate.Value.Date < today)
                 .ToListAsync();
 
             if (!expiredItemTasks.Any())
@@ -59,15 +59,15 @@ namespace Infrastructure.Repository
         public async Task<Dictionary<DateTime, List<ItemTask>>> GetItemTasksGroupedByCommitDateForNextWeek()
         {
             const int DaysInWeek = 7;
-            var today = DateTime.Today;
+            var today = DateTime.UtcNow.Date;
             var endOfWeek = today.AddDays(DaysInWeek);
 
             // dohvati sve committane taskove koji nisu complete-ani, al da su unutar 7 dana
             var tasks = await _context.ItemTasks
                 .Where(itemTask =>
                     itemTask.CompletionDate == null &&
-                    itemTask.CommittedDate >= today &&
-                    itemTask.CommittedDate < endOfWeek
+                    itemTask.CommittedDate.Value.Date >= today &&
+                    itemTask.CommittedDate.Value.Date < endOfWeek
                 )
                 .Include(itemTask => itemTask.Item)
                 .ToListAsync();
