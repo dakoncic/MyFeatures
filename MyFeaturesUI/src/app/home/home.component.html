@@ -72,7 +72,11 @@
               let-index="rowIndex"
             >
               <tr
-                [ngClass]="{ 'cursor-pointer': currentDay }"
+                [ngClass]="{
+                  'cursor-pointer':
+                    currentDay && (oneTimeItemsOrderLocked$ | async),
+                  'row-background-color': rowData.committedDate !== null
+                }"
                 [pReorderableRow]="index"
                 (dragstart)="onDragStart($event, rowData)"
                 (click)="assignItemToSelectedWeekday(rowData, currentDay)"
@@ -158,7 +162,8 @@
             >
               <tr
                 [ngClass]="{
-                  'cursor-pointer': currentDay,
+                  'cursor-pointer':
+                    currentDay && (recurringItemsOrderLocked$ | async),
                   'row-background-color': rowData.committedDate !== null
                 }"
                 [pReorderableRow]="index"

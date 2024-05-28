@@ -10,7 +10,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { TableModule } from 'primeng/table';
 import { ToolbarModule } from 'primeng/toolbar';
-import { map, of, take } from 'rxjs';
+import { filter, map, of, take, tap } from 'rxjs';
 import { ItemTaskDto } from '../../infrastructure';
 import { DescriptionType } from '../enum/description-type.enum';
 import { ItemTaskType } from '../enum/item-task-type.enum';
@@ -55,6 +55,8 @@ export class HomeComponent implements OnInit {
   currentDay!: string;
   itemTaskType = ItemTaskType;
 
+  isOneTimeItemsLocked!: boolean;
+
   weekdays: any[] = [];
 
   oneTimeItems$ = this.itemExtendedService.oneTimeItems$;
@@ -74,6 +76,10 @@ export class HomeComponent implements OnInit {
   ngOnInit() {
     this.initializeWeekdays();
 
+    this.oneTimeItemsOrderLocked$.pipe(tap(isLocked => {
+      this.isOneTimeItemsLocked = isLocked;
+    }));
+
     this.cols = [
       { field: 'description', header: 'Opis' }
     ];
@@ -85,7 +91,16 @@ export class HomeComponent implements OnInit {
 
   assignItemToSelectedWeekday(itemTask: ItemTaskDto, commitDay: string) {
     if (this.currentDay) {
-      this.itemExtendedService.commitItem(itemTask.id!, commitDay);
+      const isLocked$ = itemTask.item?.recurring
+        ? this.itemExtendedService.getRecurringItemsOrderLocked$()
+        : this.itemExtendedService.getOneTimeItemsOrderLocked$();
+
+      isLocked$.pipe(
+        take(1),
+        //zove tap samo ako je isLocked "true"
+        filter(isLocked => isLocked),
+        tap(() => this.itemExtendedService.commitItem(itemTask.id!, commitDay))
+      ).subscribe();
     }
   }
 
@@ -130,6 +145,7 @@ export class HomeComponent implements OnInit {
       }
     });
 
+    //ovo je primjer ako svu logiku radim kroz samo ovu komponentu za delete i get all
     //switchMap će biti unsubscribe-an kada i njegov parent
     //items$ budu unsubscribe-ani, a bit će zbog async pipe-a u html-u
     // ide kroz extended servis, ne lokalno
@@ -144,16 +160,21 @@ export class HomeComponent implements OnInit {
   }
 
   lockOrUnlockTableOrder(itemTask: ItemTaskType) {
-    if (itemTask === ItemTaskType.OneTimeItemTask) {
-      this.itemExtendedService.getOneTimeItemsOrderLocked$().pipe(take(1)).subscribe(isLocked => {
-        this.itemExtendedService.loadOneTimeItems(!isLocked);
-      });
+    const lockState$ = itemTask === ItemTaskType.OneTimeItemTask
+      ? this.itemExtendedService.getOneTimeItemsOrderLocked$()
+      : this.itemExtendedService.getRecurringItemsOrderLocked$();
 
-    } else {
-      this.itemExtendedService.getRecurringItemsOrderLocked$().pipe(take(1)).subscribe(isLocked => {
-        this.itemExtendedService.loadRecurringItems(!isLocked);
-      });
-    }
+    lockState$.pipe(
+      take(1),
+      //side logika za "obične" void metode
+      tap(isLocked => {
+        if (itemTask === ItemTaskType.OneTimeItemTask) {
+          this.itemExtendedService.loadOneTimeItems(!isLocked);
+        } else {
+          this.itemExtendedService.loadRecurringItems(!isLocked);
+        }
+      })
+    ).subscribe();
   }
 
   onRowReorder(event: any) {
