@@ -36,6 +36,7 @@ namespace Core.Services
             if (!includeWeekdaysCommitted)
             {
                 filter = filter.AndAlso(i =>
+                    //ako je uvjet "i.CommittedDate == null ||" onda će izostat
                     i.CommittedDate == null || i.CommittedDate.Value.Date >= DateTime.UtcNow.Date.AddDays(7));
             }
 
@@ -133,7 +134,7 @@ namespace Core.Services
                 throw new NotFoundException($"ItemTask with ID {itemTaskId} not found.");
             }
 
-            var originalDueDate = updatedItemTask.DueDate;
+            var originalDueDate = itemTaskEntity.DueDate;
 
             //eksplicitno update-amo itemTaskEntity sa novim vrijednostima .Adapt()
             //ovo neće transformirat entity objekt u domain, samo update se radi

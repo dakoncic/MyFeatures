@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, ElementRef, Input, ViewChild, inject } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild, inject } from '@angular/core';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { DragDropModule } from 'primeng/dragdrop';
@@ -26,7 +26,7 @@ import { EditItemDialogComponent } from '../edit-item-dialog/edit-item-dialog.co
   templateUrl: './todo.component.html',
   styleUrl: './todo.component.scss'
 })
-export class TodoComponent {
+export class TodoComponent implements OnInit {
   @ViewChild('dropZoneRef') dropZoneRef!: ElementRef;
   private confirmationService = inject(ConfirmationService);
   private itemExtendedService = inject(ItemExtendedService);
@@ -34,11 +34,17 @@ export class TodoComponent {
   private datePipe = inject(DatePipe);
 
   @Input() items$!: Observable<any[]>;
-  @Input() cols!: any[];
   @Input() weekDayDate!: string;
 
   isDragOver = false;
   newIndex: number | null = null;
+  cols: any[] = [];
+
+  ngOnInit() {
+    this.cols = [
+      { field: 'description' }
+    ];
+  }
 
   onDragStart(event: DragEvent, rowData: any) {
     // Convert the rowData object to a JSON string
