@@ -159,10 +159,11 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
       description: description,
       recurring: itemTask.item!.recurring,
       renewOnDueDate: itemTask.item!.renewOnDueDate,
-      dueDate: itemTask.dueDate,
+      dueDate: itemTask.dueDate ? new Date(itemTask.dueDate) : null,
       intervalValue: itemTask.item!.intervalValue,
       intervalType: itemTask.item!.intervalType
     });
+
   }
 
   saveItem() {
@@ -172,7 +173,7 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
       if (!this.itemTask.id) {
         const itemTask: ItemTaskDto = {
 
-          dueDate: this.form.getRawValue().dueDate,
+          dueDate: this.form.getRawValue().dueDate ? this.form.value.dueDate.toISOString() : null,
           description: this.form.getRawValue().description,
           item: {
             description: this.form.getRawValue().description,
@@ -190,7 +191,7 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
           //prvo stare vrijednosti npr. rowId (concurrency)
           ...this.itemTask,
 
-          dueDate: this.form.getRawValue().dueDate,
+          dueDate: this.form.getRawValue().dueDate ? this.form.getRawValue().dueDate.toISOString() : null,
           item: {
             ...this.itemTask.item,
             recurring: this.form.getRawValue().recurring,
@@ -199,6 +200,8 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
             intervalType: this.form.getRawValue().intervalType
           }
         };
+
+        console.log(itemTask);
 
         //ako je one time item, onda se mora update-at i original i task
         if (itemTask.item!.recurring === false) {
