@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ConfirmationService } from 'primeng/api';
@@ -39,7 +39,8 @@ import { TodoComponent } from './todo/todo.component';
   ],
   providers: [
     //moram provide-at zbog *null injector error-a*
-    DialogService
+    DialogService,
+    DatePipe
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
@@ -49,6 +50,7 @@ export class HomeComponent implements OnInit {
   private itemExtendedService = inject(ItemExtendedService);
   private notepadExtendedService = inject(NotepadExtendedService);
   private dialogService = inject(DialogService);
+  private datePipe = inject(DatePipe);
 
   newIndex: number | null = null;
   cols: any[] = [];
@@ -59,8 +61,22 @@ export class HomeComponent implements OnInit {
 
   weekdays: any[] = [];
 
-  oneTimeItems$ = this.itemExtendedService.oneTimeItems$;
-  recurringItems$ = this.itemExtendedService.recurringItems$;
+  oneTimeItems$ = this.itemExtendedService.oneTimeItems$.pipe(
+    map(oneTimeTaskItems => oneTimeTaskItems.map(taskItem => ({
+      ...taskItem,
+      description: taskItem.item?.description,
+      dueDate: taskItem.dueDate ? this.datePipe.transform(taskItem.dueDate, 'dd.MM.yyyy') : null
+    })))
+  );
+
+  recurringItems$ = this.itemExtendedService.recurringItems$.pipe(
+    map(recurringTaskItems => recurringTaskItems.map(taskItem => ({
+      ...taskItem,
+      description: taskItem.item?.description,
+      dueDate: taskItem.dueDate ? this.datePipe.transform(taskItem.dueDate, 'dd.MM.yyyy') : null
+    })))
+  );
+
   oneTimeItemsOrderLocked$ = this.itemExtendedService.getOneTimeItemsOrderLocked$();
   recurringItemsOrderLocked$ = this.itemExtendedService.getRecurringItemsOrderLocked$();
 
@@ -81,7 +97,8 @@ export class HomeComponent implements OnInit {
     }));
 
     this.cols = [
-      { field: 'description', header: 'Opis' }
+      { field: 'description' },
+      { field: 'dueDate', align: 'right' }
     ];
   }
 
@@ -121,7 +138,6 @@ export class HomeComponent implements OnInit {
       });
     }
   }
-
 
   editItem(itemTask: ItemTaskDto) {
     this.dialogService.open(EditItemDialogComponent, {

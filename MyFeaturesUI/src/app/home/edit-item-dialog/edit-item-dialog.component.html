@@ -29,7 +29,11 @@
 
   <div class="field">
     <label class="w-full" for="dueDate">Krajnji rok </label>
-    <p-calendar formControlName="dueDate" [showButtonBar]="true"></p-calendar>
+    <p-calendar
+      formControlName="dueDate"
+      [showButtonBar]="true"
+      dateFormat="dd/mm/yy"
+    ></p-calendar>
   </div>
 
   <div class="field">
