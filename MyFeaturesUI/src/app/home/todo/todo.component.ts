@@ -112,21 +112,27 @@ export class TodoComponent implements OnInit {
 
   generateCaption(weekDayDate: string): string {
     const dueDate = new Date(weekDayDate);
-    dueDate.setHours(0, 0, 0, 0); // postavi na početak dana, timezone je UTC
+    dueDate.setHours(0, 0, 0, 0); // Set to the start of the day, timezone is UTC
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const tomorrow = new Date();
-    tomorrow.setDate(today.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
+    const optionsWeekday: Intl.DateTimeFormatOptions = { weekday: 'long' };
+    const formattedWeekday = dueDate.toLocaleDateString('hr-HR', optionsWeekday);
+
+    // Manually format the date to avoid extra spaces and exclude the year
+    const day = ('0' + dueDate.getDate()).slice(-2);
+    const month = ('0' + (dueDate.getMonth() + 1)).slice(-2);
+    const formattedDate = `${day}.${month}.`;
 
     if (dueDate.getTime() === today.getTime()) {
-      return dueDate.toLocaleDateString('hr-HR', { weekday: 'long' }) + ' (danas)';
+      return `${formattedWeekday}, ${formattedDate} (danas)`;
     } else {
-      return dueDate.toLocaleDateString('hr-HR', { weekday: 'long' });
+      return `${formattedWeekday}, ${formattedDate}`;
     }
   }
+
+
 
   completeItem(itemTask: ItemTaskDto) {
     this.itemExtendedService.completeItem(itemTask.id!);
