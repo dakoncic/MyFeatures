@@ -172,14 +172,14 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
       if (!this.itemTask.id) {
         const itemTask: ItemTaskDto = {
 
-          dueDate: this.form.value.dueDate,
-          description: this.form.value.description,
+          dueDate: this.form.getRawValue().dueDate,
+          description: this.form.getRawValue().description,
           item: {
-            description: this.form.value.description,
-            recurring: this.form.value.recurring,
-            renewOnDueDate: this.form.value.renewOnDueDate,
-            intervalValue: this.form.value.intervalValue,
-            intervalType: this.form.value.intervalType
+            description: this.form.getRawValue().description,
+            recurring: this.form.getRawValue().recurring, //ovdi je bug na edit jer je disabled pa uzima false, moram get raw value
+            renewOnDueDate: this.form.getRawValue().renewOnDueDate,
+            intervalValue: this.form.getRawValue().intervalValue,
+            intervalType: this.form.getRawValue().intervalType
           }
         };
 
@@ -190,27 +190,27 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
           //prvo stare vrijednosti npr. rowId (concurrency)
           ...this.itemTask,
 
-          dueDate: this.form.value.dueDate,
+          dueDate: this.form.getRawValue().dueDate,
           item: {
             ...this.itemTask.item,
-            recurring: this.form.value.recurring,
-            renewOnDueDate: this.form.value.renewOnDueDate,
-            intervalValue: this.form.value.intervalValue,
-            intervalType: this.form.value.intervalType
+            recurring: this.form.getRawValue().recurring,
+            renewOnDueDate: this.form.getRawValue().renewOnDueDate,
+            intervalValue: this.form.getRawValue().intervalValue,
+            intervalType: this.form.getRawValue().intervalType
           }
         };
 
         //ako je one time item, onda se mora update-at i original i task
         if (itemTask.item!.recurring === false) {
-          itemTask.item!.description = this.form.value.description;
-          itemTask.description = this.form.value.description;
+          itemTask.item!.description = this.form.getRawValue().description;
+          itemTask.description = this.form.getRawValue().description;
         }
-        //ako je update uncommitted item-a (original), onda njega update-at iz forme
+        //ako je update uncommitted item-a (original, ne iz weekdays tablice), onda njega update-at iz forme
         else if (this.descriptionType === DescriptionType.OriginalDescription) {
-          itemTask.item!.description = this.form.value.description;
+          itemTask.item!.description = this.form.getRawValue().description;
         } else {
           //inače update-at child item
-          itemTask.description = this.form.value.description;
+          itemTask.description = this.form.getRawValue().description;
         }
 
         this.itemExtendedService.updateItem(itemTask);
