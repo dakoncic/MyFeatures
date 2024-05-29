@@ -1,4 +1,6 @@
-﻿namespace Core.DomainModels
+﻿using Core.Enum;
+
+namespace Core.DomainModels
 {
     public class Item
     {

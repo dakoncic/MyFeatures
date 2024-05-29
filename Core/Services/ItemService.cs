@@ -1,4 +1,5 @@
 ﻿using Core.DomainModels;
+using Core.Enum;
 using Core.Exceptions;
 using Core.Helpers;
 using Core.Interfaces;
@@ -413,8 +414,11 @@ namespace Core.Services
                     {
                         newItemTaskEntity.DueDate = itemTaskEntity.DueDate.Value;
 
-                        // novi DueDate ne smije biti u prošlosti, ako sam zakasnio čak i za novi datum
-                        while (newItemTaskEntity.DueDate.Value.Date < DateTime.UtcNow.Date)
+                        //na complete uvijek dodajem dane barem 1 put
+                        newItemTaskEntity.DueDate = newItemTaskEntity.DueDate.Value.AddDays(daysBetween);
+
+                        // i onda još dodaj dok ne bude dovoljno da taj datum bude veći od današnjeg dana (ako već nije)
+                        while (newItemTaskEntity.DueDate.Value.Date <= DateTime.UtcNow.Date)
                         {
                             newItemTaskEntity.DueDate = newItemTaskEntity.DueDate.Value.AddDays(daysBetween);
                         }

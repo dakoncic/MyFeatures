@@ -1,4 +1,4 @@
-﻿namespace Core
+﻿namespace Core.Enum
 {
     public enum IntervalType
     {
