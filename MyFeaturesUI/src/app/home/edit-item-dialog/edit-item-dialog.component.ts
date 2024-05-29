@@ -86,7 +86,6 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
       this.form.get('intervalValue')?.disable();
     }
 
-    //**update value and validity možda i ne treba jer resetam ako je disabled
     combineLatest([
       this.form.get('recurring')!.valueChanges,
       this.form.get('dueDate')!.valueChanges,
@@ -96,8 +95,6 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
         console.log('changes combine latest');
         if (recurring && dueDate) {
           this.form.get('renewOnDueDate')?.enable();
-          //ako je odabrao datum i recurring je, mora odabrat tip sekvence
-          this.form.get('renewOnDueDate')?.addValidators(Validators.required);
         } else {
           this.form.get('renewOnDueDate')?.disable();
           this.form.get('renewOnDueDate')?.reset();
@@ -172,8 +169,8 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
 
       if (!this.itemTask.id) {
         const itemTask: ItemTaskDto = {
-
-          dueDate: this.form.getRawValue().dueDate ? this.form.value.dueDate.toISOString() : null,
+          //spremam samo datum bez vremenske komponent ".toLocale(en-CA)"
+          dueDate: this.form.getRawValue().dueDate ? this.form.getRawValue().dueDate.toLocaleDateString('en-CA') : null,
           description: this.form.getRawValue().description,
           item: {
             description: this.form.getRawValue().description,
@@ -191,7 +188,7 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
           //prvo stare vrijednosti npr. rowId (concurrency)
           ...this.itemTask,
 
-          dueDate: this.form.getRawValue().dueDate ? this.form.getRawValue().dueDate.toISOString() : null,
+          dueDate: this.form.getRawValue().dueDate ? this.form.getRawValue().dueDate.toLocaleDateString('en-CA') : null,
           item: {
             ...this.itemTask.item,
             recurring: this.form.getRawValue().recurring,
