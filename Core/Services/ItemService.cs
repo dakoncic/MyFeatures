@@ -263,6 +263,7 @@ namespace Core.Services
             else
             {
                 itemTaskEntity.CommittedDate = null;
+                itemTaskEntity.DueDate = null;
             }
 
             await _itemTaskRepository.SaveAsync();

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CalendarModule } from 'primeng/calendar';
 import { DialogModule } from 'primeng/dialog';
@@ -30,7 +30,8 @@ import { ItemExtendedService } from '../../extended-services/item-extended-servi
     RadioButtonModule
   ],
   templateUrl: './edit-item-dialog.component.html',
-  styleUrl: './edit-item-dialog.component.scss'
+  styleUrl: './edit-item-dialog.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EditItemDialogComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -92,7 +93,6 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
     ])
       .pipe(takeUntil(this.destroy$))
       .subscribe(([recurring, dueDate]) => {
-        console.log('changes combine latest');
         if (recurring && dueDate) {
           this.form.get('renewOnDueDate')?.enable();
         } else {
@@ -104,8 +104,8 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
     this.form.get('renewOnDueDate')!.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe((renewOnDueDate) => {
-        console.log('changes only renewOnDueDate');
         //mora bit eksplicitna provjera null-a zbog boolean true/false
+        console.log('recurring');
         if (renewOnDueDate !== null) {
           this.form.get('intervalType')?.enable();
           //ako je odabrao datum i recurring je, mora odabrat tip sekvence
@@ -114,12 +114,13 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
           this.form.get('intervalType')?.disable();
           this.form.get('intervalType')?.reset();
         }
+
+        this.form.get('intervalType')?.updateValueAndValidity();
       });
 
     this.form.get('intervalType')!.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe((intervalType) => {
-        console.log('changes only intervalType');
         if (intervalType) {
           this.form.get('intervalValue')?.enable();
           this.form.get('intervalValue')?.addValidators(Validators.required);
@@ -128,6 +129,8 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
           this.form.get('intervalValue')?.disable();
           this.form.get('intervalValue')?.reset();
         }
+
+        this.form.get('intervalValue')?.updateValueAndValidity();
       });
   }
 
