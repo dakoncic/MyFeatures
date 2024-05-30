@@ -132,8 +132,6 @@ export class TodoComponent implements OnInit {
     }
   }
 
-
-
   completeItem(itemTask: ItemTaskDto) {
     this.itemExtendedService.completeItem(itemTask.id!);
   }

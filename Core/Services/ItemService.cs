@@ -237,7 +237,7 @@ namespace Core.Services
             );
 
             int newRowIndex = maxRowIndexItem != null ? maxRowIndexItem.RowIndex + 1 : 0;
-            itemTaskEntity.CommittedDate = commitDay;
+            itemTaskEntity.CommittedDate = commitDay.Date;
             itemTaskEntity.RowIndex = newRowIndex;
 
             await _itemTaskRepository.SaveAsync();

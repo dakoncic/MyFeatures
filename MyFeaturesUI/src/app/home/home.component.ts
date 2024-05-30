@@ -128,24 +128,32 @@ export class HomeComponent implements OnInit {
       return result;
     };
 
-    // Generate weekdays starting from today
     for (let i = 0; i < 7; i++) {
       let dateToAdd = addDays(new Date(), i);
-      let dayName = i === 0 ? new Intl.DateTimeFormat('hr-HR', { weekday: 'long' }).format(dateToAdd) + ' (danas)' : new Intl.DateTimeFormat('hr-HR', { weekday: 'long' }).format(dateToAdd);
+      let dayName = i === 0
+        ? new Intl.DateTimeFormat('hr-HR', { weekday: 'long' }).format(dateToAdd) + ' (danas)'
+        : new Intl.DateTimeFormat('hr-HR', { weekday: 'long' }).format(dateToAdd);
+
+      let localDateStr = dateToAdd.toLocaleDateString('en-CA', {
+        year: 'numeric', month: '2-digit', day: '2-digit'
+      });
+
       this.weekdays.push({
         name: dayName,
-        value: dateToAdd.toISOString() // Full ISO 8601 date and time format
+        value: localDateStr
       });
     }
+
+    console.log(this.weekdays);
   }
+
 
   editItem(itemTask: ItemTaskDto) {
     this.dialogService.open(EditItemDialogComponent, {
       data: {
         descriptionType: DescriptionType.OriginalDescription,
         itemTask: itemTask
-      },
-      //header: this.translate.instant('measurement.dialog.manualChannels')
+      }
     });
   }
 

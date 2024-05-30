@@ -166,15 +166,14 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
   saveItem() {
     //ako nije dirty onda nemoj zvat backend
     if (this.form.dirty) {
-
       if (!this.itemTask.id) {
         const itemTask: ItemTaskDto = {
-          //spremam samo datum bez vremenske komponent ".toLocale(en-CA)"
+          //spremam samo datum bez vremenske komponente (gledam datum iz kalendara, vremenska zona nije važna) ".toLocale(en-CA)"
           dueDate: this.form.getRawValue().dueDate ? this.form.getRawValue().dueDate.toLocaleDateString('en-CA') : null,
           description: this.form.getRawValue().description,
           item: {
             description: this.form.getRawValue().description,
-            recurring: this.form.getRawValue().recurring, //ovdi je bug na edit jer je disabled pa uzima false, moram get raw value
+            recurring: this.form.getRawValue().recurring,
             renewOnDueDate: this.form.getRawValue().renewOnDueDate,
             intervalValue: this.form.getRawValue().intervalValue,
             intervalType: this.form.getRawValue().intervalType
