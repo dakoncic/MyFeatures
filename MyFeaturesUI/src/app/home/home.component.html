@@ -3,7 +3,11 @@
     <div class="grid">
       @for (dayData of weekData$ | async; track dayData) {
       <div class="col-3">
-        <app-todo [items$]="dayData.items$" [weekDayDate]="dayData.weekDayDate">
+        <app-todo
+          [items$]="dayData.items$"
+          [weekDayDate]="dayData.weekDayDate"
+          [cols]="cols"
+        >
         </app-todo>
       </div>
       }

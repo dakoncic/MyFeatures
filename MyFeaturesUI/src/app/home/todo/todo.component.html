@@ -39,11 +39,11 @@ PrimeNG klasu# feef# -->
           <span class="pi pi-bars" pReorderableRowHandle></span>
         </td>
         @for (col of columns; track col) {
-        <td>
+        <td [ngStyle]="{ 'text-align': col.align }">
           <span>{{ rowData[col.field] }}</span>
         </td>
         }
-        <td>
+        <td class="w-8rem">
           <div class="flex justify-content-end">
             <button
               pButton

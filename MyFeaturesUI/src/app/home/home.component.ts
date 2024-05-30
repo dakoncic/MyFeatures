@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -43,7 +43,8 @@ import { TodoComponent } from './todo/todo.component';
     DatePipe
   ],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.scss'
+  styleUrl: './home.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HomeComponent implements OnInit {
   private confirmationService = inject(ConfirmationService);
@@ -64,16 +65,16 @@ export class HomeComponent implements OnInit {
   oneTimeItems$ = this.itemExtendedService.oneTimeItems$.pipe(
     map(oneTimeTaskItems => oneTimeTaskItems.map(taskItem => ({
       ...taskItem,
-      description: taskItem.item?.description,
-      dueDate: taskItem.dueDate ? this.datePipe.transform(taskItem.dueDate, 'dd.MM.yyyy') : null
+      description: taskItem.item?.description, //original od Itema ide ovdje
+      dueDate: taskItem.dueDate ? this.datePipe.transform(taskItem.dueDate, 'dd.MM.yy') : null
     })))
   );
 
   recurringItems$ = this.itemExtendedService.recurringItems$.pipe(
     map(recurringTaskItems => recurringTaskItems.map(taskItem => ({
       ...taskItem,
-      description: taskItem.item?.description,
-      dueDate: taskItem.dueDate ? this.datePipe.transform(taskItem.dueDate, 'dd.MM.yyyy') : null
+      description: taskItem.item?.description, //original od Itema ide ovdje
+      dueDate: taskItem.dueDate ? this.datePipe.transform(taskItem.dueDate, 'dd.MM.yy') : null
     })))
   );
 
@@ -83,7 +84,12 @@ export class HomeComponent implements OnInit {
   weekData$ = this.itemExtendedService.weekData$.pipe(
     map(weekdata => weekdata.map(daydata => ({
       weekDayDate: daydata.weekDayDate!,
-      items$: of(daydata.itemTasks!)
+      items$: of(daydata.itemTasks!).pipe(
+        map(itemTasks => itemTasks.map(itemTask => ({
+          ...itemTask,
+          dueDate: itemTask.dueDate ? this.datePipe.transform(itemTask.dueDate, 'dd.MM.yy') : null
+        })))
+      )
     })))
   );
 

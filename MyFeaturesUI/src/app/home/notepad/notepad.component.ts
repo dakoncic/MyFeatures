@@ -1,10 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { EditorModule } from 'primeng/editor';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { InputTextModule } from 'primeng/inputtext';
+import { Subject, takeUntil } from 'rxjs';
 import { NotepadDto } from '../../../infrastructure';
 import { NotepadExtendedService } from '../../extended-services/notepad-extended-service';
 
@@ -17,23 +19,32 @@ import { NotepadExtendedService } from '../../extended-services/notepad-extended
     EditorModule,
     ButtonModule,
     FormsModule,
-    InputNumberModule
+    InputNumberModule,
+    InputTextModule
   ],
   templateUrl: './notepad.component.html',
-  styleUrl: './notepad.component.scss'
+  styleUrl: './notepad.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 //za editor moram: npm install quill 1.3.7 (jer se na novom  ne želi bindat vrijednost content-a u p-editor html)
 //ovo je bug do njih izgleda
 //importat EditorModule
 //i dodat "node_modules/quill/dist/quill.snow.css" u angular.json pod "styles"
-export class NotepadComponent implements OnInit {
+export class NotepadComponent implements OnInit, OnDestroy {
   @Input() notepad!: NotepadDto;
+
+  private destroy$ = new Subject<void>();
 
   form!: FormGroup;
 
   private formBuilder = inject(FormBuilder);
   private notepadExtendedService = inject(NotepadExtendedService);
   private confirmationService = inject(ConfirmationService);
+  private cdr = inject(ChangeDetectorRef);
+
+  get content() {
+    return this.form.get('content');
+  }
 
   ngOnInit(): void {
     this.form = this.formBuilder.group({
@@ -42,6 +53,14 @@ export class NotepadComponent implements OnInit {
     });
 
     this.displayNotepad();
+
+    //handling specific bug for "p-editor" where component is not marked
+    //as dirty on text change, when using "ChangeDetectionStrategy.OnPush"
+    this.form.get('content')!.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.cdr.detectChanges();
+      });
   }
 
   displayNotepad(): void {
@@ -68,5 +87,10 @@ export class NotepadComponent implements OnInit {
         this.notepadExtendedService.deleteNotepad(this.notepad.id!);
       }
     });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
