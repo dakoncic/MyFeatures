@@ -17,7 +17,7 @@ namespace Core.Services
             _notepadRepository = notepadRepository;
         }
 
-        public async Task<List<Notepad>> GetAllNotepadsAsync()
+        public async Task<List<Notepad>> GetAllAsync()
         {
             var notepads = await _notepadRepository.GetAllAsync(
                 orderBy: x => x.OrderBy(n => n.RowIndex)
@@ -26,7 +26,7 @@ namespace Core.Services
             return notepads.Adapt<List<Notepad>>();
         }
 
-        public async Task<Notepad> CreateNotepadAsync()
+        public async Task<Notepad> CreateAsync()
         {
             var notepadEntity = new Entity.Notepad();
 
@@ -48,7 +48,7 @@ namespace Core.Services
             return notepadEntity.Adapt<Notepad>();
         }
 
-        public async Task<Notepad> UpdateNotepadAsync(int notepadId, Notepad updatedNotepad)
+        public async Task<Notepad> UpdateAsync(int notepadId, Notepad updatedNotepad)
         {
             var notepads = (await _notepadRepository.GetAllAsync(
                 orderBy: x => x.OrderBy(n => n.RowIndex)
@@ -102,7 +102,7 @@ namespace Core.Services
         }
 
 
-        public async Task DeleteNotepadAsync(int notepadId)
+        public async Task DeleteAsync(int notepadId)
         {
             var notepadEntity = await _notepadRepository.GetByIdAsync(notepadId);
             if (notepadEntity == null)

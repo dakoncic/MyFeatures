@@ -97,9 +97,9 @@ namespace MyFeatures.Controllers
             return Ok(itemTaskDto);
         }
 
-        [HttpPost("Create")]
+        [HttpPost("CreateItemTask")]
         //mogao sam i [Route("[action]")] pa iznad [HttpPost], isto je, ali je čišće u jednoj liniji
-        public async Task<ActionResult<ItemTaskDto>> Create(ItemTaskDto itemTaskDto)
+        public async Task<ActionResult<ItemTaskDto>> CreateItemTask(ItemTaskDto itemTaskDto)
         {
             var itemTaskDomain = itemTaskDto.Adapt<ItemTask>();
 
@@ -109,8 +109,8 @@ namespace MyFeatures.Controllers
             return Ok(createdItemTaskDto);
         }
 
-        [HttpPut("Update/{id}")]
-        public async Task<ActionResult<ItemTaskDto>> Update(int id, ItemTaskDto itemTaskDto)
+        [HttpPut("UpdateItemTask/{id}")]
+        public async Task<ActionResult<ItemTaskDto>> UpdateItemTask(int id, ItemTaskDto itemTaskDto)
         {
             var itemTaskDomain = itemTaskDto.Adapt<ItemTask>();
             var updatedItemTask = await _itemService.UpdateItemAsync(id, itemTaskDomain);
@@ -120,8 +120,8 @@ namespace MyFeatures.Controllers
             return Ok(updatedItemTaskDto);
         }
 
-        [HttpDelete("Delete/{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpDelete("DeleteItemTask/{id}")]
+        public async Task<IActionResult> DeleteItemTask(int id)
         {
             await _itemService.DeleteItemAsync(id);
             return NoContent();

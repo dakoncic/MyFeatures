@@ -10,7 +10,7 @@
         "tags": [
           "Item"
         ],
-        "operationId": "CommitItemTaskItem",
+        "operationId": "CommitItemTask",
         "requestBody": {
           "content": {
             "application/json": {
@@ -42,7 +42,7 @@
         "tags": [
           "Item"
         ],
-        "operationId": "UpdateItemTaskIndexItem",
+        "operationId": "UpdateItemTaskIndex",
         "requestBody": {
           "content": {
             "application/json": {
@@ -74,7 +74,7 @@
         "tags": [
           "Item"
         ],
-        "operationId": "UpdateItemIndexItem",
+        "operationId": "UpdateItemIndex",
         "requestBody": {
           "content": {
             "application/json": {
@@ -101,51 +101,12 @@
         }
       }
     },
-    "/api/Item/GetAll": {
-      "get": {
-        "tags": [
-          "Item"
-        ],
-        "operationId": "GetAllItem",
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ItemDto"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ItemDto"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ItemDto"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/Item/GetOneTimeItemTasks": {
       "get": {
         "tags": [
           "Item"
         ],
-        "operationId": "GetOneTimeItemTasksItem",
+        "operationId": "GetOneTimeItemTasks",
         "responses": {
           "200": {
             "description": "Success",
@@ -184,7 +145,7 @@
         "tags": [
           "Item"
         ],
-        "operationId": "GetRecurringItemTasksItem",
+        "operationId": "GetRecurringItemTasks",
         "responses": {
           "200": {
             "description": "Success",
@@ -223,7 +184,7 @@
         "tags": [
           "Item"
         ],
-        "operationId": "GetOneTimeItemTasksWithWeekdaysItem",
+        "operationId": "GetOneTimeItemTasksWithWeekdays",
         "responses": {
           "200": {
             "description": "Success",
@@ -262,7 +223,7 @@
         "tags": [
           "Item"
         ],
-        "operationId": "GetRecurringItemTasksWithWeekdaysItem",
+        "operationId": "GetRecurringItemTasksWithWeekdays",
         "responses": {
           "200": {
             "description": "Success",
@@ -301,7 +262,7 @@
         "tags": [
           "Item"
         ],
-        "operationId": "GetItemTaskItem",
+        "operationId": "GetItemTask",
         "parameters": [
           {
             "name": "id",
@@ -337,12 +298,12 @@
         }
       }
     },
-    "/api/Item/Create": {
+    "/api/Item/CreateItemTask": {
       "post": {
         "tags": [
           "Item"
         ],
-        "operationId": "CreateItem",
+        "operationId": "CreateItemTask",
         "requestBody": {
           "content": {
             "application/json": {
@@ -386,12 +347,12 @@
         }
       }
     },
-    "/api/Item/Update/{id}": {
+    "/api/Item/UpdateItemTask/{id}": {
       "put": {
         "tags": [
           "Item"
         ],
-        "operationId": "UpdateItem",
+        "operationId": "UpdateItemTask",
         "parameters": [
           {
             "name": "id",
@@ -446,12 +407,12 @@
         }
       }
     },
-    "/api/Item/Delete/{id}": {
+    "/api/Item/DeleteItemTask/{id}": {
       "delete": {
         "tags": [
           "Item"
         ],
-        "operationId": "DeleteItem",
+        "operationId": "DeleteItemTask",
         "parameters": [
           {
             "name": "id",
@@ -475,7 +436,7 @@
         "tags": [
           "Item"
         ],
-        "operationId": "CompleteItemTaskItem",
+        "operationId": "CompleteItemTask",
         "parameters": [
           {
             "name": "itemTaskId",
@@ -499,7 +460,7 @@
         "tags": [
           "Item"
         ],
-        "operationId": "GetCommitedItemsForNextWeekItem",
+        "operationId": "GetCommitedItemsForNextWeek",
         "responses": {
           "200": {
             "description": "Success",
@@ -533,12 +494,12 @@
         }
       }
     },
-    "/api/Notepad/GetAll": {
+    "/api/Notepad/GetAllNotepads": {
       "get": {
         "tags": [
           "Notepad"
         ],
-        "operationId": "GetAllNotepad",
+        "operationId": "GetAllNotepads",
         "responses": {
           "200": {
             "description": "Success",
@@ -572,7 +533,7 @@
         }
       }
     },
-    "/api/Notepad/Create": {
+    "/api/Notepad/CreateNotepad": {
       "post": {
         "tags": [
           "Notepad"
@@ -602,7 +563,7 @@
         }
       }
     },
-    "/api/Notepad/Update/{id}": {
+    "/api/Notepad/UpdateNotepad/{id}": {
       "put": {
         "tags": [
           "Notepad"
@@ -662,7 +623,7 @@
         }
       }
     },
-    "/api/Notepad/Delete/{id}": {
+    "/api/Notepad/DeleteNotepad/{id}": {
       "delete": {
         "tags": [
           "Notepad"

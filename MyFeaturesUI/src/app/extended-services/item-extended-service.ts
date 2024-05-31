@@ -27,8 +27,8 @@ export class ItemExtendedService {
     .pipe(
       switchMap((isLocked: boolean) =>
         isLocked
-          ? this.itemService.getOneTimeItemTasksItem()
-          : this.itemService.getOneTimeItemTasksWithWeekdaysItem()
+          ? this.itemService.getOneTimeItemTasks()
+          : this.itemService.getOneTimeItemTasksWithWeekdays()
       )
     );
 
@@ -36,17 +36,17 @@ export class ItemExtendedService {
     .pipe(
       switchMap((isLocked: boolean) =>
         isLocked
-          ? this.itemService.getRecurringItemTasksItem()
-          : this.itemService.getRecurringItemTasksWithWeekdaysItem()
+          ? this.itemService.getRecurringItemTasks()
+          : this.itemService.getRecurringItemTasksWithWeekdays()
       )
     );
 
   weekData$ = this.weekDaysSourceSubject
-    .pipe(switchMap(() => this.itemService.getCommitedItemsForNextWeekItem()));
+    .pipe(switchMap(() => this.itemService.getCommitedItemsForNextWeek()));
 
   //na create item, za sad osvježavamo sve
   createItem(itemTask: ItemTaskDto) {
-    return this.itemService.createItem(itemTask).pipe(
+    return this.itemService.createItemTask(itemTask).pipe(
       take(1),
     )
       .subscribe(() => {
@@ -59,7 +59,7 @@ export class ItemExtendedService {
 
   //na update item, za sad osvježavamo sve
   updateItem(itemTask: ItemTaskDto) {
-    return this.itemService.updateItem(itemTask.id!, itemTask).pipe(
+    return this.itemService.updateItemTask(itemTask.id!, itemTask).pipe(
       take(1),
     )
       .subscribe(() => {
@@ -75,7 +75,7 @@ export class ItemExtendedService {
   //kasnije možda optimizirat ovisno odakle je pozvana metoda
   //za sad samo jedna postoji koja sve osvježava
   deleteItem(itemId: number) {
-    return this.itemService.deleteItem(itemId).pipe(
+    return this.itemService.deleteItemTask(itemId).pipe(
       take(1),
     )
       .subscribe(() => {
@@ -87,7 +87,7 @@ export class ItemExtendedService {
   }
 
   completeItem(itemTaskId: number) {
-    return this.itemService.completeItemTaskItem(itemTaskId).pipe(
+    return this.itemService.completeItemTask(itemTaskId).pipe(
       take(1),
     )
       .subscribe(() => {
@@ -105,7 +105,7 @@ export class ItemExtendedService {
       itemTaskId: itemTaskId,
     };
 
-    return this.itemService.commitItemTaskItem(commitItem).pipe(
+    return this.itemService.commitItemTask(commitItem).pipe(
       take(1),
     )
       .subscribe(() => {
@@ -124,7 +124,7 @@ export class ItemExtendedService {
       recurring: recurring,
     };
 
-    return this.itemService.updateItemIndexItem(updatedItemIndex).pipe(
+    return this.itemService.updateItemIndex(updatedItemIndex).pipe(
       take(1),
     )
       .subscribe(() => {
@@ -143,7 +143,7 @@ export class ItemExtendedService {
       newIndex: newIndex
     };
 
-    return this.itemService.updateItemTaskIndexItem(updatedItemTaskIndex).pipe(
+    return this.itemService.updateItemTaskIndex(updatedItemTaskIndex).pipe(
       take(1),
     )
       .subscribe(() => {

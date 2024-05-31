@@ -11,7 +11,7 @@ export class NotepadExtendedService {
   private notepadsSourceSubject = new BehaviorSubject<NotepadDto[]>([]);
 
   notepads$ = this.notepadsSourceSubject
-    .pipe(switchMap(() => this.notepadService.getAllNotepad()));
+    .pipe(switchMap(() => this.notepadService.getAllNotepads()));
 
   createNotepad() {
     return this.notepadService.createNotepad().pipe(

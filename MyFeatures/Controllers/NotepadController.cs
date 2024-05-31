@@ -17,39 +17,39 @@ namespace MyFeatures.Controllers
             _notepadService = notepadService;
         }
 
-        [HttpGet("GetAll")]
-        public async Task<ActionResult<IEnumerable<NotepadDto>>> GetAll()
+        [HttpGet("GetAllNotepads")]
+        public async Task<ActionResult<IEnumerable<NotepadDto>>> GetAllNotepads()
         {
-            var notepads = await _notepadService.GetAllNotepadsAsync();
+            var notepads = await _notepadService.GetAllAsync();
             var notepadDtos = notepads.Adapt<List<NotepadDto>>();
 
             return Ok(notepadDtos);
         }
 
-        [HttpPost("Create")]
-        public async Task<ActionResult<NotepadDto>> Create()
+        [HttpPost("CreateNotepad")]
+        public async Task<ActionResult<NotepadDto>> CreateNotepad()
         {
-            var createdNotepad = await _notepadService.CreateNotepadAsync();
+            var createdNotepad = await _notepadService.CreateAsync();
             var createdNotepadDto = createdNotepad.Adapt<NotepadDto>();
 
             return Ok(createdNotepadDto);
         }
 
-        [HttpPut("Update/{id}")]
-        public async Task<ActionResult<NotepadDto>> Update(int id, NotepadDto notepadDto)
+        [HttpPut("UpdateNotepad/{id}")]
+        public async Task<ActionResult<NotepadDto>> UpdateNotepad(int id, NotepadDto notepadDto)
         {
             var notepadDomain = notepadDto.Adapt<Notepad>();
-            var updatedNotepad = await _notepadService.UpdateNotepadAsync(id, notepadDomain);
+            var updatedNotepad = await _notepadService.UpdateAsync(id, notepadDomain);
 
             var updatedNotepadDto = updatedNotepad.Adapt<NotepadDto>();
 
             return Ok(updatedNotepadDto);
         }
 
-        [HttpDelete("Delete/{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpDelete("DeleteNotepad/{id}")]
+        public async Task<IActionResult> DeleteNotepad(int id)
         {
-            await _notepadService.DeleteNotepadAsync(id);
+            await _notepadService.DeleteAsync(id);
             return Ok();
         }
     }

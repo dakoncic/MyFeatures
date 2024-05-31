@@ -140,7 +140,7 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
 
   //povlači itemTask za edit s backenda
   editItem(itemTask: ItemTaskDto) {
-    this.itemService.getItemTaskItem(itemTask.id!)
+    this.itemService.getItemTask(itemTask.id!)
       .pipe(take(1))
       .subscribe((itemTask) => {
         this.displayItem(itemTask);

@@ -9,10 +9,9 @@ namespace MyFeatures.Helpers
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
             var actionName = context.ApiDescription.ActionDescriptor.RouteValues["action"];
-            var controllerName = context.ApiDescription.ActionDescriptor.RouteValues["controller"];
 
             //mora bit unique
-            operation.OperationId = $"{actionName}{controllerName}";
+            operation.OperationId = $"{actionName}";
         }
     }
 }
