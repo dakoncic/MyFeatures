@@ -5,6 +5,7 @@ using Core.Helpers;
 using Core.Interfaces;
 using Infrastructure.Interfaces.IRepository;
 using Mapster;
+using Shared;
 using System.Linq.Expressions;
 //using Infrastructure.Entities; ako imam error ambiguous reference, onda maknut ovu liniju
 using Entity = Infrastructure.Entities;
@@ -38,7 +39,7 @@ namespace Core.Services
             {
                 filter = filter.AndAlso(i =>
                     //ako je uvjet "i.CommittedDate == null ||" onda će izostat
-                    i.CommittedDate == null || i.CommittedDate.Value.Date >= DateTime.UtcNow.Date.AddDays(7));
+                    i.CommittedDate == null || i.CommittedDate.Value.Date >= DateTime.UtcNow.Date.AddDays(GlobalConstants.DaysRange));
             }
 
             var itemTasks = await _itemTaskRepository.GetAllAsync(filter: filter, orderBy: x => x.OrderBy(n => n.Item.RowIndex), includeProperties: "Item");
@@ -91,25 +92,19 @@ namespace Core.Services
             {
                 itemTaskEntity.CommittedDate = itemTaskEntity.DueDate;
 
-                var maxRowIndexItemTask = await _itemTaskRepository.GetFirstOrDefaultAsync(
-                    x => x.CommittedDate.HasValue && x.CommittedDate.Value.Date == itemTaskEntity.CommittedDate.Value.Date,
-                    q => q.OrderByDescending(x => x.RowIndex)
-                );
-
-                int newRowIndex = maxRowIndexItemTask != null ? maxRowIndexItemTask.RowIndex + 1 : 0;
-
-                itemTaskEntity.RowIndex = newRowIndex;
+                itemTaskEntity.RowIndex = await GetNewRowIndex(itemTaskEntity.CommittedDate);
             }
 
             //na create itema, daj row index i parentu, svakako mu treba početna vrijednost
             //ako će se kliknut sort button da već ima svoju poziciju
             //ako pustim da je null, sortiranje nije pouzdano
             var maxRowIndexItem = await _itemRepository.GetFirstOrDefaultAsync(
-                x => x.Recurring.Equals(itemEntity.Recurring),
+                x => x.Recurring.Equals(itemEntity.Recurring) && x.RowIndex != null,
                 q => q.OrderByDescending(x => x.RowIndex)
             );
 
-            int startIndex = maxRowIndexItem != null ? maxRowIndexItem.RowIndex + 1 : 0;
+            int startIndex = maxRowIndexItem != null ? maxRowIndexItem.RowIndex.Value + 1 : 0;
+
             itemEntity.RowIndex = startIndex;
 
             itemEntity.ItemTasks.Add(itemTaskEntity);
@@ -163,14 +158,7 @@ namespace Core.Services
                 //ako due date nije null, commita na ipak neki drugi datum na Edit-u
                 if (itemTaskEntity.DueDate is not null)
                 {
-                    var maxRowIndexItem = await _itemTaskRepository.GetFirstOrDefaultAsync(
-                        x => x.CommittedDate.HasValue && x.CommittedDate.Value.Date == itemTaskEntity.CommittedDate.Value.Date,
-                        q => q.OrderByDescending(x => x.RowIndex)
-                    );
-
-                    int newRowIndex = maxRowIndexItem != null ? maxRowIndexItem.RowIndex + 1 : 0;
-
-                    itemTaskEntity.RowIndex = newRowIndex;
+                    itemTaskEntity.RowIndex = await GetNewRowIndex(itemTaskEntity.CommittedDate);
                 }
             }
 
@@ -231,14 +219,9 @@ namespace Core.Services
         //manualno commitanje samo iz originalne grupe u dan određen
         private async Task CommitItemTaskFirstTimeAsync(DateTime commitDay, Entity.ItemTask itemTaskEntity)
         {
-            var maxRowIndexItem = await _itemTaskRepository.GetFirstOrDefaultAsync(
-                x => x.CommittedDate.HasValue && x.CommittedDate.Value.Date == commitDay.Date,
-                q => q.OrderByDescending(x => x.RowIndex)
-            );
+            itemTaskEntity.RowIndex = await GetNewRowIndex(commitDay.Date);
 
-            int newRowIndex = maxRowIndexItem != null ? maxRowIndexItem.RowIndex + 1 : 0;
             itemTaskEntity.CommittedDate = commitDay.Date;
-            itemTaskEntity.RowIndex = newRowIndex;
 
             await _itemTaskRepository.SaveAsync();
         }
@@ -252,13 +235,7 @@ namespace Core.Services
             {
                 itemTaskEntity.CommittedDate = commitDay;
 
-                var maxRowIndexItem = await _itemTaskRepository.GetFirstOrDefaultAsync(
-                    x => x.CommittedDate.HasValue && x.CommittedDate.Value.Date == commitDay.Value.Date,
-                    q => q.OrderByDescending(x => x.RowIndex)
-                );
-
-                int newRowIndex = maxRowIndexItem != null ? maxRowIndexItem.RowIndex + 1 : 0;
-                itemTaskEntity.RowIndex = newRowIndex;
+                itemTaskEntity.RowIndex = await GetNewRowIndex(commitDay);
             }
             else
             {
@@ -292,7 +269,7 @@ namespace Core.Services
                 throw new NotFoundException($"Item with ID {itemId} not found.");
             }
 
-            int currentIndex = itemToUpdate.RowIndex;
+            int currentIndex = itemToUpdate.RowIndex.Value;
 
             Expression<Func<Entity.Item, bool>> filter = x => x.Recurring.Equals(recurring) && x.Id != itemId;
             Func<IQueryable<Entity.Item>, IOrderedQueryable<Entity.Item>> orderBy = q => q.OrderBy(x => x.RowIndex);
@@ -339,9 +316,9 @@ namespace Core.Services
                 throw new NotFoundException($"ItemTask with ID {itemId} not found.");
             }
 
-            int currentIndex = itemToUpdate.RowIndex;
+            int currentIndex = itemToUpdate.RowIndex.Value;
 
-            Expression<Func<Entity.ItemTask, bool>> filter = x => x.CommittedDate.Value.Date == commitDate.Date && x.Id != itemId;
+            Expression<Func<Entity.ItemTask, bool>> filter = x => x.CommittedDate.HasValue && x.CommittedDate.Value.Date == commitDate.Date && x.Id != itemId;
             Func<IQueryable<Entity.ItemTask>, IOrderedQueryable<Entity.ItemTask>> orderBy = q => q.OrderBy(x => x.RowIndex);
 
             var itemsForDate = await _itemTaskRepository.GetAllAsync(filter, orderBy);
@@ -388,8 +365,11 @@ namespace Core.Services
                 throw new NotFoundException($"ItemTask with ID {itemTaskId} not found.");
             }
 
-            //vrijeme complete-anja je sad, i tu završavamo s ovim taskom
+            //vrijeme complete-anja je sad
             itemTaskEntity.CompletionDate = DateTime.UtcNow;
+
+            //index je nerelevantan za completan itemTask
+            itemTaskEntity.RowIndex = null;
 
             //ako je recurring, kreiram novi itemTask
             //i kreira se novi ItemTask
@@ -449,11 +429,29 @@ namespace Core.Services
                     item.RowIndex--;
                 }
 
+                //index je dalje nerelevantan za parent one time item
+                //par linija gore je još trebao
+                itemTaskEntity.Item.RowIndex = null;
+
                 await _itemRepository.SaveAsync();
             }
 
 
             await _itemTaskRepository.SaveAsync();
+        }
+
+        private async Task<int> GetNewRowIndex(DateTime? compareDate)
+        {
+            var maxRowIndexItem = await _itemTaskRepository.GetFirstOrDefaultAsync(
+                x => x.CommittedDate.HasValue &&
+                     compareDate.HasValue &&
+                     x.CommittedDate.Value.Date == compareDate.Value.Date &&
+                     x.RowIndex != null,
+                q => q.OrderByDescending(x => x.RowIndex)
+            );
+
+            int newRowIndex = maxRowIndexItem != null ? maxRowIndexItem.RowIndex.Value + 1 : 0;
+            return newRowIndex;
         }
 
         private int CalculateDaysBetweenForMonths(int months)

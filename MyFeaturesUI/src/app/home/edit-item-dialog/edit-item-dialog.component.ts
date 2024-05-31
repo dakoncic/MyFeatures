@@ -104,8 +104,6 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
     this.form.get('renewOnDueDate')!.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe((renewOnDueDate) => {
-        //mora bit eksplicitna provjera null-a zbog boolean true/false
-        console.log('recurring');
         if (renewOnDueDate !== null) {
           this.form.get('intervalType')?.enable();
           //ako je odabrao datum i recurring je, mora odabrat tip sekvence
@@ -199,8 +197,6 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
             intervalType: this.form.getRawValue().intervalType
           }
         };
-
-        console.log(itemTask);
 
         //ako je one time item, onda se mora update-at i original i task
         if (itemTask.item!.recurring === false) {

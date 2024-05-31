@@ -2,6 +2,7 @@
 using Infrastructure.Entities;
 using Infrastructure.Interfaces.IRepository;
 using Microsoft.EntityFrameworkCore;
+using Shared;
 using Entity = Infrastructure.Entities;
 
 namespace Infrastructure.Repository
@@ -42,7 +43,7 @@ namespace Infrastructure.Repository
                 q => q.OrderByDescending(x => x.RowIndex)
             );
 
-            int newRowIndex = maxRowIndexItemForDay != null ? maxRowIndexItemForDay.RowIndex + 1 : 0;
+            int newRowIndex = maxRowIndexItemForDay != null ? maxRowIndexItemForDay.RowIndex.Value + 1 : 0;
 
             foreach (var task in expiredItemTasks)
             {
@@ -58,16 +59,15 @@ namespace Infrastructure.Repository
 
         public async Task<Dictionary<DateTime, List<ItemTask>>> GetItemTasksGroupedByCommitDateForNextWeek()
         {
-            const int DaysInWeek = 7;
             var today = DateTime.UtcNow.Date;
-            var endOfWeek = today.AddDays(DaysInWeek);
+            var endOfDayRange = today.AddDays(GlobalConstants.DaysRange);
 
             // dohvati sve committane taskove koji nisu complete-ani, al da su unutar 7 dana
             var tasks = await _context.ItemTasks
                 .Where(itemTask =>
                     itemTask.CompletionDate == null &&
                     itemTask.CommittedDate.Value.Date >= today &&
-                    itemTask.CommittedDate.Value.Date < endOfWeek
+                    itemTask.CommittedDate.Value.Date < endOfDayRange
                 )
                 .Include(itemTask => itemTask.Item)
                 .ToListAsync();
@@ -77,7 +77,7 @@ namespace Infrastructure.Repository
             var groupedTasks = new Dictionary<DateTime, List<ItemTask>>();
 
             // za svaki dan postoji lista, makar ih bilo 0 za taj dan
-            for (DateTime day = today; day < endOfWeek; day = day.AddDays(1))
+            for (DateTime day = today; day < endOfDayRange; day = day.AddDays(1))
             {
                 // commitani taskovi za specifičan dan
                 var tasksForDay = tasks

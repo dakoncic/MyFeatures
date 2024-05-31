@@ -12,6 +12,7 @@ import { TableModule } from 'primeng/table';
 import { ToolbarModule } from 'primeng/toolbar';
 import { filter, map, of, take, tap } from 'rxjs';
 import { ItemTaskDto } from '../../infrastructure';
+import { DAYS_RANGE } from '../constants/app.constants';
 import { DescriptionType } from '../enum/description-type.enum';
 import { ItemTaskType } from '../enum/item-task-type.enum';
 import { ItemExtendedService } from '../extended-services/item-extended-service';
@@ -109,7 +110,7 @@ export class HomeComponent implements OnInit {
   }
 
   onDayChange(event: any) {
-    console.log(event.value);
+    //console.log(event.value);
   }
 
   assignItemToSelectedWeekday(itemTask: ItemTaskDto, commitDay: string) {
@@ -134,7 +135,7 @@ export class HomeComponent implements OnInit {
       return result;
     };
 
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < DAYS_RANGE; i++) {
       let dateToAdd = addDays(new Date(), i);
       let dayName = i === 0
         ? new Intl.DateTimeFormat('hr-HR', { weekday: 'long' }).format(dateToAdd) + ' (danas)'
@@ -149,10 +150,7 @@ export class HomeComponent implements OnInit {
         value: localDateStr
       });
     }
-
-    console.log(this.weekdays);
   }
-
 
   editItem(itemTask: ItemTaskDto) {
     this.dialogService.open(EditItemDialogComponent, {

@@ -19,8 +19,7 @@ namespace Infrastructure.Entities
         public bool? RenewOnDueDate { get; set; }
         public int? DaysBetween { get; set; }
 
-        [Required]
-        public int RowIndex { get; set; }
+        public int? RowIndex { get; set; }
 
         // navigacijski property na djecu, nova lista se inicijalizira tako da nikad ne bude null
         public ICollection<ItemTask> ItemTasks { get; set; } = new List<ItemTask>();

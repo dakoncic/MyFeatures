@@ -6,11 +6,20 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{2C8245D1-279F-4A57-AC40-208F3C9172D2}"
 	ProjectSection(ProjectDependencies) = postProject
 		{15183B88-C596-4A09-BD91-224F45244CF7} = {15183B88-C596-4A09-BD91-224F45244CF7}
+		{6FFDDB2D-A4FB-467C-BA5E-47714D356820} = {6FFDDB2D-A4FB-467C-BA5E-47714D356820}
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{15183B88-C596-4A09-BD91-224F45244CF7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6FFDDB2D-A4FB-467C-BA5E-47714D356820} = {6FFDDB2D-A4FB-467C-BA5E-47714D356820}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyFeatures", "MyFeatures\MyFeatures.csproj", "{305710FE-6DBD-4B5C-9504-09017B8220E3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6FFDDB2D-A4FB-467C-BA5E-47714D356820} = {6FFDDB2D-A4FB-467C-BA5E-47714D356820}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{6FFDDB2D-A4FB-467C-BA5E-47714D356820}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,6 +39,10 @@ Global
 		{305710FE-6DBD-4B5C-9504-09017B8220E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{305710FE-6DBD-4B5C-9504-09017B8220E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{305710FE-6DBD-4B5C-9504-09017B8220E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FFDDB2D-A4FB-467C-BA5E-47714D356820}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FFDDB2D-A4FB-467C-BA5E-47714D356820}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FFDDB2D-A4FB-467C-BA5E-47714D356820}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FFDDB2D-A4FB-467C-BA5E-47714D356820}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
