@@ -436,7 +436,6 @@ namespace Core.Services
                 await _itemRepository.SaveAsync();
             }
 
-
             await _itemTaskRepository.SaveAsync();
         }
 
@@ -463,6 +462,5 @@ namespace Core.Services
 
             return daysBetween;
         }
-
     }
 }

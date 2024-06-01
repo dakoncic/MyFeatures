@@ -12,7 +12,6 @@ import { TableModule } from 'primeng/table';
 import { ToolbarModule } from 'primeng/toolbar';
 import { filter, map, of, take, tap } from 'rxjs';
 import { ItemTaskDto } from '../../infrastructure';
-import { DAYS_RANGE } from '../constants/app.constants';
 import { DescriptionType } from '../enum/description-type.enum';
 import { ItemTaskType } from '../enum/item-task-type.enum';
 import { ItemExtendedService } from '../extended-services/item-extended-service';
@@ -135,21 +134,30 @@ export class HomeComponent implements OnInit {
       return result;
     };
 
-    for (let i = 0; i < DAYS_RANGE; i++) {
-      let dateToAdd = addDays(new Date(), i);
-      let dayName = i === 0
-        ? new Intl.DateTimeFormat('hr-HR', { weekday: 'long' }).format(dateToAdd) + ' (danas)'
-        : new Intl.DateTimeFormat('hr-HR', { weekday: 'long' }).format(dateToAdd);
+    this.weekData$
+      .pipe(take(1))
+      .subscribe(weekData => {
+        const updates = [];
+        for (let i = 0; i < weekData.length; i++) {
+          let dateToAdd = addDays(new Date(), i);
+          let dayName = i === 0
+            ? new Intl.DateTimeFormat('hr-HR', { weekday: 'long' }).format(dateToAdd) + ' (danas)'
+            : new Intl.DateTimeFormat('hr-HR', { weekday: 'long' }).format(dateToAdd);
 
-      let localDateStr = dateToAdd.toLocaleDateString('en-CA', {
-        year: 'numeric', month: '2-digit', day: '2-digit'
-      });
+          let localDateStr = dateToAdd.toLocaleDateString('en-CA', {
+            year: 'numeric', month: '2-digit', day: '2-digit'
+          });
 
-      this.weekdays.push({
-        name: dayName,
-        value: localDateStr
+          updates.push({
+            name: dayName,
+            value: localDateStr
+          });
+        }
+
+        //samo push modificira array ali se ne mijenja referenca što ne okine change detection
+        //moram koristit spread syntax da napravi novu referencu#
+        this.weekdays = [...updates];
       });
-    }
   }
 
   editItem(itemTask: ItemTaskDto) {
