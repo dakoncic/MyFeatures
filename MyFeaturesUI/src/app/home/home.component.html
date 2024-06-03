@@ -79,7 +79,7 @@
                 }"
                 [pReorderableRow]="index"
                 (dragstart)="onDragStart($event, rowData)"
-                (click)="assignItemToSelectedWeekday(rowData, currentDay)"
+                (click)="assignItemToSelectedWeekday(rowData, currentDay!)"
               >
                 <td class="w-2rem">
                   @if (!(oneTimeItemsOrderLocked$ | async)) {
@@ -168,7 +168,7 @@
                 }"
                 [pReorderableRow]="index"
                 (dragstart)="onDragStart($event, rowData)"
-                (click)="assignItemToSelectedWeekday(rowData, currentDay)"
+                (click)="assignItemToSelectedWeekday(rowData, currentDay!)"
               >
                 <td class="w-2rem">
                   @if (!(recurringItemsOrderLocked$ | async)) {

@@ -1,6 +1,4 @@
 ﻿using Core.DomainModels;
-using Core.Enum;
-using Core.Exceptions;
 using Core.Helpers;
 using Core.Interfaces;
 using Infrastructure.Interfaces.IRepository;
@@ -12,7 +10,7 @@ using Entity = Infrastructure.Entities;
 
 namespace Core.Services
 {
-    public class ItemService : IItemService
+    public class ItemService : BaseService, IItemService
     {
         private readonly IGenericRepository<Entity.Item, int> _itemRepository;
         private readonly IGenericRepository<Entity.ItemTask, int> _itemTaskRepository;
@@ -60,64 +58,44 @@ namespace Core.Services
         public async Task<ItemTask> GetItemTaskByIdAsync(int itemTaskId)
         {
             var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId, "Item");
-            if (itemTaskEntity == null)
-            {
-                throw new NotFoundException($"ItemTask with ID {itemTaskId} not found.");
-            }
+
+            //ostavljamo check ovdje u servisu, ako je entity null, onda on ne može zvat
+            //nikakvu metodu da provjeri sam sebe jeli null
+            CheckIfNull(itemTaskEntity, $"ItemTask with ID {itemTaskId} not found.");
 
             return itemTaskEntity.Adapt<ItemTask>();
         }
 
-        public async Task<ItemTask> CreateItemAsync(ItemTask itemTaskDomain)
+        public async Task CreateItemAsync(ItemTask itemTaskDomain)
         {
-            var itemEntity = itemTaskDomain.Item.Adapt<Entity.Item>();
+            IntervalCalculator.CalculateAndAssignDaysBetween(itemTaskDomain.Item);
 
-            //po biznis logici, mora po defaulta odma biti kreiran ItemTask
-            var itemTaskEntity = itemTaskDomain.Adapt<Entity.ItemTask>();
+            itemTaskDomain.InitializeDates();
 
-            //prvo so mapirali što možemo, a sad eksplicitno postavljamo value za days between property
-            if (itemTaskDomain.Item.IntervalValue is not null)
+            if (itemTaskDomain.DueDate != null)
             {
-                if (itemTaskDomain.Item.IntervalType == IntervalType.Months)
-                {
-                    itemTaskEntity.Item.DaysBetween = CalculateDaysBetweenForMonths(itemTaskDomain.Item.IntervalValue.Value);
-                }
-                else
-                {
-                    itemTaskEntity.Item.DaysBetween = itemTaskDomain.Item.IntervalValue;
-                }
+                itemTaskDomain.RowIndex = await GetNewRowIndex(itemTaskDomain.CommittedDate);
             }
 
-            if (itemTaskEntity.DueDate is not null)
-            {
-                itemTaskEntity.CommittedDate = itemTaskEntity.DueDate;
-
-                itemTaskEntity.RowIndex = await GetNewRowIndex(itemTaskEntity.CommittedDate);
-            }
-
-            //na create itema, daj row index i parentu, svakako mu treba početna vrijednost
-            //ako će se kliknut sort button da već ima svoju poziciju
-            //ako pustim da je null, sortiranje nije pouzdano
+            //parentu u svakom slučaju dajemo row index, null može problem stvorit
             var maxRowIndexItem = await _itemRepository.GetFirstOrDefaultAsync(
-                x => x.Recurring.Equals(itemEntity.Recurring) && x.RowIndex != null,
+                x => x.Recurring.Equals(itemTaskDomain.Item.Recurring) && x.RowIndex != null,
                 q => q.OrderByDescending(x => x.RowIndex)
             );
 
-            int startIndex = maxRowIndexItem != null ? maxRowIndexItem.RowIndex.Value + 1 : 0;
+            itemTaskDomain.Item.RowIndex = maxRowIndexItem != null ? maxRowIndexItem.RowIndex.Value + 1 : 0;
 
-            itemEntity.RowIndex = startIndex;
+            var itemEntity = itemTaskDomain.Item.Adapt<Entity.Item>();
+            var itemTaskEntity = itemTaskDomain.Adapt<Entity.ItemTask>();
 
             itemEntity.ItemTasks.Add(itemTaskEntity);
 
             _itemRepository.Add(itemEntity);
 
             await _itemRepository.SaveAsync();
-
-            //fetchano je i dijete iako je isključen LazyLoading zato što sam ga dodao kad i parenta
-            return itemTaskEntity.Adapt<ItemTask>();
         }
 
-        public async Task<ItemTask> UpdateItemAsync(int itemTaskId, ItemTask updatedItemTask)
+        public async Task UpdateItemAsync(int itemTaskId, ItemTask updatedItemTask)
         {
             //radi se prvo get a ne odma update, zbog concurrency npr.
             //da ne može commitat na bazu ako je netko drugi u
@@ -125,42 +103,32 @@ namespace Core.Services
             //ili npr. ako je u međuvremenu obrisan pa i ne postoji više
 
             var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId, "Item");
-            if (itemTaskEntity == null)
-            {
-                throw new NotFoundException($"ItemTask with ID {itemTaskId} not found.");
-            }
+
+            CheckIfNull(itemTaskEntity, $"ItemTask with ID {itemTaskId} not found.");
 
             var originalDueDate = itemTaskEntity.DueDate;
 
-            //eksplicitno update-amo itemTaskEntity sa novim vrijednostima .Adapt()
-            //ovo neće transformirat entity objekt u domain, samo update se radi
-            updatedItemTask.Adapt(itemTaskEntity);
+            var domainItemTask = itemTaskEntity.Adapt<ItemTask>();
+            //eksplicitno update-amo domainItemTask sa novim poslanim vrijednostima .Adapt()
+            updatedItemTask.Adapt(domainItemTask);
 
             //moramo kalkulirat dane opet za slučaj da je mijenjao
-            if (updatedItemTask.Item.IntervalValue is not null)
-            {
-                if (updatedItemTask.Item.IntervalType == IntervalType.Months)
-                {
-                    itemTaskEntity.Item.DaysBetween = CalculateDaysBetweenForMonths(updatedItemTask.Item.IntervalValue.Value);
-                }
-                else
-                {
-                    itemTaskEntity.Item.DaysBetween = updatedItemTask.Item.IntervalValue;
-                }
-            }
+            IntervalCalculator.CalculateAndAssignDaysBetween(domainItemTask.Item);
 
             //ako je due date različit od originalnog datuma
-            if (originalDueDate != itemTaskEntity.DueDate)
+            if (originalDueDate != domainItemTask.DueDate)
             {
                 //ako je postavio due date na null, želim update i committed date
-                itemTaskEntity.CommittedDate = itemTaskEntity.DueDate;
+                domainItemTask.CommittedDate = domainItemTask.DueDate;
 
                 //ako due date nije null, commita na ipak neki drugi datum na Edit-u
-                if (itemTaskEntity.DueDate is not null)
+                if (domainItemTask.DueDate is not null)
                 {
-                    itemTaskEntity.RowIndex = await GetNewRowIndex(itemTaskEntity.CommittedDate);
+                    domainItemTask.RowIndex = await GetNewRowIndex(itemTaskEntity.CommittedDate);
                 }
             }
+
+            domainItemTask.Adapt(itemTaskEntity);
 
             //ako dto child ima referencu na parent, parent dto nebi trebao imat na child
             //zato što se dogodi da kad s frontenda šaljem child s ref. na parenta
@@ -168,18 +136,13 @@ namespace Core.Services
             //pregazi itemTaskEntity povučen s frontenda, i na update se obriše child.
 
             await _itemTaskRepository.SaveAsync();
-
-            return itemTaskEntity.Adapt<ItemTask>();
         }
 
         public async Task DeleteItemAsync(int itemId)
         {
-            var itemEntity = await _itemRepository.GetByIdAsync(itemId);
+            var itemEntity = await _itemRepository.GetByIdAsync(itemId, "ItemTasks");
 
-            if (itemEntity == null)
-            {
-                throw new NotFoundException($"Item with ID {itemId} not found.");
-            }
+            CheckIfNull(itemEntity, $"Item with ID {itemId} not found.");
 
             _itemRepository.Delete(itemId);
 
@@ -194,60 +157,52 @@ namespace Core.Services
             }
 
             await _itemRepository.SaveAsync();
+
+            var itemTaskEntity = itemEntity.ItemTasks.FirstOrDefault(x => x.CommittedDate != null && x.CompletionDate == null);
+
+            if (itemTaskEntity != null)
+            {
+                var committedItemTasksForDate = await _itemTaskRepository.GetAllAsync(
+                    x => x.CommittedDate.Value.Date == itemTaskEntity.CommittedDate.Value.Date && x.RowIndex > itemEntity.RowIndex,
+                    q => q.OrderBy(x => x.RowIndex)
+                );
+
+                foreach (var commitedItemTask in committedItemTasksForDate)
+                {
+                    commitedItemTask.RowIndex--;
+                }
+
+                await _itemTaskRepository.SaveAsync();
+            }
         }
 
         public async Task CommitItemTaskAsync(DateTime? commitDay, int itemTaskId)
         {
             var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId);
+            CheckIfNull(itemTaskEntity, $"ItemTask with ID {itemTaskId} not found.");
 
-            if (itemTaskEntity is null)
-            {
-                throw new NotFoundException($"ItemTask with ID {itemTaskId} not found.");
-            }
+            var domainItemTask = itemTaskEntity.Adapt<ItemTask>();
 
-            if (itemTaskEntity.CommittedDate.HasValue)
+            if (domainItemTask.CommittedDate.HasValue)
             {
-                await UpdateItemTaskCommittedDateAsync(commitDay, itemTaskEntity);
+                await UpdateItemTaskCommittedDateAsync(commitDay, domainItemTask);
             }
             else
             {
-                //šaljem .Value jer znači definitivno je poslana "not null" vrijednost
-                await CommitItemTaskFirstTimeAsync(commitDay.Value, itemTaskEntity);
+                await CommitItemTaskFirstTimeAsync(commitDay.Value, domainItemTask);
             }
-        }
 
-        //manualno commitanje samo iz originalne grupe u dan određen
-        private async Task CommitItemTaskFirstTimeAsync(DateTime commitDay, Entity.ItemTask itemTaskEntity)
-        {
-            itemTaskEntity.RowIndex = await GetNewRowIndex(commitDay.Date);
 
-            itemTaskEntity.CommittedDate = commitDay.Date;
-
+            domainItemTask.Adapt(itemTaskEntity);
             await _itemTaskRepository.SaveAsync();
         }
 
         //manualno pomicanje već commitanog itema između dana, ili vraćanje u svoju grupu
-        private async Task UpdateItemTaskCommittedDateAsync(DateTime? commitDay, Entity.ItemTask itemTaskEntity)
+        private async Task UpdateItemTaskCommittedDateAsync(DateTime? commitDay, ItemTask domainItemTask)
         {
-            var originalCommitDate = itemTaskEntity.CommittedDate;
-
-            if (commitDay.HasValue)
-            {
-                itemTaskEntity.CommittedDate = commitDay;
-
-                itemTaskEntity.RowIndex = await GetNewRowIndex(commitDay);
-            }
-            else
-            {
-                itemTaskEntity.CommittedDate = null;
-                itemTaskEntity.DueDate = null;
-            }
-
-            await _itemTaskRepository.SaveAsync();
-
-            // reorderanje taskova koji ostaju u originalnoj grupi
+            // Reorder tasks remaining in the original group
             var itemsInOriginalGroup = await _itemTaskRepository.GetAllAsync(
-                x => x.CommittedDate.HasValue && x.CommittedDate.Value.Date == originalCommitDate.Value.Date && x.RowIndex > itemTaskEntity.RowIndex,
+                x => x.CommittedDate.HasValue && x.CommittedDate.Value.Date == domainItemTask.CommittedDate.Value.Date && x.RowIndex > domainItemTask.RowIndex,
                 q => q.OrderBy(x => x.RowIndex)
             );
 
@@ -256,7 +211,26 @@ namespace Core.Services
                 item.RowIndex--;
             }
 
+            if (commitDay.HasValue)
+            {
+                domainItemTask.CommittedDate = commitDay;
+                domainItemTask.RowIndex = await GetNewRowIndex(commitDay);
+            }
+            else
+            {
+                domainItemTask.CommittedDate = null;
+                domainItemTask.DueDate = null;
+                domainItemTask.RowIndex = null;
+            }
+
             await _itemTaskRepository.SaveAsync();
+        }
+
+        //manualno commitanje samo iz originalne grupe u dan određen
+        private async Task CommitItemTaskFirstTimeAsync(DateTime commitDay, ItemTask domainItemTask)
+        {
+            domainItemTask.RowIndex = await GetNewRowIndex(commitDay.Date);
+            domainItemTask.CommittedDate = commitDay.Date;
         }
 
         //samo reorderanje pozicije unutar svoje grupe
@@ -264,10 +238,7 @@ namespace Core.Services
         {
             var itemToUpdate = await _itemRepository.GetByIdAsync(itemId);
 
-            if (itemToUpdate == null)
-            {
-                throw new NotFoundException($"Item with ID {itemId} not found.");
-            }
+            CheckIfNull(itemToUpdate, $"Item with ID {itemId} not found.");
 
             int currentIndex = itemToUpdate.RowIndex.Value;
 
@@ -300,7 +271,6 @@ namespace Core.Services
                 }
             }
 
-            // Set the new index for the item to be updated
             itemToUpdate.RowIndex = newIndex;
 
             await _itemRepository.SaveAsync();
@@ -311,10 +281,7 @@ namespace Core.Services
         {
             var itemToUpdate = await _itemTaskRepository.GetByIdAsync(itemId);
 
-            if (itemToUpdate == null)
-            {
-                throw new NotFoundException($"ItemTask with ID {itemId} not found.");
-            }
+            CheckIfNull(itemToUpdate, $"ItemTask with ID {itemId} not found.");
 
             int currentIndex = itemToUpdate.RowIndex.Value;
 
@@ -323,7 +290,7 @@ namespace Core.Services
 
             var itemsForDate = await _itemTaskRepository.GetAllAsync(filter, orderBy);
 
-            // Reorder the items based on the new index
+            // ne mogu maknut u domain ako nisam mapirao u domain, a mapirat u domain je malo overkill
             if (newIndex < currentIndex)
             {
                 // The item is moving up in the order
@@ -347,7 +314,6 @@ namespace Core.Services
                 }
             }
 
-            // Set the new index for the item to be updated
             itemToUpdate.RowIndex = newIndex;
 
             await _itemTaskRepository.SaveAsync();
@@ -360,59 +326,20 @@ namespace Core.Services
             //recurring koji nema datum će se samo vratit u svoju listu (novi ItemTask sa committedDate = null)
 
             var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId, "Item");
-            if (itemTaskEntity == null)
-            {
-                throw new NotFoundException($"ItemTask with ID {itemTaskId} not found.");
-            }
 
-            //vrijeme complete-anja je sad
-            itemTaskEntity.CompletionDate = DateTime.UtcNow;
+            CheckIfNull(itemTaskEntity, $"ItemTask with ID {itemTaskId} not found.");
 
-            //index je nerelevantan za completan itemTask
-            itemTaskEntity.RowIndex = null;
+            var domainItemTask = itemTaskEntity.Adapt<ItemTask>();
+
+            domainItemTask.Complete();
 
             //ako je recurring, kreiram novi itemTask
-            //i kreira se novi ItemTask
             if (itemTaskEntity.Item.Recurring)
             {
-                var newItemTaskEntity = new Entity.ItemTask
-                {
-                    ItemId = itemTaskEntity.Item.Id,
-                    Description = itemTaskEntity.Item.Description
-                };
+                //dobar primjer enkapsulacije biznis logike u domain klasu
+                var newItemTask = domainItemTask.CreateNewRecurringTask();
 
-                //ako npr. se uzima riblje ulje ned., neovisno zakasnio dan-2
-                //onda uvečavam na DueDate
-                //ali ako je ponavljajući bez datuma, npr. posjet zubarici (ja određujem kad, nema DueDate)
-                //onda se ne uvečava ništa
-
-                //ako je DueDate not null i ako ima daysBetween, a ne samo ako je DueDate not null
-                if (itemTaskEntity.DueDate is not null && itemTaskEntity.Item.DaysBetween is not null)
-                {
-                    var daysBetween = itemTaskEntity.Item.DaysBetween.Value;
-
-                    if (itemTaskEntity.Item.RenewOnDueDate!.Value)
-                    {
-                        newItemTaskEntity.DueDate = itemTaskEntity.DueDate.Value;
-
-                        //na complete uvijek dodajem dane barem 1 put
-                        newItemTaskEntity.DueDate = newItemTaskEntity.DueDate.Value.AddDays(daysBetween);
-
-                        // i onda još dodaj dok ne bude dovoljno da taj datum bude veći od današnjeg dana (ako već nije)
-                        while (newItemTaskEntity.DueDate.Value.Date <= DateTime.UtcNow.Date)
-                        {
-                            newItemTaskEntity.DueDate = newItemTaskEntity.DueDate.Value.AddDays(daysBetween);
-                        }
-                    }
-                    //inače se obnavlja na completion date npr. registracija auta
-                    else
-                    {
-                        newItemTaskEntity.DueDate = itemTaskEntity.CompletionDate.Value.AddDays(daysBetween);
-                    }
-
-                    //odma committamo, ne čekamo ništa
-                    newItemTaskEntity.CommittedDate = newItemTaskEntity.DueDate;
-                }
+                var newItemTaskEntity = newItemTask.Adapt<Entity.ItemTask>();
 
                 _itemTaskRepository.Add(newItemTaskEntity);
             }
@@ -451,16 +378,6 @@ namespace Core.Services
 
             int newRowIndex = maxRowIndexItem != null ? maxRowIndexItem.RowIndex.Value + 1 : 0;
             return newRowIndex;
-        }
-
-        private int CalculateDaysBetweenForMonths(int months)
-        {
-            DateTime startDate = DateTime.UtcNow;
-            DateTime endDate = startDate.AddMonths(months);
-
-            int daysBetween = (endDate - startDate).Days;
-
-            return daysBetween;
         }
     }
 }

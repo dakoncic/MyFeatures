@@ -55,7 +55,7 @@ export class HomeComponent implements OnInit {
 
   newIndex: number | null = null;
   cols: any[] = [];
-  currentDay!: string;
+  currentDay: string | null = null;
   itemTaskType = ItemTaskType;
 
   isOneTimeItemsLocked!: boolean;
@@ -161,6 +161,8 @@ export class HomeComponent implements OnInit {
   }
 
   editItem(itemTask: ItemTaskDto) {
+    this.resetCurrentDay();
+
     this.dialogService.open(EditItemDialogComponent, {
       data: {
         descriptionType: DescriptionType.OriginalDescription,
@@ -170,6 +172,8 @@ export class HomeComponent implements OnInit {
   }
 
   deleteItem(itemTask: ItemTaskDto) {
+    this.resetCurrentDay();
+
     this.confirmationService.confirm({
       header: 'Potvrda brisanja',
       acceptLabel: 'Potvrdi',
@@ -191,6 +195,8 @@ export class HomeComponent implements OnInit {
   }
 
   completeItem(itemTask: ItemTaskDto) {
+    this.resetCurrentDay();
+
     this.itemExtendedService.completeItem(itemTask.id!);
   }
 
@@ -248,5 +254,9 @@ export class HomeComponent implements OnInit {
 
   createNewNotepad() {
     this.notepadExtendedService.createNotepad();
+  }
+
+  private resetCurrentDay() {
+    this.currentDay = null;
   }
 }

@@ -8,7 +8,7 @@ using Entity = Infrastructure.Entities;
 
 namespace Core.Services
 {
-    public class NotepadService : INotepadService
+    public class NotepadService : BaseService, INotepadService
     {
         private readonly IGenericRepository<Entity.Notepad, int> _notepadRepository;
 
