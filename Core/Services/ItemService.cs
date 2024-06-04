@@ -83,7 +83,7 @@ namespace Core.Services
                 q => q.OrderByDescending(x => x.RowIndex)
             );
 
-            itemTaskDomain.Item.RowIndex = maxRowIndexItem != null ? maxRowIndexItem.RowIndex.Value + 1 : 0;
+            itemTaskDomain.Item.RowIndex = maxRowIndexItem != null ? maxRowIndexItem.RowIndex!.Value + 1 : 0;
 
             var itemEntity = itemTaskDomain.Item.Adapt<Entity.Item>();
             var itemTaskEntity = itemTaskDomain.Adapt<Entity.ItemTask>();
@@ -163,7 +163,11 @@ namespace Core.Services
             if (itemTaskEntity != null)
             {
                 var committedItemTasksForDate = await _itemTaskRepository.GetAllAsync(
-                    x => x.CommittedDate.Value.Date == itemTaskEntity.CommittedDate.Value.Date && x.RowIndex > itemEntity.RowIndex,
+                    x =>
+                    x.CommittedDate.HasValue &&
+                    itemTaskEntity.CommittedDate.HasValue &&
+                    x.CommittedDate.Value.Date == itemTaskEntity.CommittedDate.Value.Date &&
+                    x.RowIndex > itemTaskEntity.RowIndex,
                     q => q.OrderBy(x => x.RowIndex)
                 );
 
@@ -189,11 +193,11 @@ namespace Core.Services
             }
             else
             {
-                await CommitItemTaskFirstTimeAsync(commitDay.Value, domainItemTask);
+                await CommitItemTaskFirstTimeAsync(commitDay!.Value, domainItemTask);
             }
 
-
             domainItemTask.Adapt(itemTaskEntity);
+
             await _itemTaskRepository.SaveAsync();
         }
 
@@ -202,7 +206,11 @@ namespace Core.Services
         {
             // Reorder tasks remaining in the original group
             var itemsInOriginalGroup = await _itemTaskRepository.GetAllAsync(
-                x => x.CommittedDate.HasValue && x.CommittedDate.Value.Date == domainItemTask.CommittedDate.Value.Date && x.RowIndex > domainItemTask.RowIndex,
+                x =>
+                x.CommittedDate.HasValue &&
+                domainItemTask.CommittedDate.HasValue &&
+                x.CommittedDate.Value.Date == domainItemTask.CommittedDate.Value.Date
+                && x.RowIndex > domainItemTask.RowIndex,
                 q => q.OrderBy(x => x.RowIndex)
             );
 
@@ -240,7 +248,7 @@ namespace Core.Services
 
             CheckIfNull(itemToUpdate, $"Item with ID {itemId} not found.");
 
-            int currentIndex = itemToUpdate.RowIndex.Value;
+            int currentIndex = itemToUpdate.RowIndex!.Value;
 
             Expression<Func<Entity.Item, bool>> filter = x => x.Recurring.Equals(recurring) && x.Id != itemId;
             Func<IQueryable<Entity.Item>, IOrderedQueryable<Entity.Item>> orderBy = q => q.OrderBy(x => x.RowIndex);
@@ -283,7 +291,7 @@ namespace Core.Services
 
             CheckIfNull(itemToUpdate, $"ItemTask with ID {itemId} not found.");
 
-            int currentIndex = itemToUpdate.RowIndex.Value;
+            int currentIndex = itemToUpdate.RowIndex!.Value;
 
             Expression<Func<Entity.ItemTask, bool>> filter = x => x.CommittedDate.HasValue && x.CommittedDate.Value.Date == commitDate.Date && x.Id != itemId;
             Func<IQueryable<Entity.ItemTask>, IOrderedQueryable<Entity.ItemTask>> orderBy = q => q.OrderBy(x => x.RowIndex);
@@ -376,7 +384,7 @@ namespace Core.Services
                 q => q.OrderByDescending(x => x.RowIndex)
             );
 
-            int newRowIndex = maxRowIndexItem != null ? maxRowIndexItem.RowIndex.Value + 1 : 0;
+            int newRowIndex = maxRowIndexItem != null ? maxRowIndexItem.RowIndex!.Value + 1 : 0;
             return newRowIndex;
         }
     }
