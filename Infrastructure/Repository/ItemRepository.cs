@@ -14,8 +14,7 @@ namespace Infrastructure.Repository
             _context = context;
         }
 
-        //ako želim naglasit da je ovo potpuna materijalizirana lista koje se neće query-at još
-        //ond ostavit List
+
         //ne treba mi ova metoda, izbrisat
         public async Task<List<Item>> GetNonRecurringUnitemTasksAsync()
         {

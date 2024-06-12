@@ -29,21 +29,18 @@ namespace MyFeatures.Controllers
         [HttpPost("CreateNotepad")]
         public async Task<ActionResult<NotepadDto>> CreateNotepad()
         {
-            var createdNotepad = await _notepadService.CreateAsync();
-            var createdNotepadDto = createdNotepad.Adapt<NotepadDto>();
+            await _notepadService.CreateAsync();
 
-            return Ok(createdNotepadDto);
+            return Ok();
         }
 
         [HttpPut("UpdateNotepad/{id}")]
         public async Task<ActionResult<NotepadDto>> UpdateNotepad(int id, NotepadDto notepadDto)
         {
             var notepadDomain = notepadDto.Adapt<Notepad>();
-            var updatedNotepad = await _notepadService.UpdateAsync(id, notepadDomain);
+            await _notepadService.UpdateAsync(id, notepadDomain);
 
-            var updatedNotepadDto = updatedNotepad.Adapt<NotepadDto>();
-
-            return Ok(updatedNotepadDto);
+            return Ok();
         }
 
         [HttpDelete("DeleteNotepad/{id}")]

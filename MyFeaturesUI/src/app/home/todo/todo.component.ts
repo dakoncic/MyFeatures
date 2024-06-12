@@ -40,14 +40,17 @@ export class TodoComponent {
 
   isDragOver = false;
   newIndex: number | null = null;
+  originalIndex!: number;
 
-  onDragStart(event: DragEvent, rowData: any) {
+  onDragStart(event: DragEvent, rowData: any, index: number) {
     // Convert the rowData object to a JSON string
     const data = JSON.stringify(rowData);
 
     // Use the dataTransfer.setData() method to set the data to be transferred
     // "application/json" is used as a type identifier to signify the type of data being transferred
     event.dataTransfer?.setData('application/json', data);
+
+    this.originalIndex = index;
   }
 
   //ovo mi ne treba
@@ -81,10 +84,9 @@ export class TodoComponent {
     const rowData = JSON.parse(data!);
 
     //null je kad dropam item al nije promjenio poziciju ili ga pomičem na drugi dan#
-    if (this.newIndex !== null) {
+    if (this.newIndex !== null && this.newIndex !== this.originalIndex) {
       const formattedDate = this.formatDate(rowData.committedDate);
       this.itemExtendedService.updateItemTaskIndex(rowData.id, formattedDate, this.newIndex);
-      this.newIndex = null;
     }
 
     //logika za commitanje itema na neki drugi dan#
@@ -95,6 +97,8 @@ export class TodoComponent {
     if (committedDate !== weekDayDateFormatted) {
       this.itemExtendedService.commitItem(rowData.id, this.weekDayDate);
     }
+
+    this.newIndex = null;
   }
 
   onRowReorder(event: any) {

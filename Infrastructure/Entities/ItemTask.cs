@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Shared.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace Infrastructure.Entities
 {
-    public class ItemTask : BaseEntity<int>
+    public class ItemTask : BaseEntity<int>, IHasRowIndex
     {
         [Key]
         public int Id { get; set; }
@@ -25,7 +26,7 @@ namespace Infrastructure.Entities
         [DataType(DataType.Date)]
         public DateTime? CompletionDate { get; set; }
 
-        public int? RowIndex { get; set; }
+        public int RowIndex { get; set; }
 
         // Navigation property na parenta
         public Item Item { get; set; }

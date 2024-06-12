@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Shared.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace Infrastructure.Entities
 {
-    public class Item : BaseEntity<int>
+    public class Item : BaseEntity<int>, IHasRowIndex
     {
         [Key]
         public int Id { get; set; }
@@ -19,7 +20,9 @@ namespace Infrastructure.Entities
         public bool? RenewOnDueDate { get; set; }
         public int? DaysBetween { get; set; }
 
-        public int? RowIndex { get; set; }
+        public int RowIndex { get; set; }
+
+        public bool Completed { get; set; }
 
         // navigacijski property na djecu, nova lista se inicijalizira tako da nikad ne bude null
         public ICollection<ItemTask> ItemTasks { get; set; } = new List<ItemTask>();

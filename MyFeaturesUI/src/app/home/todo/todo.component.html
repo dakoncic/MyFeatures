@@ -32,7 +32,7 @@ PrimeNG klasu# feef# -->
       <tr
         [pReorderableRow]="index"
         pDraggable="true"
-        (dragstart)="onDragStart($event, rowData)"
+        (dragstart)="onDragStart($event, rowData, index)"
         (onDragEnd)="dragEnd()"
       >
         <td class="w-2rem">

@@ -54,6 +54,8 @@ export class HomeComponent implements OnInit {
   private datePipe = inject(DatePipe);
 
   newIndex: number | null = null;
+  originalIndex!: number;
+
   cols: any[] = [];
   currentDay: string | null = null;
   itemTaskType = ItemTaskType;
@@ -222,13 +224,15 @@ export class HomeComponent implements OnInit {
     this.newIndex = event.dropIndex;
   }
 
-  onDragStart(event: DragEvent, rowData: any) {
+  onDragStart(event: DragEvent, rowData: any, index: number) {
     // Convert the rowData object to a JSON string
     const data = JSON.stringify(rowData);
 
     // Use the dataTransfer.setData() method to set the data to be transferred
     // "application/json" is used as a type identifier to signify the type of data being transferred
     event.dataTransfer?.setData('application/json', data);
+
+    this.originalIndex = index;
   }
 
   onDrop(event: DragEvent, recurring: boolean) {
@@ -238,10 +242,11 @@ export class HomeComponent implements OnInit {
     const rowData = JSON.parse(data!);
 
     //null je kad dropam item al nije promjenio poziciju ili ga pomičem na drugi dan#
-    if (this.newIndex !== null) {
+    if (this.newIndex !== null && this.newIndex !== this.originalIndex) {
       this.itemExtendedService.updateItemIndex(rowData.item.id, this.newIndex, recurring);
-      this.newIndex = null;
     }
+
+    this.newIndex = null;
   }
 
   openNew() {

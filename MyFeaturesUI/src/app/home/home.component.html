@@ -78,7 +78,7 @@
                   'row-background-color': rowData.committedDate !== null
                 }"
                 [pReorderableRow]="index"
-                (dragstart)="onDragStart($event, rowData)"
+                (dragstart)="onDragStart($event, rowData, index)"
                 (click)="assignItemToSelectedWeekday(rowData, currentDay!)"
               >
                 <td class="w-2rem">
@@ -167,7 +167,7 @@
                   'row-background-color': rowData.committedDate !== null
                 }"
                 [pReorderableRow]="index"
-                (dragstart)="onDragStart($event, rowData)"
+                (dragstart)="onDragStart($event, rowData, index)"
                 (click)="assignItemToSelectedWeekday(rowData, currentDay!)"
               >
                 <td class="w-2rem">

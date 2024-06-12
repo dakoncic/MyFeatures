@@ -1,5 +1,5 @@
 ﻿using Core.DomainModels;
-using Core.Exceptions;
+using Core.Helpers;
 using Core.Interfaces;
 using Infrastructure.Interfaces.IRepository;
 using Mapster;
@@ -26,7 +26,7 @@ namespace Core.Services
             return notepads.Adapt<List<Notepad>>();
         }
 
-        public async Task<Notepad> CreateAsync()
+        public async Task CreateAsync()
         {
             var notepadEntity = new Entity.Notepad();
 
@@ -44,25 +44,22 @@ namespace Core.Services
             _notepadRepository.Add(notepadEntity);
 
             await _notepadRepository.SaveAsync();
-
-            return notepadEntity.Adapt<Notepad>();
         }
 
-        public async Task<Notepad> UpdateAsync(int notepadId, Notepad updatedNotepad)
+        //ovo refaktorat da radim single item fetch ipak kao i svagdje drugdje
+        public async Task UpdateAsync(int notepadId, Notepad updatedNotepad)
         {
-            var notepads = (await _notepadRepository.GetAllAsync(
-                orderBy: x => x.OrderBy(n => n.RowIndex)
-            )).ToList();
+            var notepadEntity = await _notepadRepository.GetByIdAsync(notepadId);
 
-            var notepadEntity = notepads.FirstOrDefault(n => n.Id == notepadId);
+            CheckIfNull(notepadEntity, $"Notepad with ID {notepadId} not found.");
 
-            if (notepadEntity == null)
-            {
-                throw new NotFoundException($"Notepad with ID {notepadId} not found.");
-            }
-
-            int oldIndex = notepadEntity.RowIndex;
+            int currentIndex = notepadEntity.RowIndex;
             int newIndex = updatedNotepad.RowIndex;
+
+            updatedNotepad.Adapt(notepadEntity);
+
+            var notepads = await _notepadRepository.GetAllAsync(
+                orderBy: x => x.OrderBy(n => n.RowIndex));
 
             // novi index koji postavljam ne smije biti manji od najmanjeg i veći od ukupnog broja Notepada
             if (newIndex < 1 || newIndex > notepads.Count())
@@ -71,44 +68,25 @@ namespace Core.Services
             }
 
             // ako je novi index različiti od trenutačnog indexa
-            if (newIndex != oldIndex)
+            if (newIndex != currentIndex)
             {
-                // ako smanjujemo index Notepadu
-                if (newIndex < oldIndex)
-                {
-                    foreach (var notepad in notepads.Where(n => n.RowIndex >= newIndex && n.RowIndex < oldIndex))
-                    {
-                        notepad.RowIndex++;
-                    }
-                }
-                // ako povećavamo index Notepadu
-                else
-                {
-                    foreach (var notepad in notepads.Where(n => n.RowIndex <= newIndex && n.RowIndex > oldIndex))
-                    {
-                        notepad.RowIndex--;
-                    }
-                }
+                var itemsToUpdate = notepads.Where(n => n.Id != notepadId).ToList();
+
+                RowIndexHelper.UpdateRowIndexes<Entity.Notepad>(itemsToUpdate, newIndex, currentIndex);
+
                 // nakon sortiranja ostalih, postavljamo novi index Notepadu
                 notepadEntity.RowIndex = newIndex;
             }
 
-            updatedNotepad.Adapt(notepadEntity);
-
             //u svakom slučaju želimo spremit ako su rađene neke druge promjene npr. update contenta
             await _notepadRepository.SaveAsync();
-
-            return notepadEntity.Adapt<Notepad>();
         }
-
 
         public async Task DeleteAsync(int notepadId)
         {
             var notepadEntity = await _notepadRepository.GetByIdAsync(notepadId);
-            if (notepadEntity == null)
-            {
-                throw new NotFoundException($"Notepad with ID {notepadId} not found.");
-            }
+
+            CheckIfNull(notepadEntity, $"Notepad with ID {notepadId} not found.");
 
             int deletedIndex = notepadEntity.RowIndex;
             var affectedNotepads = await _notepadRepository.GetAllAsync(
@@ -124,6 +102,5 @@ namespace Core.Services
             _notepadRepository.Delete(notepadId);
             await _notepadRepository.SaveAsync();
         }
-
     }
 }

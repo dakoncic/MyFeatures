@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Shared.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace Infrastructure.Entities
 {
-    public class Notepad : BaseEntity<int>
+    public class Notepad : BaseEntity<int>, IHasRowIndex
     {
         [Key]
         public int Id { get; set; }

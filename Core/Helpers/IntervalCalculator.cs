@@ -22,7 +22,7 @@ namespace Core.Helpers
 
         private static int CalculateDaysBetweenForMonths(int months)
         {
-            var startDate = DateTime.UtcNow;
+            var startDate = DateTime.Now;
             var endDate = startDate.AddMonths(months);
             return (endDate - startDate).Days;
         }

@@ -8,7 +8,7 @@
         public DateTime? DueDate { get; set; }
         public string Description { get; set; }
         public DateTime? CompletionDate { get; set; }
-        public int? RowIndex { get; set; }
+        public int RowIndex { get; set; }
         public Item Item { get; set; }
 
         public void InitializeDates()
@@ -17,12 +17,6 @@
             {
                 CommittedDate = DueDate;
             }
-        }
-
-        public void Complete()
-        {
-            CompletionDate = DateTime.UtcNow;
-            RowIndex = null;
         }
 
         public ItemTask CreateNewRecurringTask()
@@ -50,7 +44,7 @@
                     newItemTask.DueDate = DueDate.Value.AddDays(daysBetween);
 
                     // i onda još dodaj dok ne bude dovoljno da taj datum bude veći od današnjeg dana (ako već nije)
-                    while (newItemTask.DueDate.Value.Date <= DateTime.UtcNow.Date)
+                    while (newItemTask.DueDate.Value.Date <= DateTime.Now.Date)
                     {
                         newItemTask.DueDate = newItemTask.DueDate.Value.AddDays(daysBetween);
                     }
@@ -58,7 +52,7 @@
                 //inače se obnavlja na completion date npr. registracija auta
                 else
                 {
-                    newItemTask.DueDate = CompletionDate.Value.AddDays(daysBetween);
+                    newItemTask.DueDate = DateTime.Now.AddDays(daysBetween);
                 }
 
                 //odma committamo, ne čekamo ništa

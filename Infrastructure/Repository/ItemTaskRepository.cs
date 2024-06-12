@@ -21,14 +21,14 @@ namespace Infrastructure.Repository
             _itemTaskRepository = itemTaskRepository;
         }
 
-        //rename u "expired" jer samo se za njih primjenjuje
         public async Task UpdateExpiredItemTasks()
         {
-            var today = DateTime.UtcNow.Date;
+            var today = DateTime.Now.Date;
 
             // fetchamo samo istekle taskove
             var expiredItemTasks = await _context.ItemTasks
                 .Where(itemTask => itemTask.CompletionDate == null &&
+                                   itemTask.CommittedDate.HasValue &&
                                    itemTask.CommittedDate.Value.Date < today)
                 .ToListAsync();
 
@@ -39,11 +39,14 @@ namespace Infrastructure.Repository
 
             // Get the max row index for tasks committed today
             var maxRowIndexItemForDay = await _itemTaskRepository.GetFirstOrDefaultAsync(
-                x => x.CommittedDate.HasValue && x.CommittedDate.Value.Date == today,
+                x =>
+                x.CompletionDate == null &&
+                x.CommittedDate.HasValue &&
+                x.CommittedDate.Value.Date == today,
                 q => q.OrderByDescending(x => x.RowIndex)
             );
 
-            int newRowIndex = maxRowIndexItemForDay != null ? maxRowIndexItemForDay.RowIndex.Value + 1 : 0;
+            int newRowIndex = maxRowIndexItemForDay != null ? maxRowIndexItemForDay.RowIndex + 1 : 0;
 
             foreach (var task in expiredItemTasks)
             {
@@ -57,21 +60,23 @@ namespace Infrastructure.Repository
             }
         }
 
+        //ako želim naglasit da je ovo potpuna materijalizirana lista koje se neće query-at još
+        //ond ostavit List
         public async Task<Dictionary<DateTime, List<ItemTask>>> GetItemTasksGroupedByCommitDateForNextWeek()
         {
-            var today = DateTime.UtcNow.Date;
+            var today = DateTime.Now.Date;
             var endOfDayRange = today.AddDays(GlobalConstants.DaysRange);
 
             // dohvati sve committane taskove koji nisu complete-ani, al da su unutar 7 dana
             var tasks = await _context.ItemTasks
                 .Where(itemTask =>
                     itemTask.CompletionDate == null &&
+                    itemTask.CommittedDate.HasValue &&
                     itemTask.CommittedDate.Value.Date >= today &&
                     itemTask.CommittedDate.Value.Date < endOfDayRange
                 )
                 .Include(itemTask => itemTask.Item)
                 .ToListAsync();
-
 
             //dictionary koji će držat grupu taskova za tjedan
             var groupedTasks = new Dictionary<DateTime, List<ItemTask>>();
