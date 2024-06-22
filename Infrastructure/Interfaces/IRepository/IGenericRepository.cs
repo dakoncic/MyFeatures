@@ -22,8 +22,5 @@ namespace Infrastructure.Interfaces.IRepository
         void Update(TEntity entity);
         Task<int> UpdateBatchAsync(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, TEntity>> updateEntityFactory);
         void Delete(TKeyType id);
-
-        // Asynchronous operation to commit changes to the database
-        Task SaveAsync();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Core.DomainModels;
 using Core.Helpers;
 using Core.Interfaces;
+using Infrastructure.DAL;
 using Infrastructure.Interfaces.IRepository;
 using Mapster;
 using Shared;
@@ -12,17 +13,20 @@ namespace Core.Services
 {
     public class ItemService : BaseService, IItemService
     {
+        private readonly MyFeaturesDbContext _context;
         private readonly IGenericRepository<Entity.Item, int> _itemRepository;
         private readonly IGenericRepository<Entity.ItemTask, int> _itemTaskRepository;
 
         private readonly IItemTaskRepository _itemTaskExtendedRepository;
 
         public ItemService(
+            MyFeaturesDbContext context,
             IGenericRepository<Entity.Item, int> itemRepository,
             IGenericRepository<Entity.ItemTask, int> itemTaskRepository,
             IItemTaskRepository itemTaskExtendedRepository
             )
         {
+            _context = context;
             _itemRepository = itemRepository;
             _itemTaskRepository = itemTaskRepository;
             _itemTaskExtendedRepository = itemTaskExtendedRepository;
@@ -98,7 +102,7 @@ namespace Core.Services
 
             _itemRepository.Add(itemEntity);
 
-            await _itemRepository.SaveAsync();
+            await _context.SaveChangesAsync();
         }
 
         public async Task UpdateItemAsync(int itemTaskId, ItemTask updatedItemTask)
@@ -137,7 +141,7 @@ namespace Core.Services
             //onda parent nema natrag na child, što mi kod .Adapt(itemTaskEntity) mapiranja ta prazna child lista
             //pregazi itemTaskEntity povučen s frontenda, i na update se obriše child.
 
-            await _itemTaskRepository.SaveAsync();
+            await _context.SaveChangesAsync();
         }
 
         private async Task HandleDueDateChange(Entity.ItemTask itemTaskEntity, ItemTask domainItemTask, DateTime? oldCommittedDate, DateTime? newDueDate)
@@ -180,8 +184,6 @@ namespace Core.Services
                 x => new Entity.Item { RowIndex = x.RowIndex - 1 }
             );
 
-            await _itemRepository.SaveAsync();
-
             //fetcham itemTask ako je bio committan na weekday
             var itemTaskEntity = itemEntity.ItemTasks.FirstOrDefault(x => x.CommittedDate != null && x.CompletionDate == null);
 
@@ -197,8 +199,9 @@ namespace Core.Services
                     x => new Entity.ItemTask { RowIndex = x.RowIndex - 1 }
                 );
 
-                await _itemTaskRepository.SaveAsync();
             }
+
+            await _context.SaveChangesAsync();
         }
 
         public async Task CommitItemTaskOrReturnToGroupAsync(DateTime? newCommitDay, int itemTaskId)
@@ -239,7 +242,7 @@ namespace Core.Services
 
             domainItemTask.Adapt(itemTaskEntity);
 
-            await _itemTaskRepository.SaveAsync();
+            await _context.SaveChangesAsync();
         }
 
         //samo reorderanje pozicije unutar svoje originalne grupe
@@ -263,7 +266,7 @@ namespace Core.Services
 
             itemToUpdate.RowIndex = newIndex;
 
-            await _itemRepository.SaveAsync();
+            await _context.SaveChangesAsync();
         }
 
         //samo reorderanje pozicije unutar svoje grupe
@@ -290,7 +293,7 @@ namespace Core.Services
 
             itemToUpdate.RowIndex = newIndex;
 
-            await _itemTaskRepository.SaveAsync();
+            await _context.SaveChangesAsync();
         }
 
         public async Task CompleteItemTaskAsync(int itemTaskId)
@@ -348,11 +351,9 @@ namespace Core.Services
                 );
 
                 itemTaskEntity.Item.Completed = true;
-
-                await _itemRepository.SaveAsync();
             }
 
-            await _itemTaskRepository.SaveAsync();
+            await _context.SaveChangesAsync();
         }
 
         private async Task<int> GetNewRowIndex(DateTime? compareDate)
