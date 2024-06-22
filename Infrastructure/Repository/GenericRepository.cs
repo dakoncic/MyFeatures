@@ -3,6 +3,7 @@ using Infrastructure.Entities;
 using Infrastructure.Interfaces.IRepository;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using Z.EntityFramework.Plus;
 
 namespace Infrastructure.Repository
 {
@@ -106,6 +107,11 @@ namespace Infrastructure.Repository
             //neće automatski pazit pa da se moće spremit normalno u bazu
             //*AsNoTracking() se ne smije na tablici gdje pazimo na optimistic concurrency control
             _context.Entry(entity).State = EntityState.Modified;
+        }
+
+        public async Task<int> UpdateBatchAsync(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, TEntity>> updateEntityFactory)
+        {
+            return await _dbSet.Where(filter).UpdateAsync(updateEntityFactory);
         }
 
         public void Delete(TKeyType id)

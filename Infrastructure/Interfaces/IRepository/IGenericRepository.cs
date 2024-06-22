@@ -20,6 +20,7 @@ namespace Infrastructure.Interfaces.IRepository
         // Synchronous write operations
         void Add(TEntity entity);
         void Update(TEntity entity);
+        Task<int> UpdateBatchAsync(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, TEntity>> updateEntityFactory);
         void Delete(TKeyType id);
 
         // Asynchronous operation to commit changes to the database

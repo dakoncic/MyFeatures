@@ -21,7 +21,7 @@ namespace MyFeatures.Controllers
         [HttpPost("CommitItemTask")]
         public async Task<ActionResult> CommitItemTask(CommitItemTaskDto itemTaskDto)
         {
-            await _itemService.CommitItemTaskAsync(itemTaskDto.CommitDay, itemTaskDto.ItemTaskId);
+            await _itemService.CommitItemTaskOrReturnToGroupAsync(itemTaskDto.CommitDay, itemTaskDto.ItemTaskId);
 
             return Ok();
         }

@@ -24,7 +24,7 @@
             var newItemTask = new ItemTask
             {
                 ItemId = ItemId,
-                Description = Description
+                Description = Item.Description
             };
 
             //ako npr. se uzima riblje ulje ned., neovisno zakasnio dan-2
@@ -37,7 +37,7 @@
             {
                 var daysBetween = Item.DaysBetween.Value;
 
-                //ako je renewOnDueDate true, neće bit null jer postoji dajs between
+                //ako je renewOnDueDate true, neće bit null jer postoji days between
                 if (Item.RenewOnDueDate.Value)
                 {
                     //na complete uvijek dodajem dane barem 1 put
