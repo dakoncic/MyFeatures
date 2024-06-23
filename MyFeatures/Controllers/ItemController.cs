@@ -21,7 +21,7 @@ namespace MyFeatures.Controllers
         [HttpPost("CommitItemTask")]
         public async Task<ActionResult> CommitItemTask(CommitItemTaskDto itemTaskDto)
         {
-            await _itemService.CommitItemTaskOrReturnToGroupAsync(itemTaskDto.CommitDay, itemTaskDto.ItemTaskId);
+            await _itemService.CommitItemTaskOrReturnToGroup(itemTaskDto.CommitDay, itemTaskDto.ItemTaskId);
 
             return Ok();
         }
@@ -29,7 +29,7 @@ namespace MyFeatures.Controllers
         [HttpPost("UpdateItemTaskIndex")]
         public async Task<ActionResult> UpdateItemTaskIndex(UpdateItemTaskIndexDto updateItemTaskIndexDto)
         {
-            await _itemService.UpdateItemTaskIndex(
+            await _itemService.ReorderItemTaskInsideGroup(
                 updateItemTaskIndexDto.ItemTaskId,
                 updateItemTaskIndexDto.CommitDay,
                 updateItemTaskIndexDto.NewIndex
@@ -41,7 +41,7 @@ namespace MyFeatures.Controllers
         [HttpPost("UpdateItemIndex")]
         public async Task<ActionResult> UpdateItemIndex(UpdateItemIndexDto updateItemIndexDto)
         {
-            await _itemService.UpdateItemIndex(
+            await _itemService.ReorderItemInsideGroup(
                 updateItemIndexDto.ItemId,
                 updateItemIndexDto.NewIndex,
                 updateItemIndexDto.Recurring
@@ -53,7 +53,7 @@ namespace MyFeatures.Controllers
         [HttpGet("GetOneTimeItemTasks")]
         public async Task<ActionResult<IEnumerable<ItemTaskDto>>> GetOneTimeItemTasks()
         {
-            var itemTasks = await _itemService.GetActiveItemTasksAsync(false, false);
+            var itemTasks = await _itemService.GetActiveItemTasks(false, false);
             var itemTasksDto = itemTasks.Adapt<List<ItemTaskDto>>();
 
             return Ok(itemTasksDto);
@@ -62,7 +62,7 @@ namespace MyFeatures.Controllers
         [HttpGet("GetRecurringItemTasks")]
         public async Task<ActionResult<IEnumerable<ItemTaskDto>>> GetRecurringItemTasks()
         {
-            var itemTasks = await _itemService.GetActiveItemTasksAsync(true, false);
+            var itemTasks = await _itemService.GetActiveItemTasks(true, false);
             var itemTasksDto = itemTasks.Adapt<List<ItemTaskDto>>();
 
             return Ok(itemTasksDto);
@@ -71,7 +71,7 @@ namespace MyFeatures.Controllers
         [HttpGet("GetOneTimeItemTasksWithWeekdays")]
         public async Task<ActionResult<IEnumerable<ItemTaskDto>>> GetOneTimeItemTasksWithWeekdays()
         {
-            var itemTasks = await _itemService.GetActiveItemTasksAsync(false, true);
+            var itemTasks = await _itemService.GetActiveItemTasks(false, true);
             var itemTasksDto = itemTasks.Adapt<List<ItemTaskDto>>();
 
             return Ok(itemTasksDto);
@@ -80,7 +80,7 @@ namespace MyFeatures.Controllers
         [HttpGet("GetRecurringItemTasksWithWeekdays")]
         public async Task<ActionResult<IEnumerable<ItemTaskDto>>> GetRecurringItemTasksWithWeekdays()
         {
-            var itemTasks = await _itemService.GetActiveItemTasksAsync(true, true);
+            var itemTasks = await _itemService.GetActiveItemTasks(true, true);
             var itemTasksDto = itemTasks.Adapt<List<ItemTaskDto>>();
 
             return Ok(itemTasksDto);
@@ -91,7 +91,7 @@ namespace MyFeatures.Controllers
         [HttpGet("GetItemTask/{id}")]
         public async Task<ActionResult<ItemTaskDto>> GetItemTask(int id)
         {
-            var itemTask = await _itemService.GetItemTaskByIdAsync(id);
+            var itemTask = await _itemService.GetItemTaskById(id);
 
             var itemTaskDto = itemTask.Adapt<ItemTaskDto>();
             return Ok(itemTaskDto);
@@ -103,7 +103,7 @@ namespace MyFeatures.Controllers
         {
             var itemTaskDomain = itemTaskDto.Adapt<ItemTask>();
 
-            await _itemService.CreateItemAsync(itemTaskDomain);
+            await _itemService.CreateItem(itemTaskDomain);
 
             return Ok();
         }
@@ -113,7 +113,7 @@ namespace MyFeatures.Controllers
         {
             var itemTaskDomain = itemTaskDto.Adapt<ItemTask>();
 
-            await _itemService.UpdateItemAsync(id, itemTaskDomain);
+            await _itemService.UpdateItem(id, itemTaskDomain);
 
             return Ok();
         }
@@ -121,14 +121,14 @@ namespace MyFeatures.Controllers
         [HttpDelete("DeleteItemTask/{id}")]
         public async Task<IActionResult> DeleteItemTask(int id)
         {
-            await _itemService.DeleteItemAsync(id);
+            await _itemService.DeleteItem(id);
             return NoContent();
         }
 
         [HttpPost("CompleteItemTask/{itemTaskId}")]
         public async Task<IActionResult> CompleteItemTask(int itemTaskId)
         {
-            await _itemService.CompleteItemTaskAsync(itemTaskId);
+            await _itemService.CompleteItemTask(itemTaskId);
 
             return Ok();
         }
@@ -138,7 +138,7 @@ namespace MyFeatures.Controllers
         {
             var weekDays = new List<WeekDayDto>();
 
-            var groupedItems = await _itemService.GetCommitedItemsForNextWeekAsync();
+            var groupedItems = await _itemService.GetCommitedItemsForNextWeek();
             var weekDayDtos = groupedItems
                 .Select(group => new WeekDayDto
                 {

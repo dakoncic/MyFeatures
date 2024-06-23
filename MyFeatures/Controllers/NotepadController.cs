@@ -20,7 +20,7 @@ namespace MyFeatures.Controllers
         [HttpGet("GetAllNotepads")]
         public async Task<ActionResult<IEnumerable<NotepadDto>>> GetAllNotepads()
         {
-            var notepads = await _notepadService.GetAllAsync();
+            var notepads = await _notepadService.GetAll();
             var notepadDtos = notepads.Adapt<List<NotepadDto>>();
 
             return Ok(notepadDtos);
@@ -29,7 +29,7 @@ namespace MyFeatures.Controllers
         [HttpPost("CreateNotepad")]
         public async Task<ActionResult<NotepadDto>> CreateNotepad()
         {
-            await _notepadService.CreateAsync();
+            await _notepadService.Create();
 
             return Ok();
         }
@@ -38,7 +38,7 @@ namespace MyFeatures.Controllers
         public async Task<ActionResult<NotepadDto>> UpdateNotepad(int id, NotepadDto notepadDto)
         {
             var notepadDomain = notepadDto.Adapt<Notepad>();
-            await _notepadService.UpdateAsync(id, notepadDomain);
+            await _notepadService.Update(id, notepadDomain);
 
             return Ok();
         }
@@ -46,7 +46,7 @@ namespace MyFeatures.Controllers
         [HttpDelete("DeleteNotepad/{id}")]
         public async Task<IActionResult> DeleteNotepad(int id)
         {
-            await _notepadService.DeleteAsync(id);
+            await _notepadService.Delete(id);
             return Ok();
         }
     }

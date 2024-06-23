@@ -16,7 +16,7 @@ namespace Infrastructure.Helpers
                 var services = scope.ServiceProvider;
                 try
                 {
-                    var context = services.GetRequiredService<MyFeaturesDbContext>(); // Replace with your actual DbContext
+                    var context = services.GetRequiredService<MyFeaturesDbContext>();
                     context.Database.Migrate(); // This applies any pending migrations
                 }
                 catch (Exception ex)
@@ -30,19 +30,8 @@ namespace Infrastructure.Helpers
 
         public static void ConfigureMapster()
         {
-            //mapiranja konfigurirati smjer svaki za sebem
+            //mapiranja konfigurirati smjer svaki za sebe
             //.TwoWays() ne radi sa PreserveReference()
-
-
-            //za sad ništa ne puca ako su zakomentirani
-            //TypeAdapterConfig<Item, Entity.Item>.NewConfig()
-            //    .PreserveReference(true);
-
-            //TypeAdapterConfig<Entity.Item, Item>.NewConfig()
-            //    .PreserveReference(true);
-
-            //TypeAdapterConfig<ItemTask, Entity.ItemTask>.NewConfig()
-            //    .PreserveReference(true);
 
             //za sad samo ovi pucaju kod mapiranja u CreateItem, bez ovog dobim 'Access Violation'
             //cirkularna referenca
@@ -51,7 +40,6 @@ namespace Infrastructure.Helpers
 
             TypeAdapterConfig<ItemTask, ItemTaskDto>.NewConfig()
                 .PreserveReference(true);
-
         }
     }
 }

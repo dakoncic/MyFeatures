@@ -1,5 +1,7 @@
 ﻿using Core.Interfaces;
 using Core.Services;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Infrastructure.DAL;
 using Infrastructure.Helpers;
 using Infrastructure.Interfaces.IRepository;
@@ -13,11 +15,6 @@ var builder = WebApplication.CreateBuilder(args);
 var _configuration = builder.Configuration;
 
 // Add services to the container.
-
-//zapisat da moram eksplicitno dodat referencu sa webapi na core, sa core na infrastructure kroz csproj
-//inače nije mogao iz web apia prepoznat MyFeaturesDbContext
-
-//zapisat da moram entity framework design instalirat u web api inače migracije ne rade
 
 builder.Services.AddDbContext<MyFeaturesDbContext>(options =>
 {
@@ -41,6 +38,10 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     //potrebno za slanje enuma između frontenda i backenda
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
+
+//omogućuje automatsku validaciju
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 //mapster registracija nakon servisa
 StartupHelper.ConfigureMapster();

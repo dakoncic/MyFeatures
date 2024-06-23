@@ -11,9 +11,6 @@ namespace Infrastructure.Entities
         [Required]
         public int ItemId { get; set; }
 
-        //zadnji dan (datum) kad se nešto može izvršit,
-        ///npr. zubar na točan datum
-        //ili registracija auta (može i prije krajnjeg roka)
         [DataType(DataType.Date)]
         public DateTime? DueDate { get; set; }
 
@@ -28,7 +25,6 @@ namespace Infrastructure.Entities
 
         public int RowIndex { get; set; }
 
-        // Navigation property na parenta
         public Item Item { get; set; }
     }
 }

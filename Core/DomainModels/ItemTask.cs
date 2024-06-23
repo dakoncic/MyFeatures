@@ -19,18 +19,13 @@
                 Description = Item.Description
             };
 
-            //ako npr. se uzima riblje ulje ned., neovisno zakasnio dan-2
-            //onda uvečavam na DueDate
-            //ali ako je ponavljajući bez datuma, npr. posjet zubarici (ja određujem kad, nema DueDate)
-            //onda se ne uvečava ništa
-
-            //izvršavamo samo ako je DueDate i DaysBetween, ako je samo DueDate neće bit ponovno
-            if (DueDate.HasValue && Item.DaysBetween.HasValue)
+            if (DueDate is not null && Item.DaysBetween is not null)
             {
                 var daysBetween = Item.DaysBetween.Value;
 
                 //ako je renewOnDueDate true, neće bit null jer postoji days between
-                if (Item.RenewOnDueDate.Value)
+                //npr. vit D svake ned.
+                if (Item.RenewOnDueDate!.Value)
                 {
                     //na complete uvijek dodajem dane barem 1 put
                     newItemTask.DueDate = DueDate.Value.AddDays(daysBetween);
@@ -47,12 +42,11 @@
                     newItemTask.DueDate = DateTime.Now.AddDays(daysBetween);
                 }
 
-                //odma committamo, ne čekamo ništa
+                //odma committamo
                 newItemTask.CommittedDate = newItemTask.DueDate;
             }
 
             return newItemTask;
         }
     }
-
 }

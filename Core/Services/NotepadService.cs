@@ -23,7 +23,7 @@ namespace Core.Services
             _notepadRepository = notepadRepository;
         }
 
-        public async Task<List<Notepad>> GetAllAsync()
+        public async Task<List<Notepad>> GetAll()
         {
             var notepads = await _notepadRepository.GetAllAsync(
                 orderBy: x => x.OrderBy(n => n.RowIndex)
@@ -32,7 +32,7 @@ namespace Core.Services
             return notepads.Adapt<List<Notepad>>();
         }
 
-        public async Task CreateAsync()
+        public async Task Create()
         {
             var notepadEntity = new Entity.Notepad();
 
@@ -42,7 +42,6 @@ namespace Core.Services
                 q => q.OrderByDescending(x => x.RowIndex)
             );
 
-            //maxRowIndexNotepad može bit null ako kreiram prvi Notepad
             int startIndex = maxRowIndexNotepad != null ? maxRowIndexNotepad.RowIndex + 1 : 1;
 
             notepadEntity.RowIndex = startIndex;
@@ -53,7 +52,7 @@ namespace Core.Services
         }
 
         //ovo refaktorat da radim single item fetch ipak kao i svagdje drugdje
-        public async Task UpdateAsync(int notepadId, Notepad updatedNotepad)
+        public async Task Update(int notepadId, Notepad updatedNotepad)
         {
             var notepadEntity = await _notepadRepository.GetByIdAsync(notepadId);
 
@@ -67,28 +66,24 @@ namespace Core.Services
             var notepads = await _notepadRepository.GetAllAsync(
                 orderBy: x => x.OrderBy(n => n.RowIndex));
 
-            // novi index koji postavljam ne smije biti manji od najmanjeg i veći od ukupnog broja Notepada
             if (newIndex < 1 || newIndex > notepads.Count())
             {
                 throw new ArgumentOutOfRangeException(nameof(updatedNotepad.RowIndex), "Index out of range.");
             }
 
-            // ako je novi index različiti od trenutačnog indexa
             if (newIndex != currentIndex)
             {
                 var itemsToUpdate = notepads.Where(n => n.Id != notepadId).ToList();
 
                 RowIndexHelper.ManaulReorderRowIndexes<Entity.Notepad>(itemsToUpdate, newIndex, currentIndex);
 
-                // nakon sortiranja ostalih, postavljamo novi index Notepadu
                 notepadEntity.RowIndex = newIndex;
             }
 
-            //u svakom slučaju želimo spremit ako su rađene neke druge promjene npr. update contenta
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(int notepadId)
+        public async Task Delete(int notepadId)
         {
             var notepadEntity = await _notepadRepository.GetByIdAsync(notepadId);
 
@@ -100,6 +95,7 @@ namespace Core.Services
                 orderBy: x => x.OrderBy(n => n.RowIndex)
             );
 
+            //*batch update ovdje najvjv.
             foreach (var notepad in affectedNotepads)
             {
                 notepad.RowIndex--;

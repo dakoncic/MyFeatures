@@ -116,7 +116,7 @@ namespace Infrastructure.Repository
 
         public void Delete(TKeyType id)
         {
-            var entity = _dbSet.Find(id); // Or use 'FindAsync' in an async method context
+            var entity = _dbSet.Find(id);
             if (entity != null)
             {
                 _dbSet.Remove(entity);

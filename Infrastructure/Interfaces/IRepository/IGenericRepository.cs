@@ -4,7 +4,6 @@ namespace Infrastructure.Interfaces.IRepository
 {
     public interface IGenericRepository<TEntity, TKeyType> where TEntity : class
     {
-        // Asynchronous read operations
         Task<IEnumerable<TEntity>> GetAllAsync(
             Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
@@ -17,7 +16,6 @@ namespace Infrastructure.Interfaces.IRepository
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null
             );
 
-        // Synchronous write operations
         void Add(TEntity entity);
         void Update(TEntity entity);
         Task<int> UpdateBatchAsync(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, TEntity>> updateEntityFactory);

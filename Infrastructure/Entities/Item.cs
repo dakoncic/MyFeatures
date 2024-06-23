@@ -10,7 +10,7 @@ namespace Infrastructure.Entities
 
         [Required]
         [StringLength(500)]
-        public string Description { get; set; } //original description for recurring
+        public string Description { get; set; }
 
         public bool Recurring { get; set; }
 
@@ -24,7 +24,7 @@ namespace Infrastructure.Entities
 
         public bool Completed { get; set; }
 
-        // navigacijski property na djecu, nova lista se inicijalizira tako da nikad ne bude null
+        //nova lista se inicijalizira tako da nikad ne bude null
         public ICollection<ItemTask> ItemTasks { get; set; } = new List<ItemTask>();
     }
 }

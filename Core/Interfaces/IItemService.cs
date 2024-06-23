@@ -5,15 +5,15 @@ namespace Core.Interfaces
 {
     public interface IItemService
     {
-        Task CommitItemTaskOrReturnToGroupAsync(DateTime? commitDay, int itemTaskId);
-        Task UpdateItemIndex(int itemId, int newIndex, bool recurring);
-        Task UpdateItemTaskIndex(int itemId, DateTime commitDate, int newIndex);
-        Task CompleteItemTaskAsync(int itemTaskId);
-        Task CreateItemAsync(ItemTask itemTaskDomain);
-        Task DeleteItemAsync(int itemId);
-        Task<ItemTask> GetItemTaskByIdAsync(int itemTaskId);
-        Task<Dictionary<DateTime, List<Entity.ItemTask>>> GetCommitedItemsForNextWeekAsync();
-        Task<List<ItemTask>> GetActiveItemTasksAsync(bool recurring, bool includeWeekdaysCommitted);
-        Task UpdateItemAsync(int itemTaskId, ItemTask updatedItemTask);
+        Task CommitItemTaskOrReturnToGroup(DateTime? commitDay, int itemTaskId);
+        Task ReorderItemInsideGroup(int itemId, int newIndex, bool recurring);
+        Task ReorderItemTaskInsideGroup(int itemId, DateTime commitDate, int newIndex);
+        Task CompleteItemTask(int itemTaskId);
+        Task CreateItem(ItemTask itemTaskDomain);
+        Task DeleteItem(int itemId);
+        Task<ItemTask> GetItemTaskById(int itemTaskId);
+        Task<Dictionary<DateTime, List<Entity.ItemTask>>> GetCommitedItemsForNextWeek();
+        Task<List<ItemTask>> GetActiveItemTasks(bool recurring, bool includeWeekdaysCommitted);
+        Task UpdateItem(int itemTaskId, ItemTask updatedItemTask);
     }
 }

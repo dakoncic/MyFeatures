@@ -8,7 +8,7 @@ namespace Core.Helpers
         {
             if (newIndex < currentIndex)
             {
-                // Moving up in the order
+                // pomicanje prema gore
                 foreach (var item in items.Where(item => item.RowIndex >= newIndex && item.RowIndex < currentIndex))
                 {
                     item.RowIndex++;
@@ -16,7 +16,7 @@ namespace Core.Helpers
             }
             else if (newIndex > currentIndex)
             {
-                // Moving down in the order
+                // pomicanje prema dolje
                 foreach (var item in items.Where(item => item.RowIndex > currentIndex && item.RowIndex <= newIndex))
                 {
                     item.RowIndex--;

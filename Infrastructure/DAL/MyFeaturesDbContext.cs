@@ -45,7 +45,6 @@ namespace Infrastructure.DAL
                 .HasIndex(ci => ci.CompletionDate)
                 .HasDatabaseName("IDX_CompletionDate")
                 .HasFilter("CompletionDate IS NOT NULL");  // uvjetni index, ako puno redaka ima NULL, da njih ne gleda
-
         }
     }
 }
