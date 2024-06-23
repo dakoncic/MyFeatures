@@ -11,14 +11,6 @@
         public int RowIndex { get; set; }
         public Item Item { get; set; }
 
-        public void InitializeDates()
-        {
-            if (DueDate != null)
-            {
-                CommittedDate = DueDate;
-            }
-        }
-
         public ItemTask CreateNewRecurringTask()
         {
             var newItemTask = new ItemTask

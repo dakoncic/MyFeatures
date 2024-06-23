@@ -8,6 +8,7 @@
         public DateTime? DueDate { get; set; }
         public string Description { get; set; }
         public DateTime? CompletionDate { get; set; }
+        public int RowIndex { get; set; }
         public ItemDto Item { get; set; }
     }
 

@@ -4,7 +4,7 @@ namespace Core.Helpers
 {
     public static class RowIndexHelper
     {
-        public static void UpdateRowIndexes<T>(IEnumerable<T> items, int newIndex, int currentIndex) where T : IHasRowIndex
+        public static void ManaulReorderRowIndexes<T>(IEnumerable<T> items, int newIndex, int currentIndex) where T : IHasRowIndex
         {
             if (newIndex < currentIndex)
             {

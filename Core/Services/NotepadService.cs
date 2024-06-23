@@ -78,7 +78,7 @@ namespace Core.Services
             {
                 var itemsToUpdate = notepads.Where(n => n.Id != notepadId).ToList();
 
-                RowIndexHelper.UpdateRowIndexes<Entity.Notepad>(itemsToUpdate, newIndex, currentIndex);
+                RowIndexHelper.ManaulReorderRowIndexes<Entity.Notepad>(itemsToUpdate, newIndex, currentIndex);
 
                 // nakon sortiranja ostalih, postavljamo novi index Notepadu
                 notepadEntity.RowIndex = newIndex;

@@ -7,9 +7,7 @@
   "paths": {
     "/api/Item/CommitItemTask": {
       "post": {
-        "tags": [
-          "Item"
-        ],
+        "tags": ["Item"],
         "operationId": "CommitItemTask",
         "requestBody": {
           "content": {
@@ -39,9 +37,7 @@
     },
     "/api/Item/UpdateItemTaskIndex": {
       "post": {
-        "tags": [
-          "Item"
-        ],
+        "tags": ["Item"],
         "operationId": "UpdateItemTaskIndex",
         "requestBody": {
           "content": {
@@ -71,9 +67,7 @@
     },
     "/api/Item/UpdateItemIndex": {
       "post": {
-        "tags": [
-          "Item"
-        ],
+        "tags": ["Item"],
         "operationId": "UpdateItemIndex",
         "requestBody": {
           "content": {
@@ -103,9 +97,7 @@
     },
     "/api/Item/GetOneTimeItemTasks": {
       "get": {
-        "tags": [
-          "Item"
-        ],
+        "tags": ["Item"],
         "operationId": "GetOneTimeItemTasks",
         "responses": {
           "200": {
@@ -142,9 +134,7 @@
     },
     "/api/Item/GetRecurringItemTasks": {
       "get": {
-        "tags": [
-          "Item"
-        ],
+        "tags": ["Item"],
         "operationId": "GetRecurringItemTasks",
         "responses": {
           "200": {
@@ -181,9 +171,7 @@
     },
     "/api/Item/GetOneTimeItemTasksWithWeekdays": {
       "get": {
-        "tags": [
-          "Item"
-        ],
+        "tags": ["Item"],
         "operationId": "GetOneTimeItemTasksWithWeekdays",
         "responses": {
           "200": {
@@ -220,9 +208,7 @@
     },
     "/api/Item/GetRecurringItemTasksWithWeekdays": {
       "get": {
-        "tags": [
-          "Item"
-        ],
+        "tags": ["Item"],
         "operationId": "GetRecurringItemTasksWithWeekdays",
         "responses": {
           "200": {
@@ -259,9 +245,7 @@
     },
     "/api/Item/GetItemTask/{id}": {
       "get": {
-        "tags": [
-          "Item"
-        ],
+        "tags": ["Item"],
         "operationId": "GetItemTask",
         "parameters": [
           {
@@ -300,9 +284,7 @@
     },
     "/api/Item/CreateItemTask": {
       "post": {
-        "tags": [
-          "Item"
-        ],
+        "tags": ["Item"],
         "operationId": "CreateItemTask",
         "requestBody": {
           "content": {
@@ -332,9 +314,7 @@
     },
     "/api/Item/UpdateItemTask/{id}": {
       "put": {
-        "tags": [
-          "Item"
-        ],
+        "tags": ["Item"],
         "operationId": "UpdateItemTask",
         "parameters": [
           {
@@ -375,9 +355,7 @@
     },
     "/api/Item/DeleteItemTask/{id}": {
       "delete": {
-        "tags": [
-          "Item"
-        ],
+        "tags": ["Item"],
         "operationId": "DeleteItemTask",
         "parameters": [
           {
@@ -399,9 +377,7 @@
     },
     "/api/Item/CompleteItemTask/{itemTaskId}": {
       "post": {
-        "tags": [
-          "Item"
-        ],
+        "tags": ["Item"],
         "operationId": "CompleteItemTask",
         "parameters": [
           {
@@ -423,9 +399,7 @@
     },
     "/api/Item/GetItemsForWeek": {
       "get": {
-        "tags": [
-          "Item"
-        ],
+        "tags": ["Item"],
         "operationId": "GetCommitedItemsForNextWeek",
         "responses": {
           "200": {
@@ -462,9 +436,7 @@
     },
     "/api/Notepad/GetAllNotepads": {
       "get": {
-        "tags": [
-          "Notepad"
-        ],
+        "tags": ["Notepad"],
         "operationId": "GetAllNotepads",
         "responses": {
           "200": {
@@ -501,9 +473,7 @@
     },
     "/api/Notepad/CreateNotepad": {
       "post": {
-        "tags": [
-          "Notepad"
-        ],
+        "tags": ["Notepad"],
         "operationId": "CreateNotepad",
         "responses": {
           "200": {
@@ -531,9 +501,7 @@
     },
     "/api/Notepad/UpdateNotepad/{id}": {
       "put": {
-        "tags": [
-          "Notepad"
-        ],
+        "tags": ["Notepad"],
         "operationId": "UpdateNotepad",
         "parameters": [
           {
@@ -591,9 +559,7 @@
     },
     "/api/Notepad/DeleteNotepad/{id}": {
       "delete": {
-        "tags": [
-          "Notepad"
-        ],
+        "tags": ["Notepad"],
         "operationId": "DeleteNotepad",
         "parameters": [
           {
@@ -632,10 +598,7 @@
         "additionalProperties": false
       },
       "IntervalType": {
-        "enum": [
-          "Days",
-          "Months"
-        ],
+        "enum": ["Days", "Months"],
         "type": "string"
       },
       "ItemDto": {
@@ -700,6 +663,10 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
+          },
+          "rowIndex": {
+            "type": "integer",
+            "format": "int32"
           },
           "item": {
             "$ref": "#/components/schemas/ItemDto"

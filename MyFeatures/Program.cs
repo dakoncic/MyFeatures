@@ -29,8 +29,6 @@ builder.Services.AddDbContext<MyFeaturesDbContext>(options =>
 });
 
 builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
-builder.Services.AddScoped<IItemRepository, ItemRepository>();
-builder.Services.AddScoped<IItemTaskRepository, ItemTaskRepository>();
 
 builder.Services.AddScoped<IItemService, ItemService>();
 builder.Services.AddScoped<INotepadService, NotepadService>();
