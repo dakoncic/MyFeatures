@@ -4,7 +4,6 @@ import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { DragDropModule } from 'primeng/dragdrop';
 import { DialogService } from 'primeng/dynamicdialog';
-import { RippleModule } from 'primeng/ripple';
 import { TableModule } from 'primeng/table';
 import { Observable } from 'rxjs';
 import { ItemTaskDto } from '../../../infrastructure';
@@ -19,8 +18,7 @@ import { EditItemDialogComponent } from '../edit-item-dialog/edit-item-dialog.co
     CommonModule,
     TableModule,
     DragDropModule,
-    ButtonModule,
-    RippleModule
+    ButtonModule
   ],
   providers: [DatePipe],
   templateUrl: './todo.component.html',
