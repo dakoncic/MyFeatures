@@ -7,7 +7,7 @@ namespace Core.Interfaces
     {
         Task CreateItemAndTask(ItemTask itemTaskDomain);
         Task<ItemTask> GetItemTaskById(int itemTaskId);
-        Task UpdateItemAndTask(int itemTaskId, ItemTask updatedItemTask);
+        Task UpdateItemAndTask(int itemTaskId, ItemTask itemTaskDomain);
         Task DeleteItemAndTasks(int itemId);
         Task CompleteItemTask(int itemTaskId);
         Task CommitItemTaskOrReturnToGroup(DateTime? commitDay, int itemTaskId);

@@ -27,13 +27,13 @@ namespace Core.Services
         {
             var notepadEntity = new Entity.Notepad();
 
-            var maxRowIndexNotepad = await _notepadRepository.GetFirstOrDefaultAsync(
+            var maxRowIndexNotepadEntity = await _notepadRepository.GetFirstOrDefaultAsync(
                 //ne želi pustit OrderByDescending ako nemam trivijalni "true" filter
                 x => true,
                 q => q.OrderByDescending(x => x.RowIndex)
             );
 
-            int startIndex = maxRowIndexNotepad != null ? maxRowIndexNotepad.RowIndex!.Value + 1 : 1;
+            int startIndex = maxRowIndexNotepadEntity != null ? maxRowIndexNotepadEntity.RowIndex!.Value + 1 : 1;
 
             notepadEntity.RowIndex = startIndex;
 
@@ -43,30 +43,30 @@ namespace Core.Services
         }
 
         //ovo refaktorat da radim single item fetch ipak kao i svagdje drugdje
-        public async Task Update(int notepadId, Notepad updatedNotepad)
+        public async Task Update(int notepadId, Notepad notepadDomain)
         {
             var notepadEntity = await _notepadRepository.GetByIdAsync(notepadId);
 
             CheckIfNull(notepadEntity, $"Notepad with ID {notepadId} not found.");
 
             int currentIndex = notepadEntity.RowIndex!.Value;
-            int newIndex = updatedNotepad.RowIndex!.Value;
+            int newIndex = notepadDomain.RowIndex!.Value;
 
-            updatedNotepad.Adapt(notepadEntity);
+            notepadDomain.Adapt(notepadEntity);
 
-            var notepads = await _notepadRepository.GetAllAsync(
+            var notepadsEntity = await _notepadRepository.GetAllAsync(
                 orderBy: x => x.OrderBy(n => n.RowIndex));
 
-            if (newIndex < 1 || newIndex > notepads.Count())
+            if (newIndex < 1 || newIndex > notepadsEntity.Count())
             {
-                throw new ArgumentOutOfRangeException(nameof(updatedNotepad.RowIndex), "Index out of range.");
+                throw new ArgumentOutOfRangeException(nameof(notepadDomain.RowIndex), "Index out of range.");
             }
 
             if (newIndex != currentIndex)
             {
-                var itemsToUpdate = notepads.Where(n => n.Id != notepadId).ToList();
+                var itemsToUpdateEntity = notepadsEntity.Where(n => n.Id != notepadId).ToList();
 
-                RowIndexHelper.ManaulReorderRowIndexes<Entity.Notepad>(itemsToUpdate, newIndex, currentIndex);
+                RowIndexHelper.ManaulReorderRowIndexes<Entity.Notepad>(itemsToUpdateEntity, newIndex, currentIndex);
 
                 notepadEntity.RowIndex = newIndex;
             }
@@ -81,16 +81,11 @@ namespace Core.Services
             CheckIfNull(notepadEntity, $"Notepad with ID {notepadId} not found.");
 
             int deletedIndex = notepadEntity.RowIndex!.Value;
-            var affectedNotepads = await _notepadRepository.GetAllAsync(
-                filter: n => n.RowIndex > deletedIndex,
-                orderBy: x => x.OrderBy(n => n.RowIndex)
-            );
 
-            //*batch update ovdje najvjv.
-            foreach (var notepad in affectedNotepads)
-            {
-                notepad.RowIndex--;
-            }
+            await _notepadRepository.UpdateBatchAsync(
+                x => x.RowIndex > deletedIndex,
+                x => new Entity.Notepad { RowIndex = x.RowIndex - 1 }
+            );
 
             _notepadRepository.Delete(notepadId);
             await _context.SaveChangesAsync();
@@ -98,11 +93,11 @@ namespace Core.Services
 
         public async Task<List<Notepad>> GetAll()
         {
-            var notepads = await _notepadRepository.GetAllAsync(
+            var notepadsEntity = await _notepadRepository.GetAllAsync(
                 orderBy: x => x.OrderBy(n => n.RowIndex)
             );
 
-            return notepads.Adapt<List<Notepad>>();
+            return notepadsEntity.Adapt<List<Notepad>>();
         }
     }
 }

@@ -62,46 +62,44 @@ namespace Core.Services
 
             return itemTaskEntity.Adapt<ItemTask>();
         }
-        public async Task UpdateItemAndTask(int itemTaskId, ItemTask updatedItemTask)
+        public async Task UpdateItemAndTask(int itemTaskId, ItemTask itemTaskDomain)
         {
             var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId, "Item");
 
             CheckIfNull(itemTaskEntity, $"ItemTask with ID {itemTaskId} not found.");
 
-            var domainItemTask = itemTaskEntity.Adapt<ItemTask>();
-
-            updatedItemTask.Adapt(domainItemTask);
+            var updatedItemTask = itemTaskEntity.Adapt<ItemTask>();
+            itemTaskDomain.Adapt(updatedItemTask);
 
             var oldDueDate = itemTaskEntity.DueDate;
-            var newDueDate = domainItemTask.DueDate?.Date;
-
+            var newDueDate = updatedItemTask.DueDate?.Date;
             var oldCommittedDate = itemTaskEntity.CommittedDate;
 
-            IntervalCalculator.CalculateAndAssignDaysBetween(domainItemTask.Item);
+            IntervalCalculator.CalculateAndAssignDaysBetween(updatedItemTask.Item);
 
             if (oldDueDate?.Date != newDueDate?.Date)
             {
-                await HandleDueDateChange(itemTaskEntity, domainItemTask, oldCommittedDate, newDueDate);
+                await HandleDueDateChange(itemTaskEntity, updatedItemTask, oldCommittedDate, newDueDate);
             }
 
-            domainItemTask.Adapt(itemTaskEntity);
+            updatedItemTask.Adapt(itemTaskEntity);
             await _context.SaveChangesAsync();
         }
-        private async Task HandleDueDateChange(Entity.ItemTask itemTaskEntity, ItemTask domainItemTask, DateTime? oldCommittedDate, DateTime? newDueDate)
+        private async Task HandleDueDateChange(Entity.ItemTask itemTaskEntity, ItemTask updatedItemTask, DateTime? oldCommittedDate, DateTime? newDueDate)
         {
-            domainItemTask.CommittedDate = newDueDate?.Date;
+            updatedItemTask.CommittedDate = newDueDate?.Date;
             await UpdateItemTaskRowIndexesIfDateProvided(oldCommittedDate, itemTaskEntity.RowIndex);
 
             if (newDueDate is not null)
             {
-                domainItemTask.RowIndex = await GetNewItemTaskRowIndex(domainItemTask.CommittedDate);
+                updatedItemTask.RowIndex = await GetNewItemTaskRowIndex(updatedItemTask.CommittedDate);
                 //ako je postavljen dueDate, reset RowIndex
-                domainItemTask.Item.RowIndex = null;
+                updatedItemTask.Item.RowIndex = null;
             }
             else
             {
                 //ako je DueDate postavljen na null, onda postavi novi index na Item
-                await GetNewItemRowIndex(domainItemTask);
+                await GetNewItemRowIndex(updatedItemTask);
             }
         }
         public async Task DeleteItemAndTasks(int itemId)
@@ -137,10 +135,10 @@ namespace Core.Services
 
             if (itemTaskEntity.Item.Recurring)
             {
-                var domainItemTask = itemTaskEntity.Adapt<ItemTask>();
+                var itemTaskDomain = itemTaskEntity.Adapt<ItemTask>();
 
                 //dobar primjer enkapsulacije biznis logike u domain klasu
-                var newItemTask = domainItemTask.CreateNewRecurringTask();
+                var newItemTask = itemTaskDomain.CreateNewRecurringTask();
                 newItemTask.RowIndex = await GetNewItemTaskRowIndex(newItemTask.CommittedDate);
 
                 //ako je novi dueDate null, tj. nije poprimio novi datum, onda Item mora dobiti RowIndex
@@ -167,43 +165,43 @@ namespace Core.Services
             var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId, "Item");
             CheckIfNull(itemTaskEntity, $"ItemTask with ID {itemTaskId} not found.");
 
-            var domainItemTask = itemTaskEntity.Adapt<ItemTask>();
+            var itemTaskDomain = itemTaskEntity.Adapt<ItemTask>();
 
-            var oldCommittedDate = domainItemTask.CommittedDate;
-            var oldDueDate = domainItemTask.DueDate;
+            var oldCommittedDate = itemTaskDomain.CommittedDate;
+            var oldDueDate = itemTaskDomain.DueDate;
 
             if (oldCommittedDate?.Date != newCommitDay?.Date)
             {
-                domainItemTask.CommittedDate = newCommitDay?.Date;
+                itemTaskDomain.CommittedDate = newCommitDay?.Date;
 
                 await UpdateItemTaskRowIndexesIfDateProvided(oldCommittedDate, itemTaskEntity.RowIndex);
 
                 if (newCommitDay is not null)
                 {
-                    domainItemTask.RowIndex = await GetNewItemTaskRowIndex(newCommitDay);
+                    itemTaskDomain.RowIndex = await GetNewItemTaskRowIndex(newCommitDay);
                 }
                 else
                 {
                     //ako je DueDate imao neku vrijednost, daj Item-u RowIndex jer će dueDate postat sad null
                     if (oldDueDate is not null)
                     {
-                        domainItemTask.DueDate = null;
-                        await GetNewItemRowIndex(domainItemTask);
+                        itemTaskDomain.DueDate = null;
+                        await GetNewItemRowIndex(itemTaskDomain);
                     }
                 }
             }
 
-            domainItemTask.Adapt(itemTaskEntity);
+            itemTaskDomain.Adapt(itemTaskEntity);
 
             await _context.SaveChangesAsync();
         }
         public async Task ReorderItemInsideGroup(int itemId, int newIndex, bool recurring)
         {
-            var itemToUpdate = await _itemRepository.GetByIdAsync(itemId);
+            var itemEntity = await _itemRepository.GetByIdAsync(itemId);
 
-            CheckIfNull(itemToUpdate, $"Item with ID {itemId} not found.");
+            CheckIfNull(itemEntity, $"Item with ID {itemId} not found.");
 
-            int currentIndex = itemToUpdate.RowIndex!.Value;
+            int currentIndex = itemEntity.RowIndex!.Value;
 
             Expression<Func<Entity.Item, bool>> filter = x =>
                 !x.Completed &&
@@ -211,21 +209,21 @@ namespace Core.Services
                 x.Id != itemId;
             Func<IQueryable<Entity.Item>, IOrderedQueryable<Entity.Item>> orderBy = q => q.OrderBy(x => x.RowIndex);
 
-            var items = await _itemRepository.GetAllAsync(filter, orderBy);
+            var itemsEntity = await _itemRepository.GetAllAsync(filter, orderBy);
 
-            RowIndexHelper.ManaulReorderRowIndexes<Entity.Item>(items, newIndex, currentIndex);
+            RowIndexHelper.ManaulReorderRowIndexes<Entity.Item>(itemsEntity, newIndex, currentIndex);
 
-            itemToUpdate.RowIndex = newIndex;
+            itemEntity.RowIndex = newIndex;
 
             await _context.SaveChangesAsync();
         }
         public async Task ReorderItemTaskInsideGroup(int itemId, DateTime commitDate, int newIndex)
         {
-            var itemToUpdate = await _itemTaskRepository.GetByIdAsync(itemId);
+            var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemId);
 
-            CheckIfNull(itemToUpdate, $"ItemTask with ID {itemId} not found.");
+            CheckIfNull(itemTaskEntity, $"ItemTask with ID {itemId} not found.");
 
-            int currentIndex = itemToUpdate.RowIndex!.Value;
+            int currentIndex = itemTaskEntity.RowIndex!.Value;
 
             Expression<Func<Entity.ItemTask, bool>> filter =
                 x =>
@@ -235,11 +233,11 @@ namespace Core.Services
                 x.Id != itemId;
             Func<IQueryable<Entity.ItemTask>, IOrderedQueryable<Entity.ItemTask>> orderBy = q => q.OrderBy(x => x.RowIndex);
 
-            var itemsForDate = await _itemTaskRepository.GetAllAsync(filter, orderBy);
+            var itemTasksForDateEntity = await _itemTaskRepository.GetAllAsync(filter, orderBy);
 
-            RowIndexHelper.ManaulReorderRowIndexes<Entity.ItemTask>(itemsForDate, newIndex, currentIndex);
+            RowIndexHelper.ManaulReorderRowIndexes<Entity.ItemTask>(itemTasksForDateEntity, newIndex, currentIndex);
 
-            itemToUpdate.RowIndex = newIndex;
+            itemTaskEntity.RowIndex = newIndex;
 
             await _context.SaveChangesAsync();
         }
@@ -251,27 +249,28 @@ namespace Core.Services
 
             if (!includeWeekdaysCommitted)
             {
-                //ako nije sort mode, onda dodatno filtriraj za samo ne committane, i committane
+                //ako nije sort mode, onda primjeni filter zbog kojeg će se u listi
+                //prikazivati samo ne commitani i oni izvan 7 dana
                 filter = filter.AndAlso(i =>
                     i.CommittedDate == null ||
                     i.CommittedDate.Value.Date >= DateTime.Now.Date.AddDays(GlobalConstants.DaysRange));
             }
 
-            var itemTasks = await _itemTaskRepository.GetAllAsync(
+            var itemTasksEntity = await _itemTaskRepository.GetAllAsync(
                 filter: filter,
                 orderBy: x => x.OrderBy(n => n.DueDate).ThenBy(n => n.Item.RowIndex),
                 includeProperties: "Item"
                 );
 
-            return itemTasks.Adapt<List<ItemTask>>();
+            return itemTasksEntity.Adapt<List<ItemTask>>();
         }
         public async Task<Dictionary<DateTime, List<Entity.ItemTask>>> GetCommitedItemsForNextWeek()
         {
             await UpdateExpiredItemTasks();
 
-            var groupedItems = await GetItemTasksGroupedByCommitDateForNextWeek();
+            var itemTasksEntity = await GetItemTasksGroupedByCommitDateForNextWeek();
 
-            return groupedItems;
+            return itemTasksEntity;
         }
         private async Task UpdateExpiredItemTasks()
         {
@@ -282,13 +281,13 @@ namespace Core.Services
                 x.CommittedDate.HasValue &&
                 x.CommittedDate.Value.Date < today;
 
-            var expiredItemTasks = await _itemTaskRepository.GetAllAsync(filter);
+            var expiredItemTasksEntity = await _itemTaskRepository.GetAllAsync(filter);
 
-            if (expiredItemTasks.Any())
+            if (expiredItemTasksEntity.Any())
             {
                 int newRowIndex = await GetNewItemTaskRowIndex(today);
 
-                foreach (var task in expiredItemTasks)
+                foreach (var task in expiredItemTasksEntity)
                 {
                     task.CommittedDate = today;
                     task.RowIndex = newRowIndex++;
@@ -311,14 +310,14 @@ namespace Core.Services
                 x.CommittedDate.Value.Date >= today &&
                 x.CommittedDate.Value.Date < endOfDayRange;
 
-            var itemTasks = await _itemTaskRepository.GetAllAsync(filter, includeProperties: "Item");
+            var itemTasksForNextWeekEntity = await _itemTaskRepository.GetAllAsync(filter, includeProperties: "Item");
 
-            var groupedTasks = new Dictionary<DateTime, List<Entity.ItemTask>>();
+            var groupedItemTasksEntity = new Dictionary<DateTime, List<Entity.ItemTask>>();
 
             for (DateTime day = today; day < endOfDayRange; day = day.AddDays(1))
             {
                 // commitani taskovi za specifičan dan
-                var tasksForDay = itemTasks
+                var tasksForDay = itemTasksForNextWeekEntity
                     .Where(t =>
                         t.CommittedDate.HasValue &&
                         t.CommittedDate.Value.Date == day
@@ -326,25 +325,25 @@ namespace Core.Services
                     .OrderBy(t => t.RowIndex)
                     .ToList();
 
-                groupedTasks.Add(day, tasksForDay);
+                groupedItemTasksEntity.Add(day, tasksForDay);
             }
 
-            return groupedTasks;
+            return groupedItemTasksEntity;
         }
         private async Task GetNewItemRowIndex(ItemTask itemTaskDomain)
         {
-            var maxRowIndexItem = await _itemRepository.GetFirstOrDefaultAsync(
+            var maxRowIndexItemEntity = await _itemRepository.GetFirstOrDefaultAsync(
                             x =>
                             !x.Completed &&
                             x.Recurring.Equals(itemTaskDomain.Item.Recurring),
                             q => q.OrderByDescending(x => x.RowIndex)
                         );
 
-            itemTaskDomain.Item.RowIndex = maxRowIndexItem != null ? maxRowIndexItem.RowIndex + 1 : 0;
+            itemTaskDomain.Item.RowIndex = maxRowIndexItemEntity != null ? maxRowIndexItemEntity.RowIndex + 1 : 0;
         }
         private async Task<int> GetNewItemTaskRowIndex(DateTime? compareDate)
         {
-            var maxRowIndexItem = await _itemTaskRepository.GetFirstOrDefaultAsync(
+            var maxRowIndexItemEntity = await _itemTaskRepository.GetFirstOrDefaultAsync(
             x =>
                 x.CompletionDate == null &&
                 x.CommittedDate.HasValue &&
@@ -353,7 +352,7 @@ namespace Core.Services
             q => q.OrderByDescending(x => x.RowIndex)
             );
 
-            int newRowIndex = maxRowIndexItem != null ? maxRowIndexItem.RowIndex!.Value + 1 : 0;
+            int newRowIndex = maxRowIndexItemEntity != null ? maxRowIndexItemEntity.RowIndex!.Value + 1 : 0;
             return newRowIndex;
         }
         private async Task UpdateRowIndexesForRemainingItems(Entity.Item itemEntity)
