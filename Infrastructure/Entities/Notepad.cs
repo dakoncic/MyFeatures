@@ -11,6 +11,6 @@ namespace Infrastructure.Entities
         public string? Content { get; set; }
 
         [Required]
-        public int RowIndex { get; set; }
+        public int? RowIndex { get; set; }
     }
 }

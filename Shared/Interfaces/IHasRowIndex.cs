@@ -2,6 +2,6 @@
 {
     public interface IHasRowIndex
     {
-        int RowIndex { get; set; }
+        int? RowIndex { get; set; }
     }
 }

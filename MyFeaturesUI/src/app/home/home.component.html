@@ -75,14 +75,17 @@
                 [ngClass]="{
                   'cursor-pointer':
                     currentDay && (oneTimeItemsOrderLocked$ | async),
-                  'row-background-color': rowData.committedDate !== null
+                  'row-background-color':
+                    rowData.committedDate !== null && rowData.dueDate === null,
+                  'disable-row-reorder': rowData.dueDate !== null
                 }"
                 [pReorderableRow]="index"
                 (dragstart)="onDragStart($event, rowData, index)"
                 (click)="assignItemToSelectedWeekday(rowData, currentDay!)"
               >
                 <td class="w-2rem">
-                  @if (!(oneTimeItemsOrderLocked$ | async)) {
+                  @if (!(oneTimeItemsOrderLocked$ | async) && !rowData.dueDate)
+                  {
                   <span class="pi pi-bars" pReorderableRowHandle></span>
                   }
                 </td>
@@ -164,14 +167,17 @@
                 [ngClass]="{
                   'cursor-pointer':
                     currentDay && (recurringItemsOrderLocked$ | async),
-                  'row-background-color': rowData.committedDate !== null
+                  'row-background-color':
+                    rowData.committedDate !== null && rowData.dueDate === null,
+                  'disable-row-reorder': rowData.dueDate !== null
                 }"
                 [pReorderableRow]="index"
                 (dragstart)="onDragStart($event, rowData, index)"
                 (click)="assignItemToSelectedWeekday(rowData, currentDay!)"
               >
                 <td class="w-2rem">
-                  @if (!(recurringItemsOrderLocked$ | async)) {
+                  @if (!(recurringItemsOrderLocked$ | async) &&
+                  !rowData.dueDate) {
                   <span class="pi pi-bars" pReorderableRowHandle></span>
                   }
                 </td>

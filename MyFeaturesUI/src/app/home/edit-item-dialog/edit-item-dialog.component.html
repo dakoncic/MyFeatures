@@ -7,11 +7,9 @@
       id="name"
       formControlName="description"
       autofocus
-      [ngClass]="{
-        'ng-invalid ng-dirty': description?.invalid && description?.dirty
-      }"
     />
-    @if (description?.invalid && description?.dirty) {
+    @if ( this.form.get('description')?.invalid &&
+    this.form.get('description')?.dirty) {
     <small class="ng-dirty ng-invalid"> Opis je obavezan. </small>
     }
   </div>
@@ -79,7 +77,6 @@
   </div>
 </form>
 
-<!-- ne smije biti unutar form jer cancel napravit refresh cijelog page-a -->
 <button
   pButton
   pRipple

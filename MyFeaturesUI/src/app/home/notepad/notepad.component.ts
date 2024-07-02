@@ -42,10 +42,6 @@ export class NotepadComponent implements OnInit, OnDestroy {
   private confirmationService = inject(ConfirmationService);
   private cdr = inject(ChangeDetectorRef);
 
-  get content() {
-    return this.form.get('content');
-  }
-
   ngOnInit(): void {
     this.form = this.formBuilder.group({
       content: [null],
@@ -54,7 +50,7 @@ export class NotepadComponent implements OnInit, OnDestroy {
 
     this.displayNotepad();
 
-    //handling specific bug for "p-editor" where component is not marked
+    //handling specific bug only for "p-editor" where component is not marked
     //as dirty on text change, when using "ChangeDetectionStrategy.OnPush"
     this.form.get('content')!.valueChanges
       .pipe(takeUntil(this.destroy$))

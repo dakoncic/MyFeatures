@@ -26,8 +26,8 @@ namespace MyFeatures.Controllers
             return Ok();
         }
 
-        [HttpPost("UpdateItemTaskIndex")]
-        public async Task<ActionResult> UpdateItemTaskIndex(UpdateItemTaskIndexDto updateItemTaskIndexDto)
+        [HttpPost("ReorderItemTaskInsideGroup")]
+        public async Task<ActionResult> ReorderItemTaskInsideGroup(UpdateItemTaskIndexDto updateItemTaskIndexDto)
         {
             await _itemService.ReorderItemTaskInsideGroup(
                 updateItemTaskIndexDto.ItemTaskId,
@@ -38,8 +38,8 @@ namespace MyFeatures.Controllers
             return Ok();
         }
 
-        [HttpPost("UpdateItemIndex")]
-        public async Task<ActionResult> UpdateItemIndex(UpdateItemIndexDto updateItemIndexDto)
+        [HttpPost("ReorderItemInsideGroup")]
+        public async Task<ActionResult> ReorderItemInsideGroup(UpdateItemIndexDto updateItemIndexDto)
         {
             await _itemService.ReorderItemInsideGroup(
                 updateItemIndexDto.ItemId,
@@ -133,7 +133,7 @@ namespace MyFeatures.Controllers
             return Ok();
         }
 
-        [HttpGet("GetItemsForWeek")]
+        [HttpGet("GetCommitedItemsForNextWeek")]
         public async Task<IEnumerable<WeekDayDto>> GetCommitedItemsForNextWeek()
         {
             var weekDays = new List<WeekDayDto>();

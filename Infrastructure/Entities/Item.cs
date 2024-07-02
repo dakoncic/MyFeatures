@@ -20,7 +20,7 @@ namespace Infrastructure.Entities
         public bool? RenewOnDueDate { get; set; }
         public int? DaysBetween { get; set; }
 
-        public int RowIndex { get; set; }
+        public int? RowIndex { get; set; }
 
         public bool Completed { get; set; }
 

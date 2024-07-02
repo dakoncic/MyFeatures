@@ -155,7 +155,6 @@ export class TodoComponent {
       acceptLabel: 'Potvrdi',
       rejectLabel: 'Odustani',
       accept: () => {
-        //obriši i osvježi liste svima
         this.itemExtendedService.deleteItem(itemTask.item!.id!);
       }
     });

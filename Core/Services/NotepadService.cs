@@ -42,7 +42,7 @@ namespace Core.Services
                 q => q.OrderByDescending(x => x.RowIndex)
             );
 
-            int startIndex = maxRowIndexNotepad != null ? maxRowIndexNotepad.RowIndex + 1 : 1;
+            int startIndex = maxRowIndexNotepad != null ? maxRowIndexNotepad.RowIndex!.Value + 1 : 1;
 
             notepadEntity.RowIndex = startIndex;
 
@@ -58,8 +58,8 @@ namespace Core.Services
 
             CheckIfNull(notepadEntity, $"Notepad with ID {notepadId} not found.");
 
-            int currentIndex = notepadEntity.RowIndex;
-            int newIndex = updatedNotepad.RowIndex;
+            int currentIndex = notepadEntity.RowIndex!.Value;
+            int newIndex = updatedNotepad.RowIndex!.Value;
 
             updatedNotepad.Adapt(notepadEntity);
 
@@ -89,7 +89,7 @@ namespace Core.Services
 
             CheckIfNull(notepadEntity, $"Notepad with ID {notepadId} not found.");
 
-            int deletedIndex = notepadEntity.RowIndex;
+            int deletedIndex = notepadEntity.RowIndex!.Value;
             var affectedNotepads = await _notepadRepository.GetAllAsync(
                 filter: n => n.RowIndex > deletedIndex,
                 orderBy: x => x.OrderBy(n => n.RowIndex)

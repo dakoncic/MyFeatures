@@ -8,6 +8,7 @@ import { NotepadDto, NotepadService } from '../../infrastructure';
 export class NotepadExtendedService {
   private notepadService = inject(NotepadService);
 
+  //i ovdje jel bolje boolean sa null ili prazan array bolje?
   private notepadsSourceSubject = new BehaviorSubject<NotepadDto[]>([]);
 
   notepads$ = this.notepadsSourceSubject

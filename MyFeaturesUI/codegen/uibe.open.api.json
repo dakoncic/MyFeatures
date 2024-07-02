@@ -35,10 +35,10 @@
         }
       }
     },
-    "/api/Item/UpdateItemTaskIndex": {
+    "/api/Item/ReorderItemTaskInsideGroup": {
       "post": {
         "tags": ["Item"],
-        "operationId": "UpdateItemTaskIndex",
+        "operationId": "ReorderItemTaskInsideGroup",
         "requestBody": {
           "content": {
             "application/json": {
@@ -65,10 +65,10 @@
         }
       }
     },
-    "/api/Item/UpdateItemIndex": {
+    "/api/Item/ReorderItemInsideGroup": {
       "post": {
         "tags": ["Item"],
-        "operationId": "UpdateItemIndex",
+        "operationId": "ReorderItemInsideGroup",
         "requestBody": {
           "content": {
             "application/json": {
@@ -397,7 +397,7 @@
         }
       }
     },
-    "/api/Item/GetItemsForWeek": {
+    "/api/Item/GetCommitedItemsForNextWeek": {
       "get": {
         "tags": ["Item"],
         "operationId": "GetCommitedItemsForNextWeek",

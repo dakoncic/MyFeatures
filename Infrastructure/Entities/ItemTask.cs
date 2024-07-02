@@ -23,7 +23,7 @@ namespace Infrastructure.Entities
         [DataType(DataType.Date)]
         public DateTime? CompletionDate { get; set; }
 
-        public int RowIndex { get; set; }
+        public int? RowIndex { get; set; }
 
         public Item Item { get; set; }
     }

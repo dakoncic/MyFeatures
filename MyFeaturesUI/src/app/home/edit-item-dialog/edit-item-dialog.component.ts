@@ -7,7 +7,6 @@ import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { RadioButtonModule } from 'primeng/radiobutton';
-import { RippleModule } from 'primeng/ripple';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { Subject, combineLatest, take, takeUntil } from 'rxjs';
 import { IntervalType, ItemService, ItemTaskDto } from '../../../infrastructure';
@@ -24,7 +23,6 @@ import { ItemExtendedService } from '../../extended-services/item-extended-servi
     InputNumberModule,
     ReactiveFormsModule,
     SelectButtonModule,
-    RippleModule,
     InputTextModule,
     FormsModule,
     RadioButtonModule
@@ -49,15 +47,6 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
   private config = inject(DynamicDialogConfig);
   private itemService = inject(ItemService);
   private itemExtendedService = inject(ItemExtendedService);
-
-  //TO DO: refaktor ovo u generički validator
-  get description() {
-    return this.form.get('description');
-  }
-
-  get intervalValue() {
-    return this.form.get('intervalValue');
-  }
 
   intervalType = IntervalType;
 
@@ -136,7 +125,6 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
     this.itemExtendedService.completeItem(itemTask.id!);
   }
 
-  //povlači itemTask za edit s backenda
   editItem(itemTask: ItemTaskDto) {
     this.itemService.getItemTask(itemTask.id!)
       .pipe(take(1))
@@ -145,7 +133,6 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
       });
   }
 
-  //popunjava se forma za edit
   displayItem(itemTask: ItemTaskDto): void {
     this.form.reset();
 
@@ -165,7 +152,6 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
   }
 
   saveItem() {
-    //ako nije dirty onda nemoj zvat backend
     if (this.form.dirty) {
       if (!this.itemTask.id) {
         const itemTask: ItemTaskDto = {
@@ -185,7 +171,6 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
       } else {
 
         const itemTask: ItemTaskDto = {
-          //prvo stare vrijednosti npr. rowId (concurrency)
           ...this.itemTask,
 
           dueDate: this.form.getRawValue().dueDate ? this.form.getRawValue().dueDate.toLocaleDateString('en-CA') : null,

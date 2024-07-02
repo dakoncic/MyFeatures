@@ -11,6 +11,6 @@ namespace Core.DomainModels
         public int? DaysBetween { get; set; }
         public int? IntervalValue { get; set; }
         public IntervalType? IntervalType { get; set; }
-        public int RowIndex { get; set; }
+        public int? RowIndex { get; set; }
     }
 }
