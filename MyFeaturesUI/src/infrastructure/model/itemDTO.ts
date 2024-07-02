@@ -19,7 +19,7 @@ export interface ItemDto {
     renewOnDueDate?: boolean | null;
     intervalValue?: number | null;
     intervalType?: IntervalType;
-    rowIndex?: number;
+    rowIndex?: number | null;
 }
 export namespace ItemDto {
 }

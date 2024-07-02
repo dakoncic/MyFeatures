@@ -23,15 +23,6 @@ namespace Core.Services
             _notepadRepository = notepadRepository;
         }
 
-        public async Task<List<Notepad>> GetAll()
-        {
-            var notepads = await _notepadRepository.GetAllAsync(
-                orderBy: x => x.OrderBy(n => n.RowIndex)
-            );
-
-            return notepads.Adapt<List<Notepad>>();
-        }
-
         public async Task Create()
         {
             var notepadEntity = new Entity.Notepad();
@@ -103,6 +94,15 @@ namespace Core.Services
 
             _notepadRepository.Delete(notepadId);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<Notepad>> GetAll()
+        {
+            var notepads = await _notepadRepository.GetAllAsync(
+                orderBy: x => x.OrderBy(n => n.RowIndex)
+            );
+
+            return notepads.Adapt<List<Notepad>>();
         }
     }
 }

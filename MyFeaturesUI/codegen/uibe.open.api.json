@@ -5,6 +5,160 @@
     "version": "1.0"
   },
   "paths": {
+    "/api/Item/CreateItemAndTask": {
+      "post": {
+        "tags": ["Item"],
+        "operationId": "CreateItemAndTask",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ItemTaskDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ItemTaskDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ItemTaskDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Item/GetItemTaskById/{id}": {
+      "get": {
+        "tags": ["Item"],
+        "operationId": "GetItemTaskById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemTaskDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemTaskDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemTaskDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Item/UpdateItemAndTask/{id}": {
+      "put": {
+        "tags": ["Item"],
+        "operationId": "UpdateItemAndTask",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ItemTaskDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ItemTaskDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ItemTaskDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Item/DeleteItemAndTasks/{id}": {
+      "delete": {
+        "tags": ["Item"],
+        "operationId": "DeleteItemAndTasks",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Item/CompleteItemTask/{itemTaskId}": {
+      "post": {
+        "tags": ["Item"],
+        "operationId": "CompleteItemTask",
+        "parameters": [
+          {
+            "name": "itemTaskId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/Item/CommitItemTask": {
       "post": {
         "tags": ["Item"],
@@ -35,36 +189,6 @@
         }
       }
     },
-    "/api/Item/ReorderItemTaskInsideGroup": {
-      "post": {
-        "tags": ["Item"],
-        "operationId": "ReorderItemTaskInsideGroup",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateItemTaskIndexDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateItemTaskIndexDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateItemTaskIndexDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      }
-    },
     "/api/Item/ReorderItemInsideGroup": {
       "post": {
         "tags": ["Item"],
@@ -84,6 +208,36 @@
             "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/UpdateItemIndexDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Item/ReorderItemTaskInsideGroup": {
+      "post": {
+        "tags": ["Item"],
+        "operationId": "ReorderItemTaskInsideGroup",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateItemTaskIndexDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateItemTaskIndexDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateItemTaskIndexDto"
               }
             }
           }
@@ -239,160 +393,6 @@
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "/api/Item/GetItemTask/{id}": {
-      "get": {
-        "tags": ["Item"],
-        "operationId": "GetItemTask",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ItemTaskDto"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ItemTaskDto"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ItemTaskDto"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/Item/CreateItemTask": {
-      "post": {
-        "tags": ["Item"],
-        "operationId": "CreateItemTask",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ItemTaskDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ItemTaskDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/ItemTaskDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      }
-    },
-    "/api/Item/UpdateItemTask/{id}": {
-      "put": {
-        "tags": ["Item"],
-        "operationId": "UpdateItemTask",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ItemTaskDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ItemTaskDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/ItemTaskDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      }
-    },
-    "/api/Item/DeleteItemTask/{id}": {
-      "delete": {
-        "tags": ["Item"],
-        "operationId": "DeleteItemTask",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      }
-    },
-    "/api/Item/CompleteItemTask/{itemTaskId}": {
-      "post": {
-        "tags": ["Item"],
-        "operationId": "CompleteItemTask",
-        "parameters": [
-          {
-            "name": "itemTaskId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
           }
         }
       }
@@ -629,7 +629,8 @@
           },
           "rowIndex": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -666,7 +667,8 @@
           },
           "rowIndex": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "nullable": true
           },
           "item": {
             "$ref": "#/components/schemas/ItemDto"
@@ -687,7 +689,8 @@
           },
           "rowIndex": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "nullable": true
           }
         },
         "additionalProperties": false

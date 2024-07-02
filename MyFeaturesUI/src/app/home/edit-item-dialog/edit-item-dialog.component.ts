@@ -126,7 +126,7 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
   }
 
   editItem(itemTask: ItemTaskDto) {
-    this.itemService.getItemTask(itemTask.id!)
+    this.itemService.getItemTaskById(itemTask.id!)
       .pipe(take(1))
       .subscribe((itemTask) => {
         this.displayItem(itemTask);

@@ -18,22 +18,57 @@ namespace MyFeatures.Controllers
             _itemService = itemService;
         }
 
-        [HttpPost("CommitItemTask")]
-        public async Task<ActionResult> CommitItemTask(CommitItemTaskDto itemTaskDto)
+        [HttpPost("CreateItemAndTask")]
+        //mogao sam i [Route("[action]")] pa iznad [HttpPost], isto je, ali je čišće u jednoj liniji
+        public async Task<ActionResult> CreateItemAndTask(ItemTaskDto itemTaskDto)
         {
-            await _itemService.CommitItemTaskOrReturnToGroup(itemTaskDto.CommitDay, itemTaskDto.ItemTaskId);
+            var itemTaskDomain = itemTaskDto.Adapt<ItemTask>();
+
+            await _itemService.CreateItemAndTask(itemTaskDomain);
 
             return Ok();
         }
 
-        [HttpPost("ReorderItemTaskInsideGroup")]
-        public async Task<ActionResult> ReorderItemTaskInsideGroup(UpdateItemTaskIndexDto updateItemTaskIndexDto)
+        //bez {id} bi morao zvat metodu preko query parametra Get?id=123, 
+        //a sa {id} mogu Get/1
+        [HttpGet("GetItemTaskById/{id}")]
+        public async Task<ActionResult<ItemTaskDto>> GetItemTaskById(int id)
         {
-            await _itemService.ReorderItemTaskInsideGroup(
-                updateItemTaskIndexDto.ItemTaskId,
-                updateItemTaskIndexDto.CommitDay,
-                updateItemTaskIndexDto.NewIndex
-                );
+            var itemTask = await _itemService.GetItemTaskById(id);
+
+            var itemTaskDto = itemTask.Adapt<ItemTaskDto>();
+            return Ok(itemTaskDto);
+        }
+
+        [HttpPut("UpdateItemAndTask/{id}")]
+        public async Task<ActionResult> UpdateItemAndTask(int id, ItemTaskDto itemTaskDto)
+        {
+            var itemTaskDomain = itemTaskDto.Adapt<ItemTask>();
+
+            await _itemService.UpdateItemAndTask(id, itemTaskDomain);
+
+            return Ok();
+        }
+
+        [HttpDelete("DeleteItemAndTasks/{id}")]
+        public async Task<IActionResult> DeleteItemAndTasks(int id)
+        {
+            await _itemService.DeleteItemAndTasks(id);
+            return NoContent();
+        }
+
+        [HttpPost("CompleteItemTask/{itemTaskId}")]
+        public async Task<IActionResult> CompleteItemTask(int itemTaskId)
+        {
+            await _itemService.CompleteItemTask(itemTaskId);
+
+            return Ok();
+        }
+
+        [HttpPost("CommitItemTask")]
+        public async Task<ActionResult> CommitItemTask(CommitItemTaskDto itemTaskDto)
+        {
+            await _itemService.CommitItemTaskOrReturnToGroup(itemTaskDto.CommitDay, itemTaskDto.ItemTaskId);
 
             return Ok();
         }
@@ -45,6 +80,18 @@ namespace MyFeatures.Controllers
                 updateItemIndexDto.ItemId,
                 updateItemIndexDto.NewIndex,
                 updateItemIndexDto.Recurring
+                );
+
+            return Ok();
+        }
+
+        [HttpPost("ReorderItemTaskInsideGroup")]
+        public async Task<ActionResult> ReorderItemTaskInsideGroup(UpdateItemTaskIndexDto updateItemTaskIndexDto)
+        {
+            await _itemService.ReorderItemTaskInsideGroup(
+                updateItemTaskIndexDto.ItemTaskId,
+                updateItemTaskIndexDto.CommitDay,
+                updateItemTaskIndexDto.NewIndex
                 );
 
             return Ok();
@@ -84,53 +131,6 @@ namespace MyFeatures.Controllers
             var itemTasksDto = itemTasks.Adapt<List<ItemTaskDto>>();
 
             return Ok(itemTasksDto);
-        }
-
-        //bez {id} bi morao zvat metodu preko query parametra Get?id=123, 
-        //a sa {id} mogu Get/1
-        [HttpGet("GetItemTask/{id}")]
-        public async Task<ActionResult<ItemTaskDto>> GetItemTask(int id)
-        {
-            var itemTask = await _itemService.GetItemTaskById(id);
-
-            var itemTaskDto = itemTask.Adapt<ItemTaskDto>();
-            return Ok(itemTaskDto);
-        }
-
-        [HttpPost("CreateItemTask")]
-        //mogao sam i [Route("[action]")] pa iznad [HttpPost], isto je, ali je čišće u jednoj liniji
-        public async Task<ActionResult> CreateItemTask(ItemTaskDto itemTaskDto)
-        {
-            var itemTaskDomain = itemTaskDto.Adapt<ItemTask>();
-
-            await _itemService.CreateItem(itemTaskDomain);
-
-            return Ok();
-        }
-
-        [HttpPut("UpdateItemTask/{id}")]
-        public async Task<ActionResult> UpdateItemTask(int id, ItemTaskDto itemTaskDto)
-        {
-            var itemTaskDomain = itemTaskDto.Adapt<ItemTask>();
-
-            await _itemService.UpdateItem(id, itemTaskDomain);
-
-            return Ok();
-        }
-
-        [HttpDelete("DeleteItemTask/{id}")]
-        public async Task<IActionResult> DeleteItemTask(int id)
-        {
-            await _itemService.DeleteItem(id);
-            return NoContent();
-        }
-
-        [HttpPost("CompleteItemTask/{itemTaskId}")]
-        public async Task<IActionResult> CompleteItemTask(int itemTaskId)
-        {
-            await _itemService.CompleteItemTask(itemTaskId);
-
-            return Ok();
         }
 
         [HttpGet("GetCommitedItemsForNextWeek")]

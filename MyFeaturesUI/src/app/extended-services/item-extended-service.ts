@@ -36,7 +36,7 @@ export class ItemExtendedService {
     .pipe(switchMap(() => this.itemService.getCommitedItemsForNextWeek()));
 
   createItem(itemTask: ItemTaskDto) {
-    return this.itemService.createItemTask(itemTask).pipe(
+    return this.itemService.createItemAndTask(itemTask).pipe(
       take(1),
     )
       .subscribe(() => {
@@ -45,7 +45,7 @@ export class ItemExtendedService {
   }
 
   updateItem(itemTask: ItemTaskDto) {
-    return this.itemService.updateItemTask(itemTask.id!, itemTask).pipe(
+    return this.itemService.updateItemAndTask(itemTask.id!, itemTask).pipe(
       take(1),
     )
       .subscribe(() => {
@@ -54,7 +54,7 @@ export class ItemExtendedService {
   }
 
   deleteItem(itemId: number) {
-    return this.itemService.deleteItemTask(itemId).pipe(
+    return this.itemService.deleteItemAndTasks(itemId).pipe(
       take(1),
     )
       .subscribe(() => {

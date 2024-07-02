@@ -19,7 +19,7 @@ export interface ItemTaskDto {
     dueDate?: string | null;
     description?: string | null;
     completionDate?: string | null;
-    rowIndex?: number;
+    rowIndex?: number | null;
     item?: ItemDto;
 }
 
