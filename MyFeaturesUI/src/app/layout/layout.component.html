@@ -1,4 +1,21 @@
-<div class="topbar"></div>
+<p-toolbar>
+  <div class="p-toolbar-group-left">My Features App</div>
+  <div class="p-toolbar-group-right">
+    <p-menu #menu [model]="items" [popup]="true"></p-menu>
+    <button
+      pButton
+      class="p-button-info"
+      type="button"
+      (click)="menu.toggle($event)"
+    >
+      <i class="pi pi-globe" style="margin-right: 0.5em"></i>
+      {{ selectedLanguage.label }}
+    </button>
+  </div>
+</p-toolbar>
+
+<!-- zakomentiran custom topbar -->
+<!-- <div class="topbar"></div> -->
 
 <!-- zakomentiran sidebar -->
 <!-- <div class="sidebar"></div> -->
@@ -10,8 +27,8 @@
   <!-- margine moraju bit udaljene za visinu i širinu topbar i sidebar, pusha se od flexa
        a ne od topbara, pa se ne collapsa margin -->
   <!-- padding sa svih strana malo odmakne main prema unutra -->
-  <!-- margin-left: 7rem; vratit ako koristim sidebar -->
-  <main style="margin-top: 7rem; width: 100%; padding: 1rem">
+  <!--margin-top: 7rem; margin-left: 7rem; vratit ako koristim sidebar -->
+  <main style="width: 100%; padding: 1rem">
     <router-outlet></router-outlet>
   </main>
 </div>

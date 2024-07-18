@@ -1,0 +1,79 @@
+<div pDroppable="true" (drop)="onDrop($event, isRecurring)">
+  <p-table
+    [value]="items"
+    [columns]="columns"
+    [rowHover]="true"
+    dataKey="id"
+    (onRowReorder)="onRowReorder($event)"
+  >
+    <ng-template pTemplate="caption">
+      <div
+        class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
+      >
+        <h5 class="m-0">{{ title | translate }}</h5>
+        <button
+          pButton
+          [icon]="itemsOrderLocked ? 'pi pi-lock' : 'pi pi-lock-open'"
+          class="p-button-rounded mr-2"
+          [ngClass]="{
+            'p-button-success': itemsOrderLocked,
+            'p-button-warning': !itemsOrderLocked
+          }"
+          (click)="lockOrUnlockTableOrder(isRecurring)"
+        ></button>
+      </div>
+    </ng-template>
+    <ng-template
+      pTemplate="body"
+      let-rowData
+      let-columns="columns"
+      let-index="rowIndex"
+    >
+      <tr
+        [ngClass]="{
+          'cursor-pointer': currentDay && itemsOrderLocked,
+          'row-background-color':
+            rowData.committedDate !== null && rowData.dueDate === null,
+          'disable-row-reorder': rowData.dueDate !== null
+        }"
+        [pReorderableRow]="index"
+        (dragstart)="onDragStart($event, rowData, index)"
+        (click)="assignItemToSelectedWeekday(rowData)"
+      >
+        <td class="w-2rem">
+          <span
+            *ngIf="!itemsOrderLocked && !rowData.dueDate"
+            class="pi pi-bars"
+            pReorderableRowHandle
+          ></span>
+        </td>
+        <td *ngFor="let col of columns" [ngStyle]="{ 'text-align': col.align }">
+          <span>{{ rowData[col.field] }}</span>
+        </td>
+        <td class="w-8rem">
+          <div class="flex justify-content-end">
+            <button
+              *ngIf="!isRecurring"
+              pButton
+              icon="pi pi-check"
+              class="p-button-rounded p-button-info mr-2"
+              (click)="completeItem(rowData)"
+            ></button>
+            <button
+              pButton
+              icon="pi pi-pencil"
+              class="p-button-rounded p-button-success mr-2"
+              (click)="editItem(rowData)"
+            ></button>
+            <button
+              pButton
+              icon="pi pi-trash"
+              class="p-button-rounded p-button-warning"
+              (click)="deleteItem(rowData)"
+            ></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

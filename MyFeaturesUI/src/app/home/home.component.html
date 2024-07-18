@@ -28,180 +28,30 @@
         [(ngModel)]="currentDay"
         optionLabel="name"
         optionValue="value"
-        (onChange)="onDayChange($event)"
       >
       </p-selectButton>
     </p-toolbar>
 
     <div class="grid">
       <div class="col-6">
-        <div pDroppable="true" (drop)="onDrop($event, false)">
-          <p-table
-            [value]="(oneTimeItems$ | async)!"
-            [columns]="cols"
-            [rowHover]="true"
-            dataKey="id"
-            (onRowReorder)="onRowReorder($event)"
-          >
-            <ng-template pTemplate="caption">
-              <div
-                class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
-              >
-                <h5 class="m-0">Jednokratni</h5>
-                <button
-                  pButton
-                  [icon]="
-                    (oneTimeItemsOrderLocked$ | async)!
-                      ? 'pi pi-lock'
-                      : 'pi pi-lock-open'
-                  "
-                  class="p-button-rounded mr-2"
-                  [ngClass]="{
-                    'p-button-success': (oneTimeItemsOrderLocked$ | async),
-                    'p-button-warning': !(oneTimeItemsOrderLocked$ | async)
-                  }"
-                  (click)="lockOrUnlockTableOrder(itemTaskType.OneTimeItemTask)"
-                ></button>
-              </div>
-            </ng-template>
-            <ng-template
-              pTemplate="body"
-              let-rowData
-              let-columns="columns"
-              let-index="rowIndex"
-            >
-              <tr
-                [ngClass]="{
-                  'cursor-pointer':
-                    currentDay && (oneTimeItemsOrderLocked$ | async),
-                  'row-background-color':
-                    rowData.committedDate !== null && rowData.dueDate === null,
-                  'disable-row-reorder': rowData.dueDate !== null
-                }"
-                [pReorderableRow]="index"
-                (dragstart)="onDragStart($event, rowData, index)"
-                (click)="assignItemToSelectedWeekday(rowData, currentDay!)"
-              >
-                <td class="w-2rem">
-                  @if (!(oneTimeItemsOrderLocked$ | async) && !rowData.dueDate)
-                  {
-                  <span class="pi pi-bars" pReorderableRowHandle></span>
-                  }
-                </td>
-                @for (col of columns; track col) {
-                <td [ngStyle]="{ 'text-align': col.align }">
-                  <span>{{ rowData[col.field] }}</span>
-                </td>
-                }
-                <td class="w-8rem">
-                  <div class="flex justify-content-end">
-                    <button
-                      pButton
-                      icon="pi pi-check"
-                      class="p-button-rounded p-button-info mr-2"
-                      (click)="completeItem(rowData)"
-                    ></button>
-                    <button
-                      pButton
-                      icon="pi pi-pencil"
-                      class="p-button-rounded p-button-success mr-2"
-                      (click)="editItem(rowData)"
-                    ></button>
-                    <button
-                      pButton
-                      icon="pi pi-trash"
-                      class="p-button-rounded p-button-warning"
-                      (click)="deleteItem(rowData)"
-                    ></button>
-                  </div>
-                </td>
-              </tr>
-            </ng-template>
-          </p-table>
-        </div>
+        <app-active-item-tasks-table
+          [items]="(oneTimeItems$ | async)!"
+          [columns]="cols"
+          [(currentDay)]="currentDay"
+          [itemsOrderLocked]="(oneTimeItemsOrderLocked$ | async)!"
+          title="home.oneTime"
+          [isRecurring]="false"
+        ></app-active-item-tasks-table>
       </div>
-
       <div class="col-6">
-        <div pDroppable="true" (drop)="onDrop($event, true)">
-          <p-table
-            [value]="(recurringItems$ | async)!"
-            [columns]="cols"
-            [rowHover]="true"
-            dataKey="id"
-            (onRowReorder)="onRowReorder($event)"
-          >
-            <ng-template pTemplate="caption">
-              <div
-                class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
-              >
-                <h5 class="m-0">Ponavljajući</h5>
-                <button
-                  pButton
-                  [icon]="
-                    (recurringItemsOrderLocked$ | async)!
-                      ? 'pi pi-lock'
-                      : 'pi pi-lock-open'
-                  "
-                  class="p-button-rounded mr-2"
-                  [ngClass]="{
-                    'p-button-success': (recurringItemsOrderLocked$ | async),
-                    'p-button-warning': !(recurringItemsOrderLocked$ | async)
-                  }"
-                  (click)="
-                    lockOrUnlockTableOrder(itemTaskType.RecurringItemTask)
-                  "
-                ></button>
-              </div>
-            </ng-template>
-            <ng-template
-              pTemplate="body"
-              let-rowData
-              let-columns="columns"
-              let-index="rowIndex"
-            >
-              <tr
-                [ngClass]="{
-                  'cursor-pointer':
-                    currentDay && (recurringItemsOrderLocked$ | async),
-                  'row-background-color':
-                    rowData.committedDate !== null && rowData.dueDate === null,
-                  'disable-row-reorder': rowData.dueDate !== null
-                }"
-                [pReorderableRow]="index"
-                (dragstart)="onDragStart($event, rowData, index)"
-                (click)="assignItemToSelectedWeekday(rowData, currentDay!)"
-              >
-                <td class="w-2rem">
-                  @if (!(recurringItemsOrderLocked$ | async) &&
-                  !rowData.dueDate) {
-                  <span class="pi pi-bars" pReorderableRowHandle></span>
-                  }
-                </td>
-                @for (col of columns; track col) {
-                <td [ngStyle]="{ 'text-align': col.align }">
-                  <span>{{ rowData[col.field] }}</span>
-                </td>
-                }
-                <td class="w-8rem">
-                  <div class="flex justify-content-end">
-                    <button
-                      pButton
-                      icon="pi pi-pencil"
-                      class="p-button-rounded p-button-success mr-2"
-                      (click)="editItem(rowData)"
-                    ></button>
-                    <button
-                      pButton
-                      icon="pi pi-trash"
-                      class="p-button-rounded p-button-warning"
-                      (click)="deleteItem(rowData)"
-                    ></button>
-                  </div>
-                </td>
-              </tr>
-            </ng-template>
-          </p-table>
-        </div>
+        <app-active-item-tasks-table
+          [items]="(recurringItems$ | async)!"
+          [columns]="cols"
+          [(currentDay)]="currentDay"
+          [itemsOrderLocked]="(recurringItemsOrderLocked$ | async)!"
+          title="home.recurring"
+          [isRecurring]="true"
+        ></app-active-item-tasks-table>
       </div>
     </div>
 
@@ -209,7 +59,7 @@
 
     <button
       pButton
-      label="Novi Notepad"
+      [label]="'home.newNotepad' | translate"
       icon="pi pi-plus"
       class="p-button-info mr-2"
       (click)="createNewNotepad()"
