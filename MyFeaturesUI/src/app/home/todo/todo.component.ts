@@ -1,5 +1,6 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, Input, ViewChild, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, inject } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { DragDropModule } from 'primeng/dragdrop';
@@ -7,10 +8,10 @@ import { DialogService } from 'primeng/dynamicdialog';
 import { TableModule } from 'primeng/table';
 import { Observable } from 'rxjs';
 import { ItemTaskDto } from '../../../infrastructure';
-import { DescriptionType } from '../../enum/description-type.enum';
 import { ItemExtendedService } from '../../extended-services/item-extended-service';
+import { APPLICATION_JSON } from '../../shared/constants';
+import { DescriptionType } from '../../shared/enum/description-type.enum';
 import { EditItemDialogComponent } from '../edit-item-dialog/edit-item-dialog.component';
-import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-todo',
@@ -47,7 +48,7 @@ export class TodoComponent {
 
     // Use the dataTransfer.setData() method to set the data to be transferred
     // "application/json" is used as a type identifier to signify the type of data being transferred
-    event.dataTransfer?.setData('application/json', data);
+    event.dataTransfer?.setData(APPLICATION_JSON, data);
 
     this.originalIndex = index;
   }
@@ -74,7 +75,7 @@ export class TodoComponent {
     //moramo ovdje stavit false inače bi ostao border
     this.isDragOver = false;
 
-    const data = event.dataTransfer?.getData('application/json');
+    const data = event.dataTransfer?.getData(APPLICATION_JSON);
     const rowData = JSON.parse(data!);
 
     //null je kad dropam item al nije promjenio poziciju ili ga pomičem na drugi dan#

@@ -7,8 +7,9 @@ import { DialogService } from 'primeng/dynamicdialog';
 import { TableModule } from 'primeng/table';
 import { filter, take, tap } from 'rxjs';
 import { ItemDto, ItemTaskDto } from '../../../infrastructure';
-import { DescriptionType } from '../../enum/description-type.enum';
 import { ItemExtendedService } from '../../extended-services/item-extended-service';
+import { APPLICATION_JSON } from '../../shared/constants';
+import { DescriptionType } from '../../shared/enum/description-type.enum';
 import { EditItemDialogComponent } from '../edit-item-dialog/edit-item-dialog.component';
 
 @Component({
@@ -50,7 +51,7 @@ export class ActiveItemTasksTableComponent {
 
     // Use the dataTransfer.setData() method to set the data to be transferred
     // "application/json" is used as a type identifier to signify the type of data being transferred
-    event.dataTransfer?.setData('application/json', data);
+    event.dataTransfer?.setData(APPLICATION_JSON, data);
 
     this.originalIndex = index;
   }
@@ -58,7 +59,7 @@ export class ActiveItemTasksTableComponent {
   onDrop(event: DragEvent, recurring: boolean) {
     event.preventDefault(); //just in case ako neki browser ne dopušta
 
-    const data = event.dataTransfer?.getData('application/json');
+    const data = event.dataTransfer?.getData(APPLICATION_JSON);
     const rowData = JSON.parse(data!);
 
     //null je kad dropam item al nije promjenio poziciju ili ga pomičem na drugi dan#

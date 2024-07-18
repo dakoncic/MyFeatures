@@ -92,7 +92,7 @@ export class ItemExtendedService {
       recurring: recurring,
     };
 
-    return this.itemService.reorderItemInsideGroup(updatedItemIndex).pipe(
+    this.itemService.reorderItemInsideGroup(updatedItemIndex).pipe(
       take(1),
     )
       .subscribe(() => {
@@ -111,7 +111,7 @@ export class ItemExtendedService {
       newIndex: newIndex
     };
 
-    return this.itemService.reorderItemTaskInsideGroup(updatedItemTaskIndex).pipe(
+    this.itemService.reorderItemTaskInsideGroup(updatedItemTaskIndex).pipe(
       take(1),
     )
       .subscribe(() => {

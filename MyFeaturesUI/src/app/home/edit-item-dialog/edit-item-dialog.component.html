@@ -2,9 +2,9 @@
   <div class="field flex flex-column">
     <label for="description">* {{ "editItem.description" | translate }}</label>
     <input
+      id="description"
       type="text"
       pInputText
-      id="name"
       formControlName="description"
       autofocus
     />
@@ -19,12 +19,19 @@
   <div class="field">
     <label for="recurring">* {{ "editItem.taskType" | translate }} </label>
     <p-selectButton
+      id="recurring"
       [options]="stateOptions"
       formControlName="recurring"
       optionLabel="label"
       optionValue="value"
     >
     </p-selectButton>
+    @if ( this.form.get('recurring')?.invalid &&
+    this.form.get('recurring')?.dirty) {
+    <small class="ng-dirty ng-invalid">
+      {{ "editItem.recurring.required" | translate }}
+    </small>
+    }
   </div>
 
   <div class="field">
@@ -32,6 +39,7 @@
       >{{ "editItem.dueDate" | translate }}
     </label>
     <p-calendar
+      id="dueDate"
       formControlName="dueDate"
       [showButtonBar]="true"
       dateFormat="dd/mm/yy"
@@ -39,8 +47,11 @@
   </div>
 
   <div class="field">
-    <label for="recurring">{{ "editItem.renewOnDueDate" | translate }} </label>
+    <label for="renewOnDueDate"
+      >{{ "editItem.renewOnDueDate" | translate }}
+    </label>
     <p-selectButton
+      id="renewOnDueDate"
       [options]="renewOptions"
       formControlName="renewOnDueDate"
       optionLabel="label"
@@ -56,9 +67,9 @@
           name="intervalType"
           [value]="intervalType.Days"
           formControlName="intervalType"
-          inputId="ingredient1"
+          inputId="days"
         />
-        <label for="ingredient1" class="ml-2">
+        <label for="days" class="ml-2">
           {{ "editItem.days" | translate }}
         </label>
       </div>
@@ -68,9 +79,9 @@
           name="intervalType"
           [value]="intervalType.Months"
           formControlName="intervalType"
-          inputId="ingredient2"
+          inputId="months"
         />
-        <label for="ingredient2" class="ml-2">
+        <label for="months" class="ml-2">
           {{ "editItem.months" | translate }}
         </label>
       </div>
@@ -81,7 +92,8 @@
     <label class="w-full" for="intervalValue"
       >{{ "editItem.intervalValue" | translate }}
     </label>
-    <p-inputNumber formControlName="intervalValue"> </p-inputNumber>
+    <p-inputNumber id="intervalValue" formControlName="intervalValue">
+    </p-inputNumber>
   </div>
 </form>
 

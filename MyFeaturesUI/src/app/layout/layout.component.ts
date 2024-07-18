@@ -7,7 +7,7 @@ import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { MenuModule } from 'primeng/menu';
 import { ToolbarModule } from 'primeng/toolbar';
-import { LanguageService } from '../../services/language-service';
+import { LanguageService } from '../shared/services/language-service';
 
 @Component({
   selector: 'app-layout',

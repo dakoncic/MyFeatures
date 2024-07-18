@@ -14,6 +14,7 @@
   "editItem.intervalValue": "Broj dana/mjeseci između svakog taska",
   "editItem.oneTime": "Jednokratni",
   "editItem.recurring": "Ponavljajući",
+  "editItem.recurring.required": "Tip zadatka je obavezan.",
   "editItem.onDueDate": "Na krajnji rok",
   "editItem.onCompletionDate": "Na datum izvršenja",
 

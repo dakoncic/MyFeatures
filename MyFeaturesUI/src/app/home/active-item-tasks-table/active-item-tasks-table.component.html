@@ -32,7 +32,7 @@
       <tr
         [ngClass]="{
           'cursor-pointer': currentDay && itemsOrderLocked,
-          'row-background-color':
+          'committed-background-color':
             rowData.committedDate !== null && rowData.dueDate === null,
           'disable-row-reorder': rowData.dueDate !== null
         }"
@@ -41,24 +41,25 @@
         (click)="assignItemToSelectedWeekday(rowData)"
       >
         <td class="w-2rem">
-          <span
-            *ngIf="!itemsOrderLocked && !rowData.dueDate"
-            class="pi pi-bars"
-            pReorderableRowHandle
-          ></span>
+          @if (!itemsOrderLocked && !rowData.dueDate) {
+          <span class="pi pi-bars" pReorderableRowHandle></span>
+          }
         </td>
-        <td *ngFor="let col of columns" [ngStyle]="{ 'text-align': col.align }">
+        @for (col of columns; track col) {
+        <td [ngStyle]="{ 'text-align': col.align }">
           <span>{{ rowData[col.field] }}</span>
         </td>
+        }
         <td class="w-8rem">
           <div class="flex justify-content-end">
+            @if (!isRecurring) {
             <button
-              *ngIf="!isRecurring"
               pButton
               icon="pi pi-check"
               class="p-button-rounded p-button-info mr-2"
               (click)="completeItem(rowData)"
             ></button>
+            }
             <button
               pButton
               icon="pi pi-pencil"

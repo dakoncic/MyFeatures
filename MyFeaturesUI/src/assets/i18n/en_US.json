@@ -14,6 +14,7 @@
   "editItem.intervalValue": "Number of days/months between each task",
   "editItem.oneTime": "One time",
   "editItem.recurring": "Recurring",
+  "editItem.recurring.required": "Task type is required.",
   "editItem.onDueDate": "On due date",
   "editItem.onCompletionDate": "On completion date",
 
