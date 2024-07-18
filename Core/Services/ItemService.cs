@@ -52,6 +52,7 @@ namespace Core.Services
 
             await _context.SaveChangesAsync();
         }
+
         public async Task<ItemTask> GetItemTaskById(int itemTaskId)
         {
             var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId, "Item");
@@ -62,6 +63,7 @@ namespace Core.Services
 
             return itemTaskEntity.Adapt<ItemTask>();
         }
+
         public async Task UpdateItemAndTask(int itemTaskId, ItemTask itemTaskDomain)
         {
             var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId, "Item");
@@ -85,6 +87,7 @@ namespace Core.Services
             updatedItemTask.Adapt(itemTaskEntity);
             await _context.SaveChangesAsync();
         }
+
         private async Task HandleDueDateChange(Entity.ItemTask itemTaskEntity, ItemTask updatedItemTask, DateTime? oldCommittedDate, DateTime? newDueDate)
         {
             updatedItemTask.CommittedDate = newDueDate?.Date;
@@ -102,6 +105,7 @@ namespace Core.Services
                 await GetNewItemRowIndex(updatedItemTask);
             }
         }
+
         public async Task DeleteItemAndTasks(int itemId)
         {
             var itemEntity = await _itemRepository.GetByIdAsync(itemId, "ItemTasks");
@@ -123,6 +127,7 @@ namespace Core.Services
 
             await _context.SaveChangesAsync();
         }
+
         public async Task CompleteItemTask(int itemTaskId)
         {
             var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemTaskId, "Item");
@@ -195,6 +200,7 @@ namespace Core.Services
 
             await _context.SaveChangesAsync();
         }
+
         public async Task ReorderItemInsideGroup(int itemId, int newIndex, bool recurring)
         {
             var itemEntity = await _itemRepository.GetByIdAsync(itemId);
@@ -217,6 +223,7 @@ namespace Core.Services
 
             await _context.SaveChangesAsync();
         }
+
         public async Task ReorderItemTaskInsideGroup(int itemId, DateTime commitDate, int newIndex)
         {
             var itemTaskEntity = await _itemTaskRepository.GetByIdAsync(itemId);
@@ -241,6 +248,7 @@ namespace Core.Services
 
             await _context.SaveChangesAsync();
         }
+
         public async Task<List<ItemTask>> GetActiveItemTasks(bool recurring, bool includeWeekdaysCommitted)
         {
             //ako je sort mode, onda prikaži sve trenutačno aktivne
@@ -264,6 +272,7 @@ namespace Core.Services
 
             return itemTasksEntity.Adapt<List<ItemTask>>();
         }
+
         public async Task<Dictionary<DateTime, List<Entity.ItemTask>>> GetCommitedItemsForNextWeek()
         {
             await UpdateExpiredItemTasks();
@@ -272,6 +281,7 @@ namespace Core.Services
 
             return itemTasksEntity;
         }
+
         private async Task UpdateExpiredItemTasks()
         {
             var today = DateTime.Now.Date;
@@ -299,6 +309,7 @@ namespace Core.Services
                 }
             }
         }
+
         private async Task<Dictionary<DateTime, List<Entity.ItemTask>>> GetItemTasksGroupedByCommitDateForNextWeek()
         {
             var today = DateTime.Now.Date;
@@ -330,6 +341,7 @@ namespace Core.Services
 
             return groupedItemTasksEntity;
         }
+
         private async Task GetNewItemRowIndex(ItemTask itemTaskDomain)
         {
             var maxRowIndexItemEntity = await _itemRepository.GetFirstOrDefaultAsync(
@@ -341,6 +353,7 @@ namespace Core.Services
 
             itemTaskDomain.Item.RowIndex = maxRowIndexItemEntity != null ? maxRowIndexItemEntity.RowIndex + 1 : 0;
         }
+
         private async Task<int> GetNewItemTaskRowIndex(DateTime? compareDate)
         {
             var maxRowIndexItemEntity = await _itemTaskRepository.GetFirstOrDefaultAsync(
@@ -355,6 +368,7 @@ namespace Core.Services
             int newRowIndex = maxRowIndexItemEntity != null ? maxRowIndexItemEntity.RowIndex!.Value + 1 : 0;
             return newRowIndex;
         }
+
         private async Task UpdateRowIndexesForRemainingItems(Entity.Item itemEntity)
         {
             await _itemRepository.UpdateBatchAsync(
@@ -364,6 +378,7 @@ namespace Core.Services
                 x => new Entity.Item { RowIndex = x.RowIndex - 1 }
             );
         }
+
         private async Task UpdateItemTaskRowIndexesIfDateProvided(DateTime? oldCommittedDate, int? oldItemTaskRowIndex)
         {
             await _itemTaskRepository.UpdateBatchAsync(
