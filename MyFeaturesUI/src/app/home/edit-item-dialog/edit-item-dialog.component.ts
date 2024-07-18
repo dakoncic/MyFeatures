@@ -12,6 +12,7 @@ import { Subject, combineLatest, take, takeUntil } from 'rxjs';
 import { IntervalType, ItemService, ItemTaskDto } from '../../../infrastructure';
 import { DescriptionType } from '../../enum/description-type.enum';
 import { ItemExtendedService } from '../../extended-services/item-extended-service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-edit-item-dialog',
@@ -25,7 +26,8 @@ import { ItemExtendedService } from '../../extended-services/item-extended-servi
     SelectButtonModule,
     InputTextModule,
     FormsModule,
-    RadioButtonModule
+    RadioButtonModule,
+    TranslateModule
   ],
   templateUrl: './edit-item-dialog.component.html',
   styleUrl: './edit-item-dialog.component.scss',
@@ -34,19 +36,26 @@ import { ItemExtendedService } from '../../extended-services/item-extended-servi
 export class EditItemDialogComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
-  itemTask: ItemTaskDto = {}; //trenutno selektiran
-  stateOptions: any[] = [{ label: 'Jednokratni', value: false }, { label: 'Ponavljajući', value: true }];
-
-  renewOptions: any[] = [{ label: 'Na krajnji rok', value: true }, { label: 'Na datum izvršenja', value: false }];
-  descriptionType!: DescriptionType;
-  ingredient!: string;
-
   form!: FormGroup;
   private formBuilder = inject(FormBuilder);
   private ref = inject(DynamicDialogRef);
   private config = inject(DynamicDialogConfig);
   private itemService = inject(ItemService);
   private itemExtendedService = inject(ItemExtendedService);
+  private translate = inject(TranslateService);
+
+  itemTask: ItemTaskDto = {}; //trenutno selektiran
+  stateOptions: any[] = [
+    { label: this.translate.instant('editItem.oneTime'), value: false },
+    { label: this.translate.instant('editItem.recurring'), value: true }
+  ];
+
+  renewOptions: any[] = [
+    { label: this.translate.instant('editItem.onDueDate'), value: true },
+    { label: this.translate.instant('editItem.onCompletionDate'), value: false }
+  ];
+  descriptionType!: DescriptionType;
+  ingredient!: string;
 
   intervalType = IntervalType;
 

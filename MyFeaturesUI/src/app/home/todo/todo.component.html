@@ -35,7 +35,6 @@ p-draggable-enter - kada draggable uđe u droppable zonu, onda div poprimi ovu k
         [pReorderableRow]="index"
         pDraggable="true"
         (dragstart)="onDragStart($event, rowData, index)"
-        (onDragEnd)="dragEnd()"
       >
         <td class="w-2rem">
           <span class="pi pi-bars" pReorderableRowHandle></span>

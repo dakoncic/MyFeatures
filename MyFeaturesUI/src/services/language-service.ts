@@ -23,9 +23,10 @@ export class LanguageService {
   }
 
   setLanguage(lang: string) {
-    console.log('set language: ' + lang);
     this.storage.setItem(this.languageStorageKey, lang);
     this.translate.use(lang);
+
+    window.location.reload();
   }
 
   getActiveLanguage() {

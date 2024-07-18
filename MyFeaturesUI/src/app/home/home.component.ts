@@ -114,9 +114,12 @@ export class HomeComponent implements OnInit {
         const updates = [];
         for (let i = 0; i < weekData.length; i++) {
           let dateToAdd = addDays(new Date(), i);
+
+          let dayNameInEnglish = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(dateToAdd);
+
           let dayName = i === 0
-            ? new Intl.DateTimeFormat('hr-HR', { weekday: 'long' }).format(dateToAdd) + ' (danas)'
-            : new Intl.DateTimeFormat('hr-HR', { weekday: 'long' }).format(dateToAdd);
+            ? this.translate.instant(dayNameInEnglish) + ' (' + this.translate.instant('today') + ')'
+            : this.translate.instant(dayNameInEnglish);
 
           let localDateStr = dateToAdd.toLocaleDateString('en-CA', {
             year: 'numeric', month: '2-digit', day: '2-digit'
@@ -128,8 +131,8 @@ export class HomeComponent implements OnInit {
           });
         }
 
-        //samo push modificira array ali se ne mijenja referenca što ne okine change detection
-        //moram koristit spread syntax da napravi novu referencu#
+        // samo push modificira array ali se ne mijenja referenca što ne okine change detection
+        // moram koristit spread syntax da napravi novu referencu
         this.weekdays = [...updates];
       });
   }

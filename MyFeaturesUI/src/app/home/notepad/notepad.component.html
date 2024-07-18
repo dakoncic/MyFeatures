@@ -9,7 +9,7 @@
   <div class="flex mt-3">
     <button
       pButton
-      label="Spremi Notepad"
+      [label]="'notepad.save' | translate"
       icon="pi pi-save"
       class="p-button-success mr-2"
       (click)="saveNotepad()"
@@ -17,7 +17,7 @@
     ></button>
     <button
       pButton
-      label="Obriši Notepad"
+      [label]="'notepad.delete' | translate"
       icon="pi pi-trash"
       class="p-button-danger mr-2"
       (click)="deleteNotepad()"

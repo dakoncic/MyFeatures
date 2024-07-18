@@ -1,5 +1,36 @@
 {
   "home.newNotepad": "Novi Notepad",
   "home.oneTime": "Jednokratni",
-  "home.recurring": "Ponavljajući"
+  "home.recurring": "Ponavljajući",
+  "home.newTask": "Novi Task",
+
+  "editItem.description": "Opis",
+  "editItem.description.required": "Opis je obavezan.",
+  "editItem.taskType": "Tip zadatka",
+  "editItem.dueDate": "Krajnji rok",
+  "editItem.renewOnDueDate": "Automatsko kreiranje novog taska po završetku",
+  "editItem.days": "Dani",
+  "editItem.months": "Mjeseci",
+  "editItem.intervalValue": "Broj dana/mjeseci između svakog taska",
+  "editItem.oneTime": "Jednokratni",
+  "editItem.recurring": "Ponavljajući",
+  "editItem.onDueDate": "Na krajnji rok",
+  "editItem.onCompletionDate": "Na datum izvršenja",
+
+  "deleteConfirmation": "Potvrda brisanja",
+  "confirm": "Potvrdi",
+  "cancel": "Odustani",
+  "save": "Save",
+
+  "notepad.save": "Spremi Notepad",
+  "notepad.delete": "Obriši Notepad",
+
+  "Monday": "Ponedjeljak",
+  "Tuesday": "Utorak",
+  "Wednesday": "Srijeda",
+  "Thursday": "Četvrtak",
+  "Friday": "Petak",
+  "Saturday": "Subota",
+  "Sunday": "Nedjelja",
+  "today": "danas"
 }

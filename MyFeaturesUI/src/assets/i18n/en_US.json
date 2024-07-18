@@ -1,5 +1,27 @@
 {
   "home.newNotepad": "New Notepad",
   "home.oneTime": "One Time",
-  "home.recurring": "Recurring"
+  "home.recurring": "Recurring",
+  "home.newTask": "New Task",
+
+  "editItem.description": "Description",
+  "editItem.description.required": "Description is required.",
+  "editItem.taskType": "Task type",
+  "editItem.dueDate": "Due date",
+  "editItem.renewOnDueDate": "Automatic creation of new task upon completion",
+  "editItem.days": "Days",
+  "editItem.months": "Months",
+  "editItem.intervalValue": "Number of days/months between each task",
+  "editItem.oneTime": "One time",
+  "editItem.recurring": "Recurring",
+  "editItem.onDueDate": "On due date",
+  "editItem.onCompletionDate": "On completion date",
+
+  "deleteConfirmation": "Delete confirmation",
+  "confirm": "Confirm",
+  "cancel": "Cancel",
+  "save": "Save",
+
+  "notepad.save": "Save Notepad",
+  "notepad.delete": "Delete Notepad"
 }

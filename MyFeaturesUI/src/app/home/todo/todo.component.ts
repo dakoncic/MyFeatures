@@ -10,6 +10,7 @@ import { ItemTaskDto } from '../../../infrastructure';
 import { DescriptionType } from '../../enum/description-type.enum';
 import { ItemExtendedService } from '../../extended-services/item-extended-service';
 import { EditItemDialogComponent } from '../edit-item-dialog/edit-item-dialog.component';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-todo',
@@ -26,11 +27,11 @@ import { EditItemDialogComponent } from '../edit-item-dialog/edit-item-dialog.co
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TodoComponent {
-  @ViewChild('dropZoneRef') dropZoneRef!: ElementRef;
   private confirmationService = inject(ConfirmationService);
   private itemExtendedService = inject(ItemExtendedService);
   private dialogService = inject(DialogService);
   private datePipe = inject(DatePipe);
+  private translate = inject(TranslateService);
 
   @Input() items$!: Observable<any[]>;
   @Input() weekDayDate!: string;
@@ -49,11 +50,6 @@ export class TodoComponent {
     event.dataTransfer?.setData('application/json', data);
 
     this.originalIndex = index;
-  }
-
-  //ovo mi ne treba
-  dragEnd() {
-    //console.log('drag end happening');
   }
 
   onDragOver(event: DragEvent) {
@@ -115,7 +111,7 @@ export class TodoComponent {
     today.setHours(0, 0, 0, 0);
 
     const optionsWeekday: Intl.DateTimeFormatOptions = { weekday: 'long' };
-    const formattedWeekday = dueDate.toLocaleDateString('hr-HR', optionsWeekday);
+    const formattedWeekday = this.translate.instant(dueDate.toLocaleDateString('en-US', optionsWeekday));
 
     // Manually format the date to avoid extra spaces and exclude the year
     const day = ('0' + dueDate.getDate()).slice(-2);
@@ -123,7 +119,7 @@ export class TodoComponent {
     const formattedDate = `${day}.${month}.`;
 
     if (dueDate.getTime() === today.getTime()) {
-      return `${formattedWeekday}, ${formattedDate} (danas)`;
+      return `${formattedWeekday}, ${formattedDate} (${this.translate.instant('today')})`;
     } else {
       return `${formattedWeekday}, ${formattedDate}`;
     }
@@ -138,8 +134,7 @@ export class TodoComponent {
       data: {
         descriptionType: DescriptionType.TaskItemDescription,
         itemTask: itemTask
-      },
-      //header: this.translate.instant('measurement.dialog.manualChannels')
+      }
     });
   }
 
@@ -149,9 +144,9 @@ export class TodoComponent {
 
   deleteItem(itemTask: ItemTaskDto) {
     this.confirmationService.confirm({
-      header: 'Potvrda brisanja',
-      acceptLabel: 'Potvrdi',
-      rejectLabel: 'Odustani',
+      header: this.translate.instant('deleteConfirmation'),
+      acceptLabel: this.translate.instant('confirm'),
+      rejectLabel: this.translate.instant('cancel'),
       accept: () => {
         this.itemExtendedService.deleteItem(itemTask.item!.id!);
       }

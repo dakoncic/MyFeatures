@@ -1,6 +1,6 @@
 <form [formGroup]="form" style="height: 500px">
   <div class="field flex flex-column">
-    <label for="description">* Opis</label>
+    <label for="description">* {{ "editItem.description" | translate }}</label>
     <input
       type="text"
       pInputText
@@ -10,12 +10,14 @@
     />
     @if ( this.form.get('description')?.invalid &&
     this.form.get('description')?.dirty) {
-    <small class="ng-dirty ng-invalid"> Opis je obavezan. </small>
+    <small class="ng-dirty ng-invalid">
+      {{ "editItem.description.required" | translate }}
+    </small>
     }
   </div>
 
   <div class="field">
-    <label for="recurring">* Tip taska</label>
+    <label for="recurring">* {{ "editItem.taskType" | translate }} </label>
     <p-selectButton
       [options]="stateOptions"
       formControlName="recurring"
@@ -26,7 +28,9 @@
   </div>
 
   <div class="field">
-    <label class="w-full" for="dueDate">Krajnji rok </label>
+    <label class="w-full" for="dueDate"
+      >{{ "editItem.dueDate" | translate }}
+    </label>
     <p-calendar
       formControlName="dueDate"
       [showButtonBar]="true"
@@ -35,7 +39,7 @@
   </div>
 
   <div class="field">
-    <label for="recurring">Automatsko kreiranje novog taska po završetku</label>
+    <label for="recurring">{{ "editItem.renewOnDueDate" | translate }} </label>
     <p-selectButton
       [options]="renewOptions"
       formControlName="renewOnDueDate"
@@ -54,7 +58,9 @@
           formControlName="intervalType"
           inputId="ingredient1"
         />
-        <label for="ingredient1" class="ml-2"> Dani </label>
+        <label for="ingredient1" class="ml-2">
+          {{ "editItem.days" | translate }}
+        </label>
       </div>
 
       <div class="flex align-items-center">
@@ -64,14 +70,16 @@
           formControlName="intervalType"
           inputId="ingredient2"
         />
-        <label for="ingredient2" class="ml-2"> Mjeseci </label>
+        <label for="ingredient2" class="ml-2">
+          {{ "editItem.months" | translate }}
+        </label>
       </div>
     </div>
   </div>
 
   <div class="field">
     <label class="w-full" for="intervalValue"
-      >Broj dana/mjeseci između svakog taska
+      >{{ "editItem.intervalValue" | translate }}
     </label>
     <p-inputNumber formControlName="intervalValue"> </p-inputNumber>
   </div>
@@ -79,7 +87,7 @@
 
 <button
   pButton
-  label="Odustani"
+  [label]="'cancel' | translate"
   icon="pi pi-times"
   class="p-button-text"
   (click)="hideDialog()"
@@ -87,7 +95,7 @@
 <button
   pButton
   [disabled]="form.invalid"
-  label="Spremi"
+  [label]="'save' | translate"
   icon="pi pi-check"
   class="p-button-text"
   (click)="saveItem()"

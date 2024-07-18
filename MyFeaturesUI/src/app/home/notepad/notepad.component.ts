@@ -9,6 +9,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { Subject, takeUntil } from 'rxjs';
 import { NotepadDto } from '../../../infrastructure';
 import { NotepadExtendedService } from '../../extended-services/notepad-extended-service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-notepad',
@@ -20,7 +21,8 @@ import { NotepadExtendedService } from '../../extended-services/notepad-extended
     ButtonModule,
     FormsModule,
     InputNumberModule,
-    InputTextModule
+    InputTextModule,
+    TranslateModule
   ],
   templateUrl: './notepad.component.html',
   styleUrl: './notepad.component.scss',
@@ -41,6 +43,7 @@ export class NotepadComponent implements OnInit, OnDestroy {
   private notepadExtendedService = inject(NotepadExtendedService);
   private confirmationService = inject(ConfirmationService);
   private cdr = inject(ChangeDetectorRef);
+  private translate = inject(TranslateService);
 
   ngOnInit(): void {
     this.form = this.formBuilder.group({
@@ -76,9 +79,9 @@ export class NotepadComponent implements OnInit, OnDestroy {
 
   deleteNotepad() {
     this.confirmationService.confirm({
-      header: 'Potvrda brisanja',
-      acceptLabel: 'Potvrdi',
-      rejectLabel: 'Odustani',
+      header: this.translate.instant('deleteConfirmation'),
+      acceptLabel: this.translate.instant('confirm'),
+      rejectLabel: this.translate.instant('cancel'),
       accept: () => {
         this.notepadExtendedService.deleteNotepad(this.notepad.id!);
       }

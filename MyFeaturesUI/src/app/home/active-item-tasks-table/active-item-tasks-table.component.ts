@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { DialogService } from 'primeng/dynamicdialog';
@@ -35,6 +35,7 @@ export class ActiveItemTasksTableComponent {
   private confirmationService = inject(ConfirmationService);
   private itemExtendedService = inject(ItemExtendedService);
   private dialogService = inject(DialogService);
+  private translate = inject(TranslateService);
 
   newIndex: number | null = null;
   originalIndex!: number;
@@ -97,9 +98,9 @@ export class ActiveItemTasksTableComponent {
     this.resetCurrentDay();
 
     this.confirmationService.confirm({
-      header: 'Potvrda brisanja',
-      acceptLabel: 'Potvrdi',
-      rejectLabel: 'Odustani',
+      header: this.translate.instant('deleteConfirmation'),
+      acceptLabel: this.translate.instant('confirm'),
+      rejectLabel: this.translate.instant('cancel'),
       accept: () => {
         this.itemExtendedService.deleteItem(itemTask.item!.id!);
       }
