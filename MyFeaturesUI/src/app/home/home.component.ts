@@ -138,11 +138,7 @@ export class HomeComponent implements OnInit {
   }
 
   openNew() {
-    this.dialogService.open(EditItemDialogComponent, {
-      data: {
-      },
-      //header: this.translate.instant('measurement.dialog.manualChannels')
-    });
+    this.dialogService.open(EditItemDialogComponent, {});
   }
 
   createNewNotepad() {
