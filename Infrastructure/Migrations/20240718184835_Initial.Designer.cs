@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(MyFeaturesDbContext))]
-    [Migration("20240523101943_AddedRowIndexOnItem")]
-    partial class AddedRowIndexOnItem
+    [Migration("20240718184835_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,6 +33,9 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("Completed")
+                        .HasColumnType("bit");
+
                     b.Property<int?>("DaysBetween")
                         .HasColumnType("int");
 
@@ -47,7 +50,7 @@ namespace Infrastructure.Migrations
                     b.Property<bool?>("RenewOnDueDate")
                         .HasColumnType("bit");
 
-                    b.Property<int>("RowIndex")
+                    b.Property<int?>("RowIndex")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -80,7 +83,7 @@ namespace Infrastructure.Migrations
                     b.Property<int>("ItemId")
                         .HasColumnType("int");
 
-                    b.Property<int>("RowIndex")
+                    b.Property<int?>("RowIndex")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -112,7 +115,8 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RowIndex")
+                    b.Property<int?>("RowIndex")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.HasKey("Id");
