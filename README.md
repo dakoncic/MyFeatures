@@ -1,6 +1,6 @@
 #🌟 Introduction
 In both our personal and professional lives, we all write down notes and create "to-do" lists. Whether it's setting New Year's goals, 
-managing finances, planning a summer vacation, or remembering important tasks, we rely on different methods to keep track of what needs to be done.\
+managing finances, planning a summer vacation, or remembering important life events, we rely on different methods to keep track of what needs to be done.\
 Usually we use notepads or phone apps for these reminders.
 
 However, we often forget simple things like: cleaning the apartment, calling grandparents, 
@@ -9,7 +9,7 @@ This problem of delaying things can hurt our productivity.
 
 I've found that planning my day or week in advance improves my productivity. But manually writing to-do lists repeatedly can become annoying, 
 and eventually I stop doing it. I needed a solution to be more productive and disciplined without the constant effort of manual planning,
-a tool that acts like a personal assistant, consistently reminding me of my tasks.
+a tool that acts like a personal assistant, consistently reminding me of my obligations.
 
 To solve this problem, I made an app to help organize daily activities better.
 
@@ -33,7 +33,7 @@ It consists of single page with four main features:
 
 Each task can have an optional due date. When a due date is within the next 7 days, the task is automatically added to your schedule. 
 Repeating tasks can be set to recreate automatically after a specified interval, such as reminding you to register your car annually. 
-Tasks without a deadline can still be assigned to specific days within the next week.
+Tasks without a deadline can still be assigned to specific days within the next week (soft commit).
 
 Tasks can be moved back to their original groups (One-Time or Repeating), and both scheduled and unscheduled tasks can be sorted to 
 prioritize your activities effectively.
