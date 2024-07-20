@@ -13,13 +13,13 @@ a tool that acts like a personal assistant, consistently reminding me of my task
 
 To solve this problem, I made an app to help organize daily activities better.
 
-#Life organizer app
-The Life Organizer App is a web application designed to simplify your daily planning. 
+#TaskMinder
+TaskMinder is a web application designed to simplify your daily planning. 
 It consists of single page with four main features:
 
 1. 7-Days Schedule: A weekly overview (including today) of your committed tasks, making sure you stay on track with your goals.
 2. One-Time Tasks: A section for non-repeating tasks that need to be completed once, such as:
-    - ...
+    - organize a bachelor party
     - research best investing options for retirement
 3. Repeating Tasks: A section for recurring tasks such as:
     - exercise every other day
