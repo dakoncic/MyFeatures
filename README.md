@@ -3,7 +3,7 @@ In both our personal and professional lives, we all write down notes and create 
 managing finances, planning a summer vacation, or remembering important tasks, we rely on different methods to keep track of what needs to be done.\
 Usually we use notepads or phone apps for these reminders.
 
-However, we often forget simple tasks like: cleaning the apartment, calling grandparents, 
+However, we often forget simple things like: cleaning the apartment, calling grandparents, 
 reading more books, or exercising regularly. These tasks are easy to put off with the thought, "I'll do it tomorrow." \
 This problem of delaying things can hurt our productivity.
 
