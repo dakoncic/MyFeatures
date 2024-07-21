@@ -1,10 +1,10 @@
 #🌟 Introduction
 In both our personal and professional lives, we all write down notes and create "to-do" lists. Whether it's setting New Year's goals, 
 managing finances, planning a summer vacation, or remembering important life events, we rely on different methods to keep track of what needs to be done.\
-Usually we use notepads or phone apps for these reminders.
+Usually we use notepads or apps for these reminders.
 
-However, we often forget simple things like: cleaning the apartment, calling grandparents, 
-reading more books, or exercising regularly. These tasks are easy to put off with the thought, "I'll do it tomorrow." \
+However, we often forget simple things like: exercising regularly, reading more books or calling our grandparents more often. \
+These tasks are easy to put off with the thought, "I'll do it tomorrow." \
 This problem of delaying things can hurt our productivity.
 
 I've found that planning my day or week in advance improves my productivity. But manually writing to-do lists repeatedly can become annoying, 
@@ -32,11 +32,13 @@ It consists of single page with four main features:
     - wish list for future purchase
 
 Each task can have an optional due date. When a due date is within the next 7 days, the task is automatically added to your schedule. 
-Repeating tasks can be set to recreate automatically after a specified interval, such as reminding you to register your car annually. 
+Repeating tasks can be set to recreate automatically after a specified interval, such as reminding you to register your car annually.
 Tasks without a deadline can still be assigned to specific days within the next week (soft commit).
-
 Tasks can be moved back to their original groups (One-Time or Repeating), and both scheduled and unscheduled tasks can be sorted to 
 prioritize your activities effectively.
+
+Automating tasks with same interval and making it easier to commit to tasks which do not yet have their date greatly reduces friction
+for us to achieve our goals.
 
 ---
 
