@@ -5,7 +5,7 @@ Usually we use notepads or apps for these reminders.
 
 However, we often forget simple things like: exercising regularly, reading more books or calling our grandparents more often. \
 These tasks are easy to put off with the thought, "I'll do it tomorrow." \
-This problem of delaying things can hurt our productivity.
+This problem of delaying things hurts our productivity.
 
 I've found that planning my day or week in advance improves my productivity. But manually writing to-do lists repeatedly can become annoying, 
 and eventually I stop doing it. I needed a solution to be more productive and disciplined without the constant effort of manual planning,
