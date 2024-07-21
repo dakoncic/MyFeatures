@@ -33,12 +33,11 @@ It consists of single page with four main features:
 
 Each task can have an optional due date. When a due date is within the next 7 days, the task is automatically added to your schedule. 
 Repeating tasks can be set to recreate automatically after a specified interval, such as reminding you to register your car annually.
-Tasks without a deadline can still be assigned to specific days within the next week (soft commit).
+Tasks without a deadline can still be assigned to specific days within the next week with only 2 clicks (soft commit).
 Tasks can be moved back to their original groups (One-Time or Repeating), and both scheduled and unscheduled tasks can be sorted to 
 prioritize your activities effectively.
+This greatly reduces friction in helping us complete what we plan to do.
 
-Automating tasks with same interval and making it easier to commit to tasks which do not yet have their date greatly reduces friction
-for us to achieve our goals.
 
 ---
 
