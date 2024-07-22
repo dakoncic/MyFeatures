@@ -13,6 +13,7 @@ module.exports = {
         standard: [
           /^p-/,      // Safelists all classes starting with 'p-' (for PrimeNG)
           /.*ng-.*/,  // Safelists any class that starts with 'ng-'
+          /^ql-/
         ],
 
       }
