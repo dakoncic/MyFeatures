@@ -15,7 +15,9 @@ module.exports = {
           /.*ng-.*/,  // Safelists any class that starts with 'ng-'
           /^ql-/
         ],
-
+        deep: [
+          /^ql-/,     // Safelists deeply nested classes starting with 'ql-'
+        ]
       }
      }),
     new BundleAnalyzerPlugin({
