@@ -30,8 +30,6 @@ namespace Core.Services
 
         public async Task CreateItemAndTask(ItemTask itemTaskDomain)
         {
-            IntervalCalculator.CalculateAndAssignDaysBetween(itemTaskDomain.Item);
-
             if (itemTaskDomain.DueDate != null)
             {
                 itemTaskDomain.CommittedDate = itemTaskDomain.DueDate;
@@ -76,8 +74,6 @@ namespace Core.Services
             var oldDueDate = itemTaskEntity.DueDate;
             var newDueDate = updatedItemTask.DueDate?.Date;
             var oldCommittedDate = itemTaskEntity.CommittedDate;
-
-            IntervalCalculator.CalculateAndAssignDaysBetween(updatedItemTask.Item);
 
             if (oldDueDate?.Date != newDueDate?.Date)
             {

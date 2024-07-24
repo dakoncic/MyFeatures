@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(MyFeaturesDbContext))]
-    [Migration("20240718184835_Initial")]
+    [Migration("20240724173934_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -36,13 +36,16 @@ namespace Infrastructure.Migrations
                     b.Property<bool>("Completed")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("DaysBetween")
-                        .HasColumnType("int");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("IntervalType")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("IntervalValue")
+                        .HasColumnType("int");
 
                     b.Property<bool>("Recurring")
                         .HasColumnType("bit");

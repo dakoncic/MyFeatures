@@ -1,4 +1,5 @@
-﻿using Shared.Interfaces;
+﻿using Shared.Enum;
+using Shared.Interfaces;
 using System.ComponentModel.DataAnnotations;
 
 namespace Infrastructure.Entities
@@ -18,7 +19,8 @@ namespace Infrastructure.Entities
         //za novi DueDate
         //ako je true onda na DueDate
         public bool? RenewOnDueDate { get; set; }
-        public int? DaysBetween { get; set; }
+        public int? IntervalValue { get; set; }
+        public IntervalType? IntervalType { get; set; }
 
         public int? RowIndex { get; set; }
 

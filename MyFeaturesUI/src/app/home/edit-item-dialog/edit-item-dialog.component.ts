@@ -167,14 +167,13 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
 
   saveItem() {
     if (this.form.dirty) {
-      let itemTask: ItemTaskDto = {
-        //spremam samo datum bez vremenske komponente (gledam datum iz kalendara, vremenska zona nije važna) ".toLocale(en-CA)"
-        dueDate: this.form.getRawValue().dueDate ? this.form.getRawValue().dueDate.toLocaleDateString('en-CA') : null
-      }
+      let itemTask: ItemTaskDto;
 
       if (!this.itemTask.id) {
         itemTask = {
           description: this.form.getRawValue().description,
+          //spremam samo datum bez vremenske komponente (gledam datum iz kalendara, vremenska zona nije važna) ".toLocale(en-CA)"
+          dueDate: this.form.getRawValue().dueDate ? this.form.getRawValue().dueDate.toLocaleDateString('en-CA') : null,
           item: {
             ...this.form.getRawValue()
           }
@@ -185,6 +184,7 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
 
         itemTask = {
           ...this.itemTask,
+          dueDate: this.form.getRawValue().dueDate ? this.form.getRawValue().dueDate.toLocaleDateString('en-CA') : null,
           item: {
             ...this.itemTask.item,
             renewOnDueDate: this.form.getRawValue().renewOnDueDate,

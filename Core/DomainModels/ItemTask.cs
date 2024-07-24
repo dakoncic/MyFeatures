@@ -1,4 +1,6 @@
-﻿namespace Core.DomainModels
+﻿using Core.Enum;
+
+namespace Core.DomainModels
 {
     public class ItemTask
     {
@@ -19,9 +21,9 @@
                 Description = Item.Description
             };
 
-            if (DueDate is not null && Item.DaysBetween is not null)
+            if (DueDate is not null && Item.IntervalValue is not null)
             {
-                var daysBetween = Item.DaysBetween.Value;
+                var daysBetween = CalculateDaysBetween(Item);
 
                 //ako je renewOnDueDate true, neće bit null jer postoji days between
                 //npr. vit D svake ned.
@@ -48,5 +50,26 @@
 
             return newItemTask;
         }
+
+        private int CalculateDaysBetween(Item item)
+        {
+            if (item.IntervalType!.Value == IntervalType.Months)
+            {
+                return CalculateDaysBetweenForMonths(item.IntervalValue!.Value);
+            }
+            else
+            {
+                return item.IntervalValue!.Value;
+            }
+        }
+
+
+        private int CalculateDaysBetweenForMonths(int months)
+        {
+            var startDate = DateTime.Now;
+            var endDate = startDate.AddMonths(months);
+            return (endDate - startDate).Days;
+        }
     }
+
 }
