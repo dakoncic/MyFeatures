@@ -38,7 +38,7 @@ namespace Core.Services
             else
             {
                 //ako je DueDate postavljen na null, onda daj index parentu
-                await GetNewItemRowIndex(itemTaskDomain);
+                itemTaskDomain.Item.RowIndex = await GetNewItemRowIndex(itemTaskDomain.Item.Recurring);
             }
 
             var itemEntity = itemTaskDomain.Item.Adapt<Entity.Item>();
@@ -98,7 +98,7 @@ namespace Core.Services
             else
             {
                 //ako je DueDate postavljen na null, onda postavi novi index na Item
-                await GetNewItemRowIndex(updatedItemTask);
+                updatedItemTask.Item.RowIndex = await GetNewItemRowIndex(updatedItemTask.Item.Recurring);
             }
         }
 
@@ -134,29 +134,32 @@ namespace Core.Services
 
             await UpdateItemTaskRowIndexesIfDateProvided(itemTaskEntity.CommittedDate, itemTaskEntity.RowIndex);
 
-            if (itemTaskEntity.Item.Recurring)
-            {
-                var itemTaskDomain = itemTaskEntity.Adapt<ItemTask>();
-
-                //dobar primjer enkapsulacije biznis logike u domain klasu
-                var newItemTask = itemTaskDomain.CreateNewRecurringTask();
-                newItemTask.RowIndex = await GetNewItemTaskRowIndex(newItemTask.CommittedDate);
-
-                //ako je novi dueDate null, tj. nije poprimio novi datum, onda Item mora dobiti RowIndex
-                if (newItemTask.DueDate is null)
-                {
-                    await GetNewItemRowIndex(newItemTask);
-                }
-                //al ako nije null, onda RowIndex ostaje default null
-
-                var newItemTaskEntity = newItemTask.Adapt<Entity.ItemTask>();
-                _itemTaskRepository.Add(newItemTaskEntity);
-            }
-            else
+            if (!itemTaskEntity.Item.Recurring)
             {
                 await UpdateRowIndexesForRemainingItems(itemTaskEntity.Item);
 
                 itemTaskEntity.Item.Completed = true;
+            }
+            else
+            {
+                //ako je novi dueDate null, tj. nije poprimio novi datum, onda Item mora dobiti RowIndex
+                if (itemTaskEntity.DueDate is null)
+                {
+                    itemTaskEntity.Item.RowIndex = await GetNewItemRowIndex(itemTaskEntity.Item.Recurring);
+                }
+                //al ako nije null, onda RowIndex ostaje default null
+
+                var itemTaskDomain = itemTaskEntity.Adapt<ItemTask>();
+
+                //dobar primjer enkapsulacije biznis logike u domain klasu
+                var newItemTask = itemTaskDomain.CreateNewRecurringTask();
+                if (newItemTask.CommittedDate != null)
+                {
+                    newItemTask.RowIndex = await GetNewItemTaskRowIndex(newItemTask.CommittedDate);
+                }
+
+                var newItemTaskEntity = newItemTask.Adapt<Entity.ItemTask>();
+                _itemTaskRepository.Add(newItemTaskEntity);
             }
 
             await _context.SaveChangesAsync();
@@ -187,7 +190,7 @@ namespace Core.Services
                     if (oldDueDate is not null)
                     {
                         itemTaskDomain.DueDate = null;
-                        await GetNewItemRowIndex(itemTaskDomain);
+                        itemTaskDomain.Item.RowIndex = await GetNewItemRowIndex(itemTaskDomain.Item.Recurring);
                     }
                 }
             }
@@ -338,21 +341,21 @@ namespace Core.Services
             return groupedItemTasksEntity;
         }
 
-        private async Task GetNewItemRowIndex(ItemTask itemTaskDomain)
+        private async Task<int> GetNewItemRowIndex(bool recurring)
         {
             var maxRowIndexItemEntity = await _itemRepository.GetFirstOrDefaultAsync(
                             x =>
                             !x.Completed &&
-                            x.Recurring.Equals(itemTaskDomain.Item.Recurring),
+                            x.Recurring.Equals(recurring),
                             q => q.OrderByDescending(x => x.RowIndex)
                         );
 
-            itemTaskDomain.Item.RowIndex = maxRowIndexItemEntity != null ? maxRowIndexItemEntity.RowIndex + 1 : 0;
+            return maxRowIndexItemEntity?.RowIndex + 1 ?? 0;
         }
 
         private async Task<int> GetNewItemTaskRowIndex(DateTime? compareDate)
         {
-            var maxRowIndexItemEntity = await _itemTaskRepository.GetFirstOrDefaultAsync(
+            var maxRowIndexItemTaskEntity = await _itemTaskRepository.GetFirstOrDefaultAsync(
             x =>
                 x.CompletionDate == null &&
                 x.CommittedDate.HasValue &&
@@ -361,8 +364,7 @@ namespace Core.Services
             q => q.OrderByDescending(x => x.RowIndex)
             );
 
-            int newRowIndex = maxRowIndexItemEntity != null ? maxRowIndexItemEntity.RowIndex!.Value + 1 : 0;
-            return newRowIndex;
+            return maxRowIndexItemTaskEntity?.RowIndex + 1 ?? 0;
         }
 
         private async Task UpdateRowIndexesForRemainingItems(Entity.Item itemEntity)

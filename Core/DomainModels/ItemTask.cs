@@ -63,7 +63,6 @@ namespace Core.DomainModels
             }
         }
 
-
         private int CalculateDaysBetweenForMonths(int months)
         {
             var startDate = DateTime.Now;
