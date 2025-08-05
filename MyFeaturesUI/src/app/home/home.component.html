@@ -38,7 +38,6 @@
           [items]="(oneTimeItems$ | async)!"
           [columns]="cols"
           [(currentDay)]="currentDay"
-          [itemsOrderLocked]="(oneTimeItemsOrderLocked$ | async)!"
           title="home.oneTime"
           [isRecurring]="false"
         ></app-active-item-tasks-table>
@@ -48,7 +47,6 @@
           [items]="(recurringItems$ | async)!"
           [columns]="cols"
           [(currentDay)]="currentDay"
-          [itemsOrderLocked]="(recurringItemsOrderLocked$ | async)!"
           title="home.recurring"
           [isRecurring]="true"
         ></app-active-item-tasks-table>

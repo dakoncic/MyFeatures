@@ -5,7 +5,6 @@ import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { DialogService } from 'primeng/dynamicdialog';
 import { TableModule } from 'primeng/table';
-import { filter, take, tap } from 'rxjs';
 import { ItemDto, ItemTaskDto } from '../../../infrastructure';
 import { ItemExtendedService } from '../../extended-services/item-extended-service';
 import { APPLICATION_JSON } from '../../shared/constants';
@@ -28,7 +27,6 @@ export class ActiveItemTasksTableComponent {
   @Input() items!: ItemDto[];
   @Input() columns!: any[];
   @Input() currentDay!: string | null;
-  @Input() itemsOrderLocked!: boolean;
   @Input() title!: string;
   @Input() isRecurring!: boolean;
   @Output() currentDayChange = new EventEmitter<any>();
@@ -72,15 +70,7 @@ export class ActiveItemTasksTableComponent {
 
   assignItemToSelectedWeekday(itemTask: ItemTaskDto) {
     if (this.currentDay) {
-      const isLocked$ = itemTask.item?.recurring
-        ? this.itemExtendedService.getRecurringItemsOrderLocked$()
-        : this.itemExtendedService.getOneTimeItemsOrderLocked$();
-
-      isLocked$.pipe(
-        take(1),
-        filter(isLocked => isLocked),
-        tap(() => this.itemExtendedService.commitItem(itemTask.id!, this.currentDay))
-      ).subscribe();
+      this.itemExtendedService.commitItem(itemTask.id!, this.currentDay);
     }
   }
 
@@ -121,23 +111,6 @@ export class ActiveItemTasksTableComponent {
     this.resetCurrentDay();
 
     this.itemExtendedService.completeItem(itemTask.id!);
-  }
-
-  lockOrUnlockTableOrder(recurring: boolean) {
-    const lockState$ = recurring
-      ? this.itemExtendedService.getRecurringItemsOrderLocked$()
-      : this.itemExtendedService.getOneTimeItemsOrderLocked$();
-
-    lockState$.pipe(
-      take(1),
-      tap(isLocked => {
-        if (recurring) {
-          this.itemExtendedService.loadRecurringItems(!isLocked);
-        } else {
-          this.itemExtendedService.loadOneTimeItems(!isLocked);
-        }
-      })
-    ).subscribe();
   }
 
   private resetCurrentDay() {

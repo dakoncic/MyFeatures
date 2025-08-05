@@ -13,7 +13,7 @@ namespace Core.Interfaces
         Task CommitItemTaskOrReturnToGroup(DateTime? commitDay, int itemTaskId);
         Task ReorderItemInsideGroup(int itemId, int newIndex, bool recurring);
         Task ReorderItemTaskInsideGroup(int itemId, DateTime commitDate, int newIndex);
-        Task<List<ItemTask>> GetActiveItemTasks(bool recurring, bool includeWeekdaysCommitted);
+        Task<List<ItemTask>> GetActiveItemTasks(bool recurring);
         Task<Dictionary<DateTime, List<Entity.ItemTask>>> GetCommitedItemsForNextWeek();
     }
 }

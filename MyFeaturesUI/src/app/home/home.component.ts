@@ -75,9 +75,6 @@ export class HomeComponent implements OnInit {
     })))
   );
 
-  oneTimeItemsOrderLocked$ = this.itemExtendedService.getOneTimeItemsOrderLocked$();
-  recurringItemsOrderLocked$ = this.itemExtendedService.getRecurringItemsOrderLocked$();
-
   weekData$ = this.itemExtendedService.weekData$.pipe(
     map(weekdata => weekdata.map(daydata => ({
       weekDayDate: daydata.weekDayDate!,

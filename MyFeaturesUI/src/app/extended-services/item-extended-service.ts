@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, switchMap, take } from 'rxjs';
-import { CommitItemTaskDto, ItemService, ItemTaskDto, UpdateItemIndexDto, UpdateItemTaskIndexDto, WeekDayDto } from '../../infrastructure';
+import { BehaviorSubject, switchMap, take } from 'rxjs';
+import { CommitItemTaskDto, ItemService, ItemTaskDto, UpdateItemIndexDto, UpdateItemTaskIndexDto } from '../../infrastructure';
 
 @Injectable({
   providedIn: 'root'
@@ -8,32 +8,21 @@ import { CommitItemTaskDto, ItemService, ItemTaskDto, UpdateItemIndexDto, Update
 export class ItemExtendedService {
   private itemService = inject(ItemService);
 
-  private oneTimeItemsSourceSubject = new BehaviorSubject<boolean>(true);
-  private recurringItemsSourceSubject = new BehaviorSubject<boolean>(true);
+  private oneTimeItemsSourceSubject = new BehaviorSubject<void>(undefined);
+  private recurringItemsSourceSubject = new BehaviorSubject<void>(undefined);
+  private weekDaysSourceSubject = new BehaviorSubject<void>(undefined);
 
-  //refaktor i weekdays da je boolean sa nekim default npr. null?
-  private weekDaysSourceSubject = new BehaviorSubject<WeekDayDto[]>([]);
+  oneTimeItems$ = this.oneTimeItemsSourceSubject.pipe(
+    switchMap(() => this.itemService.getOneTimeItemTasks())
+  );
 
-  oneTimeItems$ = this.oneTimeItemsSourceSubject
-    .pipe(
-      switchMap((isLocked: boolean) =>
-        isLocked
-          ? this.itemService.getOneTimeItemTasks()
-          : this.itemService.getOneTimeItemTasksWithWeekdays()
-      )
-    );
+  recurringItems$ = this.recurringItemsSourceSubject.pipe(
+    switchMap(() => this.itemService.getRecurringItemTasks())
+  );
 
-  recurringItems$ = this.recurringItemsSourceSubject
-    .pipe(
-      switchMap((isLocked: boolean) =>
-        isLocked
-          ? this.itemService.getRecurringItemTasks()
-          : this.itemService.getRecurringItemTasksWithWeekdays()
-      )
-    );
-
-  weekData$ = this.weekDaysSourceSubject
-    .pipe(switchMap(() => this.itemService.getCommitedItemsForNextWeek()));
+  weekData$ = this.weekDaysSourceSubject.pipe(
+    switchMap(() => this.itemService.getCommitedItemsForNextWeek())
+  );
 
   createItem(itemTask: ItemTaskDto) {
     return this.itemService.createItemAndTask(itemTask).pipe(
@@ -97,9 +86,9 @@ export class ItemExtendedService {
     )
       .subscribe(() => {
         if (recurring) {
-          this.recurringItemsSourceSubject.next(false);
+          this.recurringItemsSourceSubject.next();
         } else {
-          this.oneTimeItemsSourceSubject.next(false);
+          this.oneTimeItemsSourceSubject.next();
         }
       });
   }
@@ -115,29 +104,13 @@ export class ItemExtendedService {
       take(1),
     )
       .subscribe(() => {
-        this.weekDaysSourceSubject.next([]);
+        this.weekDaysSourceSubject.next();
       });
   }
 
-  loadOneTimeItems(isLocked: boolean) {
-    this.oneTimeItemsSourceSubject.next(isLocked);
-  }
-
-  loadRecurringItems(isLocked: boolean) {
-    this.recurringItemsSourceSubject.next(isLocked);
-  }
-
-  getOneTimeItemsOrderLocked$(): Observable<boolean> {
-    return this.oneTimeItemsSourceSubject.asObservable();
-  }
-
-  getRecurringItemsOrderLocked$(): Observable<boolean> {
-    return this.recurringItemsSourceSubject.asObservable();
-  }
-
   private refreshAllItemLists() {
-    this.oneTimeItemsSourceSubject.next(true);
-    this.recurringItemsSourceSubject.next(true);
-    this.weekDaysSourceSubject.next([]);
+    this.oneTimeItemsSourceSubject.next();
+    this.recurringItemsSourceSubject.next();
+    this.weekDaysSourceSubject.next();
   }
 }

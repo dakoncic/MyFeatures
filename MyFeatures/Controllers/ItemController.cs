@@ -145,7 +145,7 @@ namespace MyFeatures.Controllers
         [HttpGet("GetOneTimeItemTasks")]
         public async Task<ActionResult<IEnumerable<ItemTaskDto>>> GetOneTimeItemTasks()
         {
-            var itemTasks = await _itemService.GetActiveItemTasks(false, false);
+            var itemTasks = await _itemService.GetActiveItemTasks(false);
             var itemTasksDto = itemTasks.Adapt<List<ItemTaskDto>>();
 
             return Ok(itemTasksDto);
@@ -158,33 +158,7 @@ namespace MyFeatures.Controllers
         [HttpGet("GetRecurringItemTasks")]
         public async Task<ActionResult<IEnumerable<ItemTaskDto>>> GetRecurringItemTasks()
         {
-            var itemTasks = await _itemService.GetActiveItemTasks(true, false);
-            var itemTasksDto = itemTasks.Adapt<List<ItemTaskDto>>();
-
-            return Ok(itemTasksDto);
-        }
-
-        /// <summary>
-        /// Retrieves a list of one-time item tasks including those committed for the next week.
-        /// </summary>
-        /// <returns>An ActionResult containing a list of one-time item task data transfer objects with weekdays.</returns>
-        [HttpGet("GetOneTimeItemTasksWithWeekdays")]
-        public async Task<ActionResult<IEnumerable<ItemTaskDto>>> GetOneTimeItemTasksWithWeekdays()
-        {
-            var itemTasks = await _itemService.GetActiveItemTasks(false, true);
-            var itemTasksDto = itemTasks.Adapt<List<ItemTaskDto>>();
-
-            return Ok(itemTasksDto);
-        }
-
-        /// <summary>
-        /// Retrieves a list of recurring item tasks including those committed for the next week.
-        /// </summary>
-        /// <returns>An ActionResult containing a list of recurring item task data transfer objects with weekdays.</returns>
-        [HttpGet("GetRecurringItemTasksWithWeekdays")]
-        public async Task<ActionResult<IEnumerable<ItemTaskDto>>> GetRecurringItemTasksWithWeekdays()
-        {
-            var itemTasks = await _itemService.GetActiveItemTasks(true, true);
+            var itemTasks = await _itemService.GetActiveItemTasks(true);
             var itemTasksDto = itemTasks.Adapt<List<ItemTaskDto>>();
 
             return Ok(itemTasksDto);

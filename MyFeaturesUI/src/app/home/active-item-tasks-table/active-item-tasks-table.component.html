@@ -11,16 +11,6 @@
         class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
       >
         <h5 class="m-0">{{ title | translate }}</h5>
-        <button
-          pButton
-          [icon]="itemsOrderLocked ? 'pi pi-lock' : 'pi pi-lock-open'"
-          class="p-button-rounded mr-2"
-          [ngClass]="{
-            'p-button-success': itemsOrderLocked,
-            'p-button-warning': !itemsOrderLocked
-          }"
-          (click)="lockOrUnlockTableOrder(isRecurring)"
-        ></button>
       </div>
     </ng-template>
     <ng-template
@@ -31,7 +21,7 @@
     >
       <tr
         [ngClass]="{
-          'cursor-pointer': currentDay && itemsOrderLocked,
+          'cursor-pointer': currentDay,
           'committed-background-color':
             rowData.committedDate !== null && rowData.dueDate === null,
           'disable-row-reorder': rowData.dueDate !== null
@@ -41,7 +31,7 @@
         (click)="assignItemToSelectedWeekday(rowData)"
       >
         <td class="w-2rem">
-          @if (!itemsOrderLocked && !rowData.dueDate) {
+          @if (!rowData.dueDate) {
           <span class="pi pi-bars" pReorderableRowHandle></span>
           }
         </td>

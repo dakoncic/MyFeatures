@@ -172,7 +172,6 @@ namespace Core.Services
             var itemTaskDomain = itemTaskEntity.Adapt<ItemTask>();
 
             var oldCommittedDate = itemTaskDomain.CommittedDate;
-            var oldDueDate = itemTaskDomain.DueDate;
 
             if (oldCommittedDate?.Date != newCommitDay?.Date)
             {
@@ -183,15 +182,13 @@ namespace Core.Services
                 if (newCommitDay is not null)
                 {
                     itemTaskDomain.RowIndex = await GetNewItemTaskRowIndex(newCommitDay);
+                    itemTaskDomain.Item.RowIndex = null;
                 }
                 else
                 {
-                    //ako je DueDate imao neku vrijednost, daj Item-u RowIndex jer će dueDate postat sad null
-                    if (oldDueDate is not null)
-                    {
-                        itemTaskDomain.DueDate = null;
-                        itemTaskDomain.Item.RowIndex = await GetNewItemRowIndex(itemTaskDomain.Item.Recurring);
-                    }
+                    itemTaskDomain.DueDate = null;
+                    itemTaskDomain.RowIndex = null;
+                    itemTaskDomain.Item.RowIndex = await GetNewItemRowIndex(itemTaskDomain.Item.Recurring);
                 }
             }
 
@@ -248,20 +245,12 @@ namespace Core.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<ItemTask>> GetActiveItemTasks(bool recurring, bool includeWeekdaysCommitted)
+        public async Task<List<ItemTask>> GetActiveItemTasks(bool recurring)
         {
-            //ako je sort mode, onda prikaži sve trenutačno aktivne
             Expression<Func<Entity.ItemTask, bool>> filter = i =>
-                i.Item.Recurring.Equals(recurring) && i.CompletionDate == null;
-
-            if (!includeWeekdaysCommitted)
-            {
-                //ako nije sort mode, onda primjeni filter zbog kojeg će se u listi
-                //prikazivati samo ne commitani i oni izvan 7 dana
-                filter = filter.AndAlso(i =>
-                    i.CommittedDate == null ||
-                    i.CommittedDate.Value.Date >= DateTime.Now.Date.AddDays(GlobalConstants.DaysRange));
-            }
+                i.Item.Recurring.Equals(recurring) &&
+                i.CompletionDate == null &&
+                (i.CommittedDate == null || i.CommittedDate.Value.Date >= DateTime.Now.Date.AddDays(GlobalConstants.DaysRange));
 
             var itemTasksEntity = await _itemTaskRepository.GetAllAsync(
                 filter: filter,
