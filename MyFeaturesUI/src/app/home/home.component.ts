@@ -81,6 +81,7 @@ export class HomeComponent implements OnInit {
       items$: of(daydata.itemTasks!).pipe(
         map(itemTasks => itemTasks.map(itemTask => ({
           ...itemTask,
+          originalDescription: itemTask.item?.description,
           dueDate: itemTask.dueDate ? this.datePipe.transform(itemTask.dueDate, 'dd.MM.yy') : null
         })))
       )

@@ -16,6 +16,21 @@
     }
   </div>
 
+  @if (itemTask.item?.recurring && itemTask.committedDate) {
+  <div class="field flex flex-column">
+    <label for="originalDescription">{{
+      "editItem.originalDescription" | translate
+    }}</label>
+    <input
+      id="originalDescription"
+      type="text"
+      pInputText
+      [value]="itemTask.item!.description"
+      [disabled]="true"
+    />
+  </div>
+  }
+
   <div class="field">
     <label for="recurring">* {{ "editItem.taskType" | translate }} </label>
     <p-selectButton

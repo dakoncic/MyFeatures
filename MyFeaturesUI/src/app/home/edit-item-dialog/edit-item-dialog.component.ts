@@ -12,7 +12,6 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { Subject, combineLatest, take, takeUntil } from 'rxjs';
 import { IntervalType, ItemService, ItemTaskDto } from '../../../infrastructure';
 import { ItemExtendedService } from '../../extended-services/item-extended-service';
-import { DescriptionType } from '../../shared/enum/description-type.enum';
 
 @Component({
   selector: 'app-edit-item-dialog',
@@ -54,7 +53,6 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
     { label: this.translate.instant('editItem.onDueDate'), value: true },
     { label: this.translate.instant('editItem.onCompletionDate'), value: false }
   ];
-  descriptionType!: DescriptionType;
   ingredient!: string;
 
   intervalType = IntervalType;
@@ -71,8 +69,6 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
 
     //ako je edit, povuci s backenda i prikaži na formi
     if (this.config.data?.itemTask) {
-      this.descriptionType = this.config.data.descriptionType;
-
       this.editItem(this.config.data.itemTask);
 
       //nema mijenjanja recurringa na edit
@@ -153,7 +149,7 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
   displayItem(itemTask: ItemTaskDto): void {
     this.itemTask = itemTask;
 
-    const description = this.descriptionType === DescriptionType.OriginalDescription ? itemTask.item!.description : itemTask.description;
+    const description = itemTask.committedDate ? itemTask.description : itemTask.item!.description;
 
     this.form.patchValue({
       description: description,
@@ -208,14 +204,14 @@ export class EditItemDialogComponent implements OnInit, OnDestroy {
     //za one time, update se radi na oba descriptiona
     if (!itemTask.item!.recurring) {
       itemTask.item!.description = description;
-      itemTask.description = description
+      itemTask.description = description;
     }
     //ako je update original item-a (ne iz weekdays tablice), onda samo njega update-at iz forme
-    else if (this.descriptionType === DescriptionType.OriginalDescription) {
-      itemTask.item!.description = description
+    else if (itemTask.committedDate) {
+      itemTask.description = description;
     } else {
       //inače update-at child item iz weekdays
-      itemTask.description = description
+      itemTask.item!.description = description;
     }
   }
 

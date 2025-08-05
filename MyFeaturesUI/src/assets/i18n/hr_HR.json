@@ -17,6 +17,7 @@
   "editItem.recurring.required": "Tip zadatka je obavezan.",
   "editItem.onDueDate": "Na krajnji rok",
   "editItem.onCompletionDate": "Na datum izvršenja",
+  "editItem.originalDescription": "Originalni opis",
 
   "deleteConfirmation": "Potvrda brisanja",
   "confirm": "Potvrdi",

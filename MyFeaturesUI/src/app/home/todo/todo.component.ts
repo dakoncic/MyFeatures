@@ -10,7 +10,6 @@ import { Observable } from 'rxjs';
 import { ItemTaskDto } from '../../../infrastructure';
 import { ItemExtendedService } from '../../extended-services/item-extended-service';
 import { APPLICATION_JSON } from '../../shared/constants';
-import { DescriptionType } from '../../shared/enum/description-type.enum';
 import { EditItemDialogComponent } from '../edit-item-dialog/edit-item-dialog.component';
 
 @Component({
@@ -133,7 +132,6 @@ export class TodoComponent {
   editItem(itemTask: ItemTaskDto) {
     this.dialogService.open(EditItemDialogComponent, {
       data: {
-        descriptionType: DescriptionType.TaskItemDescription,
         itemTask: itemTask
       }
     });

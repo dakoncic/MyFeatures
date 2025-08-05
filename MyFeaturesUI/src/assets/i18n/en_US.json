@@ -17,6 +17,7 @@
   "editItem.recurring.required": "Task type is required.",
   "editItem.onDueDate": "On due date",
   "editItem.onCompletionDate": "On completion date",
+  "editItem.originalDescription": "Original description",
 
   "deleteConfirmation": "Delete confirmation",
   "confirm": "Confirm",

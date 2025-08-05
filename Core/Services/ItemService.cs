@@ -159,6 +159,7 @@ namespace Core.Services
                 }
 
                 var newItemTaskEntity = newItemTask.Adapt<Entity.ItemTask>();
+                newItemTaskEntity.Description = itemTaskEntity.Item.Description;
                 _itemTaskRepository.Add(newItemTaskEntity);
             }
 
@@ -186,6 +187,7 @@ namespace Core.Services
                 }
                 else
                 {
+                    itemTaskDomain.Description = itemTaskDomain.Item.Description;
                     itemTaskDomain.DueDate = null;
                     itemTaskDomain.RowIndex = null;
                     itemTaskDomain.Item.RowIndex = await GetNewItemRowIndex(itemTaskDomain.Item.Recurring);
