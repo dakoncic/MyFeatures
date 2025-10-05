@@ -35,13 +35,14 @@ Each task can have an optional due date. When a due date is within the next 7 da
 Repeating tasks can be set to recreate automatically after a specified interval, such as reminding you to register your car annually.
 This greatly reduces friction in helping us complete what we plan to do.
 
+---
+
+> "Changes that seem small and unimportant at first will compound into remarkable results if you're willing to stick with them for years. We all deal with setbacks but in the long run, the quality of our lives often depends on the quality of our habits."  
+> — *James Clear*
 -----
 TO DO:
 - remove comments from code
 - implement seeder for dummy data
 - ...
 
----
 
-> "Changes that seem small and unimportant at first will compound into remarkable results if you're willing to stick with them for years. We all deal with setbacks but in the long run, the quality of our lives often depends on the quality of our habits."  
-> — *James Clear*
