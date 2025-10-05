@@ -1,4 +1,5 @@
-#🌟 Introduction
+🌟 Introduction 
+
 In both our personal and professional lives, we all write down notes and create "to-do" lists. Whether it's setting New Year's goals, 
 managing finances, planning a summer vacation, or remembering important life events, we rely on different methods to keep track of what needs to be done.\
 Usually we use notepads or apps for these reminders.
@@ -13,7 +14,8 @@ a tool that acts like a personal assistant, consistently reminding me of my obli
 
 To solve this problem, I made an app to help organize daily activities better.
 
-#🗓️ TaskMinder
+🗓️ TaskMinder
+
 **TaskMinder** is a web application designed to simplify your daily planning. 
 It consists of single page with four main features:
 
