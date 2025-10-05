@@ -43,6 +43,7 @@ This greatly reduces friction in helping us complete what we plan to do.
 TO DO:
 - remove comments from code
 - implement seeder for dummy data
+- make UI look nicer
 - ...
 
 
